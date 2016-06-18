@@ -1,6 +1,9 @@
 Script.Load("lua/Additions/Conductor.lua")
+Script.Load("lua/Additions/Imaginator.lua")
 Script.Load("lua/Additions/AirLock.lua")       
-Script.Load("lua/Additions/CystAvoca.lua")
+Script.Load("lua/Additions/AutoCyst.lua")   
+
+Script.Load("lua/Additions/Functions.lua")       
 
 function Location:MakeSureRoomIsntEmpty()
           --So that the room lights being changed are actually observed, otherwise useless :)

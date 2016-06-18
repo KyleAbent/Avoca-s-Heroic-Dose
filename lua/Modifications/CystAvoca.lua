@@ -18,6 +18,7 @@ function CystAvoca:GetCystParentRange()
 return 999
 end
 
+
 if Server then
    function CystAvoca:GetIsActuallyConnected()
    return true
@@ -31,6 +32,9 @@ end
 function CystAvoca:GetMatureMaxArmor()
     return kMatureCystArmor * 4
 end 
+function CystAvoca:GetInfestationRadius()
+    return 0
+end
 /*
 function CystAvoca:GetMaturityRate()
 
@@ -38,7 +42,7 @@ end
 */
 function CystAvoca:OnAdjustModelCoords(modelCoords)
     local coords = modelCoords
-        local scale = Clamp( 4 * (self:GetHealthScalar() * self:GetMaturityFraction()), .5, 4)
+        local scale = Clamp( 4 * (self:GetHealthScalar() * self:GetMaturityFraction() or 1), .5, 4)
        if scale >= 1 then
         coords.xAxis = coords.xAxis * scale
         coords.yAxis = coords.yAxis * scale

@@ -10,7 +10,7 @@ local networkVars =
 {
 }
 
-local function  GetIsInAirLock(who)  --I don't want to rely on networkvars.
+ function GetIsInAirLock(who)  --I don't want to rely on networkvars.
 local boolean = false
 if who:isa("Spectator") then return false end
 
@@ -82,6 +82,43 @@ local function CoordinateWithPowerNode(locationname)
                     powernode:AddTimedCallback(function() powernode:SetLightMode(kLightMode.Normal) end, 10)
                     end
 end
+local function MatchOrigins(mac, where)
+local macloation = GetLocationForPoint(mac:GetOrigin())
+local macloationname = macloation and macloation:GetName() or ""
+local orderlocation = where.name
+  return macloationname == orderlaction 
+end
+local function FindAppropriateOrder(mac,where)
+            local constructable =  GetNearestMixin(where, "Construct", 1, function(ent) return not ent:GetIsBuilt() and ent:GetCanConstruct(mac) and mac:CheckTarget(ent:GetOrigin())  end)
+               if constructable then
+                    mac:GiveOrder(kTechId.Construct, constructable:GetId(), constructable:GetOrigin())
+                    return
+                end
+            
+                // Look for entities to heal with weld.
+                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", 1, where, 12)
+                for w = 1, #weldables do
+                
+                    local weldable = weldables[w]
+                    // There are cases where the weldable's weld percentage is very close to
+                    // 100% but not exactly 100%. This second check prevents the MAC from being so pedantic.
+                    if weldable:GetCanBeWelded(mac) and weldable:GetWeldPercentage() < 1 and not GetIsWeldedByOtherMAC(mac, weldable) then
+                    mac:GiveOrder(kTechId.Construct, weldable:GetId(), weldable:GetOrigin())
+                    return
+                    end
+                 end
+        
+end
+local function MoveMacs(where)
+        for _, mac in ipairs(GetEntitiesWithinRange("MAC", where, 999)) do
+           if mac:GetIsAlive() and not mac:GetHasOrder() and not MatchOrigins(mac, where) then
+           FindAppropriateOrder(mac, where)
+           end
+       end
+end
+local function EntityIsaPowerPoint(nearestenemy)
+ return nearestenemy:isa("PowerPoint") and nearestenemy:GetIsBuilt() and not nearestenemy:GetIsDisabled()
+end
 local function CreateAlienMarker(where)
        
 
@@ -91,7 +128,7 @@ local function CreateAlienMarker(where)
         local inCombat = (nearestenemy.timeLastDamageDealt + 8 > Shared.GetTime()) or (nearestenemy.lastTakenDamageTime + 8 > Shared.GetTime())
         local where = nearestenemy:GetOrigin()
         
-      if inCombat then 
+      if inCombat or (nearestenemy and EntityIsaPowerPoint(nearestenemy)) then 
         CreatePheromone(kTechId.ThreatMarker,where, 2) 
         else
         CreatePheromone(kTechId.ExpandingMarker, where, 2)  
@@ -161,7 +198,7 @@ end
 local function FindOrCreateKingCyst(where, which)
  local hasking = falss
  local king = false
- local toplace = GetNearest(where, "Player", 2, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() and ent:GetIsOnGround() end) 
+ local toplace = GetNearest(where, "Alien", 2, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() and ent:GetIsOnGround() end) 
      
      if toplace then 
      
@@ -172,12 +209,10 @@ local function FindOrCreateKingCyst(where, which)
           end
           
           if hasking and king then
-               king:SetDesiredInfestationRadius(0)
-               king:SetOrigin(toplace:GetOrigin()) 
-               king:SetDesiredInfestationRadius(7)
           else
               local KingCyst = CreateEntity(CystAvoca.kMapName, where, 2)
               KingCyst:SetConstructionComplete()
+              KingCyst:SetInfestationRadius(0)
               king = KingCyst
           end
      else
@@ -205,12 +240,35 @@ local function SealAirLock()
           end
 
 end
+local function BuildAllNodes(self)
 
+          for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
+              powerpoint:SetConstructionComplete()
+          end
+
+end
 function Conductor:OnCreate() 
+   for i = 1,8  do
+     Print("Conductor created")
+   end
+   
+
+   
            if Server then
+              BuildAllNodes(self)
+              self:SpawnInitialStructures()
+              local CreateImagination = CreateEntity(Imaginator.kMapName)
               self:AddTimedCallback(Conductor.PickMainRoom, 16)
               self:AddTimedCallback(Conductor.Automations, 8)
             end
+end
+function Conductor:OnDestroy()
+     if Server then
+          for _, imagination in ientitylist(Shared.GetEntitiesWithClassname("Imaginator")) do
+             DestroyEntity(imagination)  --how cruel
+          end
+      end
+
 end
 function Conductor:PickMainRoom()
        --Print("Picking main room")
@@ -221,6 +279,7 @@ function Conductor:PickMainRoom()
        return true
 end
 function Conductor:SetMainRoom(where, which)
+       if Server then MoveMacs(where) end
         CoordinateWithPowerNode(which.name)
         CreateAlienMarker(where)
         BreachAirLock(where, which)
