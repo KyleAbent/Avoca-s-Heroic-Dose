@@ -11,10 +11,16 @@ local kAirLockMaterial = PrecacheAsset("materials/power/powered_decal.material")
 
 local networkVars =
 {
-  testingslap = "compensated time"
 }
 
-
+local function PowerSurgeMarines(self)
+    --Print("PowerSurgeMarines being called")
+        for _, entity in ipairs(self:GetEntitiesInTrigger()) do
+            if HasMixin(entity, "PowerConsumer") then
+             entity:SetPowerSurgeDuration(4) Print("PowerSurged structure") 
+          end
+    end
+end
 
 function AirLock:OnInitialized()
    Trigger.OnInitialized(self) 
@@ -22,8 +28,10 @@ function AirLock:OnInitialized()
    self:SetTriggerCollisionEnabled(true)
    self:SetPropagate(Entity.Propagate_Always)
 
+
    
 end
+
 local function ForTheLulz(self, who)
                local direction = Vector(math.random(-900,900),math.random(-900,900),math.random(-900,900))
                local current = who:GetVelocity()
@@ -42,10 +50,14 @@ local function ThanksEEM(self)
 end
 
 function AirLock:OnUpdate(deltaTime) 
-     -- if Shared.GetTime() > self.testingslap + 4 then
-      --    ThanksEEM(self)
-     -- end
-     --    self.testingslap = Shared.GetTime()
+  /*
+    if Server then
+      if not self.lastupdate or Shared.GetTime() > self.lastupdate + 1 then
+         PowerSurgeMarines(self)
+     end
+     --    self.lastupdate = Shared.GetTime()
+    end
+  */
 end
 function GetAirLocks()
     return EntityListToTable(Shared.GetEntitiesWithClassname("AirLock"))

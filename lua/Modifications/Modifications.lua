@@ -6,6 +6,7 @@ Script.Load("lua/Modifications/Criticisms.lua")
 Script.Load("lua/Modifications/AvocaRules.lua")
 Script.Load("lua/Modifications/CystAvoca.lua")
 Script.Load("lua/Modifications/PowerPointAvoca.lua")
+Script.Load("lua/Modifications/AutoBioMass.lua")
 
 
 Script.Load("lua/Modifications/GameStart.lua")
@@ -41,3 +42,26 @@ return true
 end
 
 SetCachedTechData(kTechId.Harvester, kTechDataRequiresInfestation, false)
+SetCachedTechData(kTechId.Crag, kTechDataRequiresInfestation, false)
+SetCachedTechData(kTechId.Whip, kTechDataRequiresInfestation, false)
+
+if Server then
+
+function Whip:UpdateRootState()
+    
+    local infested = true --self:GetGameEffectMask(kGameEffect.OnInfestation)
+    local moveOrdered = self:GetCurrentOrder() and self:GetCurrentOrder():GetType() == kTechId.Move
+    -- unroot if we have a move order or infestation recedes
+    if self.rooted and (moveOrdered or not infested) then
+        self:Unroot()
+    end
+    
+    -- root if on infestation and not moving/teleporting
+    if not self.rooted and infested and not (moveOrdered or self:GetIsTeleporting()) then
+        self:Root()
+    end
+    
+end
+
+
+end

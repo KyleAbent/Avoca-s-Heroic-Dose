@@ -88,6 +88,37 @@ local macloationname = macloation and macloation:GetName() or ""
 local orderlocation = where.name
   return macloationname == orderlaction 
 end
+local function GetIsWeldedByOtherMAC(self, target)
+
+    if target then
+    
+        for _, mac in ipairs(GetEntitiesForTeam("MAC", self:GetTeamNumber())) do
+        
+            if self ~= mac then
+            
+                if mac.secondaryTargetId ~= nil and Shared.GetEntity(mac.secondaryTargetId) == target then
+                    return true
+                end
+                
+                local currentOrder = mac:GetCurrentOrder()
+                local orderTarget = nil
+                if currentOrder and currentOrder:GetParam() ~= nil then
+                    orderTarget = Shared.GetEntity(currentOrder:GetParam())
+                end
+                
+                if currentOrder and orderTarget == target and (currentOrder:GetType() == kTechId.FollowAndWeld or currentOrder:GetType() == kTechId.Weld or currentOrder:GetType() == kTechId.AutoWeld) then
+                    return true
+                end
+                
+            end
+            
+        end
+        
+    end
+    
+    return false
+    
+end
 local function FindAppropriateOrder(mac,where)
             local constructable =  GetNearestMixin(where, "Construct", 1, function(ent) return not ent:GetIsBuilt() and ent:GetCanConstruct(mac) and mac:CheckTarget(ent:GetOrigin())  end)
                if constructable then
@@ -120,15 +151,25 @@ local function EntityIsaPowerPoint(nearestenemy)
  return nearestenemy:isa("PowerPoint") and nearestenemy:GetIsBuilt() and not nearestenemy:GetIsDisabled()
 end
 local function CreateAlienMarker(where)
-       
 
-       
+       local gameLength = Shared.GetTime() - GetGamerules():GetGameStartTime()
+      if gameLength <= 300  then
+           local hive = nil
+             for _, hivey in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
+             hive = hivey
+            end
+
+        local nearestbuiltnode = GetNearest(hive:GetOrigin(), "PowerPoint", 1, function(ent) return ent:GetIsBuilt() and not ent:GetIsDisabled()  end)
+    if nearestbuiltnode then
+         CreatePheromone(kTechId.ThreatMarker,nearestbuiltnode:GetOrigin(), 2)
+         return 
+    end
+      end
         local nearestenemy = GetNearestMixin(where, "Combat", 1, function(ent) return not ent:isa("Commander") and ent:GetIsAlive()  end)
         if not nearestenemy then return end -- hopefully not. Just for now this should be useful anyway.
         local inCombat = (nearestenemy.timeLastDamageDealt + 8 > Shared.GetTime()) or (nearestenemy.lastTakenDamageTime + 8 > Shared.GetTime())
         local where = nearestenemy:GetOrigin()
-        
-      if inCombat or (nearestenemy and EntityIsaPowerPoint(nearestenemy)) then 
+       if inCombat then 
         CreatePheromone(kTechId.ThreatMarker,where, 2) 
         else
         CreatePheromone(kTechId.ExpandingMarker, where, 2)  
@@ -169,7 +210,28 @@ local function SendTheMarineOrdersHere(who, where, which)
  local offense = nil 
  local defense = nil 
  local move = nil  
- 
+
+
+             local gameLength = Shared.GetTime() - GetGamerules():GetGameStartTime()
+      if gameLength <= 300  then
+           local cc = nil
+          local team1avgorigin = Vector(0, 0, 0)
+          local marines = 1
+          
+            for _, marine in ientitylist(Shared.GetEntitiesWithClassname("Marine")) do
+            if marine:GetIsAlive() and not marine:isa("Commander") then marines = marines + 1 team1avgorigin = team1avgorigin + marine:GetOrigin() end
+             end
+             
+            team1avgorigin  = (team1avgorigin / marines )
+
+        local nearestbuildable = GetNearestMixin(team1avgorigin, "Construct", 1, function(ent) return not ent:GetIsBuilt() end)
+    if nearestbuildable then
+        who:GiveOrder(kTechId.Build, nearestbuildable:GetId(), nearestbuildable:GetOrigin(), nil, true, true)
+         return 
+    end
+      end
+      
+      
            offense = FindMarineOffense(where)
                 if offense ~= nil then
                 who:GiveOrder(kTechId.Attack, offense:GetId(), offense:GetOrigin(), nil, true, true)
@@ -196,11 +258,12 @@ end
          end
 end
 local function FindOrCreateKingCyst(where, which)
- local hasking = falss
  local king = false
- local toplace = GetNearest(where, "Alien", 2, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() and ent:GetIsOnGround() end) 
-     
+ local temphack =  GetNearest(where, "Player", nil, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() and ent:GetIsOnGround() end) 
+ local toplace = FindFreeSpace(where, 4)
      if toplace then 
+     
+       if temphack then  temphack = temphack:GetOrigin() toplace.y = temphack.y end
      
            for _, kingcyst in ientitylist(Shared.GetEntitiesWithClassname("CystAvoca")) do
              hasking = true
@@ -209,6 +272,7 @@ local function FindOrCreateKingCyst(where, which)
           end
           
           if hasking and king then
+             king:SetOrigin(toplace) 
           else
               local KingCyst = CreateEntity(CystAvoca.kMapName, where, 2)
               KingCyst:SetConstructionComplete()
@@ -229,7 +293,7 @@ local function BreachAirLock(where, which)
   airlock:SetBox(airlock.scale)  -- Rather than trigger init?
   Print("Airlock @ %s", which.name)
   
-  FindOrCreateKingCyst(where, which)
+
   
   
 end
@@ -257,6 +321,7 @@ function Conductor:OnCreate()
            if Server then
               BuildAllNodes(self)
               self:SpawnInitialStructures()
+              self:AutoBioMass()
               local CreateImagination = CreateEntity(Imaginator.kMapName)
               self:AddTimedCallback(Conductor.PickMainRoom, 16)
               self:AddTimedCallback(Conductor.Automations, 8)
@@ -284,6 +349,7 @@ function Conductor:SetMainRoom(where, which)
         CreateAlienMarker(where)
         BreachAirLock(where, which)
         ForAllMarinesSendWP(where, which)
+        FindOrCreateKingCyst(where, which)
 end
 function Conductor:Automations()
               self:CollectResources()

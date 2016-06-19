@@ -1,7 +1,6 @@
 class 'AutoCyst' (Cyst)
 AutoCyst.kMapName = "autocyst"
  local function ReallySpawnCysts(powerpoint, location)
-local extents = (location:GetOrigin().x + location:GetOrigin().y + location:GetOrigin().z) - (location.scale.x + location.scale.y + location.scale.z)
 local cysts, ratio = GetCystsInLocation(location, powerpoint)
             if cysts == 0 then 
               local cyst = CreateEntity(AutoCyst.kMapName, FindFreeSpace(powerpoint:GetOrigin(),4), 2)
@@ -9,10 +8,10 @@ local cysts, ratio = GetCystsInLocation(location, powerpoint)
              return 
             end
             
-       local ratio = math.abs(extents/(cysts*kCystRedeployRange))
-             if ratio >= 4 or cysts == 1 then
 
-                   local nearestcyst = GetNearest(powerpoint:GetOrigin(), "Cyst", 2, function(ent) return GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(powerpoint:GetOrigin()) end)
+             if ratio >= 4 then
+
+                   local nearestcyst = GetNearest(powerpoint:GetOrigin(), "AutoCyst", 2, function(ent) return GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(powerpoint:GetOrigin()) end)
                     if nearestcyst then
                     --   Print("nearestcyst is %s", nearestcyst)
                       local cyst = CreateEntity(AutoCyst.kMapName, FindFreeSpace(nearestcyst:GetOrigin(), kCystRedeployRange +1), 2)
@@ -23,18 +22,27 @@ local cysts, ratio = GetCystsInLocation(location, powerpoint)
 end
 if Server then
     function GetCystsInLocation(location, powerpoint)
-     local extents = (location:GetOrigin().x + location:GetOrigin().y + location:GetOrigin().z) - (location.scale.x + location.scale.y + location.scale.z)
-            local entities = GetEntitiesForTeamWithinRange("Cyst", 2, powerpoint:GetOrigin(), 24)
+        if not powerpoint then powerpoint = GetPowerPointForLocation(location.name) end
+      /*
+          local entities = location:GetEntitiesInTrigger()
+           for i = 1, #entities do
+              local entity = entities[i]
+              if entity:isa("AutoCyst") then Print("AutoCyst found in room") end
+           end
+      */
+         local tableof = {}
+            local entities = GetEntitiesForTeamWithinRange("AutoCyst", 2, powerpoint:GetOrigin(), 24)
                 local cysts = 0
             for i = 1, #entities do
             local entity = entities[i]
-                if entity:isa("Cyst") and entity:GetLocationName() == location.name then 
+                if GetLocationForPoint(entity:GetOrigin()) == location then 
                   cysts = cysts + 1
+                  table.insert(tableof, entity)
                 end
             end
-
-            
-            return cysts, ratio
+            local extents = (location:GetOrigin().x + location:GetOrigin().y + location:GetOrigin().z) - (location.scale.x + location.scale.y + location.scale.z)
+            local ratio = math.abs(extents/(cysts*kCystRedeployRange))
+            return cysts, ratio, tableof
 end
 end
 
