@@ -1,3 +1,4 @@
+/*
 local function SpawnChairThenSpawnBase(self)
 local cc = nil
 local tech = nil
@@ -12,6 +13,7 @@ local tech = nil
                     end
 
 end
+*/
 local function AlreadySpawned(self, origin)
         local ents = GetEntitiesWithMixinForTeamWithinRange("Construct", 1, origin, 18)
         if ents and #ents >= 4 then return true else return false end
@@ -25,7 +27,7 @@ local techPointOrigin = nil or origin
             techPointOrigin = cc[1]:GetOrigin()
         end
       
-      if AlreadySpawned(self, techPointOrigin) then return end
+     -- if AlreadySpawned(self, techPointOrigin) then return end -- For when things get reversed
 
   
         local IPspawnPoint1 = GetRandomBuildPosition( kTechId.InfantryPortal, techPointOrigin, 8 )
@@ -48,12 +50,13 @@ local techPointOrigin = nil or origin
     CreateEntity(PhaseGate.kMapName, PhaseGatePoint, 1)
     CreateEntity(Observatory.kMapName, ObsPoint, 1)
     
-    if #cc < 3 then
-      SpawnChairThenSpawnBase(self)
-   end
+    --if #cc < 3 then
+   --   SpawnChairThenSpawnBase(self)
+  -- end
         
     
 end
+/*
 local function SpawnAlienHives(self)
  local hive = nil
         local hives = GetEntitiesForTeam("Hive", 2)
@@ -71,8 +74,40 @@ local function SpawnAlienHives(self)
               
          end
 end
+*/
+local function TrySomethingElse(self)
+ local cc = nil
+        local ccs = GetEntitiesForTeam("CommandStation", 1)
+        if ccs and #ccs == 1 then
+            cc = ccs[1]:GetOrigin()
+        end
+        
+         for i = 1, 2 do
+              if Server then
+              local techpoint = CreateEntity(TechPoint.kMapName, FindFreeSpace(cc, 8), nil) 
+              local chair = techpoint:SpawnCommandStructure(1)
+                chair:SetConstructionComplete()
+              techpoint:SetIsVisible(false)
+               end
+              
+         end
+self:SpawnBaseEntities(self, cc)    
+ 
+local hive = nil
+local tech = nil
+                    local techPoints = EntityListToTable(Shared.GetEntitiesWithClassname("TechPoint"))
+                    for i=1, #techPoints do
+                             tech = techPoints[i]
+                          if tech:GetAttached() == nil then
+                           local hive = tech:SpawnCommandStructure(2)
+                          hive:SetConstructionComplete()
+                          end
+                    end
+         
+         
+end
 function Conductor:SpawnInitialStructures()
     self:SpawnBaseEntities(self)
-    
-    SpawnAlienHives(self)
+    TrySomethingElse(self)
+    --SpawnAlienHives(self)
 end

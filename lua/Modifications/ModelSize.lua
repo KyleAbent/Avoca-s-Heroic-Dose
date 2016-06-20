@@ -15,7 +15,7 @@ function Embryo:OnAdjustModelCoords(coords)
 end
  function LiveMixin:OnAdjustModelCoords(modelCoords)
          local coords = modelCoords
-    if self:GetTeamNumber() == 2 then
+    if self:GetTeamNumber() == 2 and not self:isa("PowerDrainer") then
     local isplayer = self:isa("Player")
         local value = Clamp(self:GetHealthScalar(), .3, 1)
     	local scale = Clamp(value + (isplayer and .4 or 0), value, 1)  --Because I dont want 70%hp to drop to 70% size 

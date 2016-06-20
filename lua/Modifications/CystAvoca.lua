@@ -88,10 +88,22 @@ local function SynchronizeCystEntities(whips, crags, cyst, origin)
          --   end     
             
 end
+local function MoveEggs(self)
+          for index, egg in ipairs(GetEntitiesForTeam("Egg", 2)) do
+               if self:GetDistance(egg) >= 16 and egg:GetIsFree() then 
+                local toplace = GetRandomBuildPosition( kTechId.Egg, self:GetOrigin(), 8 )
+                   if toplace then
+                        egg:SetOrigin(toplace)
+                     end
+                end
+           end
+end
 function CystAvoca:Synchronize()
+                     MoveEggs(self)
                      local whips = GetEntitiesForTeamWithinRange("Whip", 2, self:GetOrigin(), 999999)
                      local crags = GetEntitiesForTeamWithinRange("Crag", 2, self:GetOrigin(), 999999)
-                     SynchronizeCystEntities(whips, crags, self, FindFreeSpace(self:GetOrigin(), 4))
+                     local tospawn = GetRandomBuildPosition( kTechId.Whip, self:GetOrigin(), 8 )
+                     SynchronizeCystEntities(whips, crags, self, tospawn)
                      local cysts, ratio, tableof = GetCystsInLocation(GetLocationForPoint(self:GetOrigin()))
                      for i = 1, #tableof do
                         local autocyst = tableof[i]
@@ -115,10 +127,11 @@ function MagnetizeStructures(who)
                 end
           end
           for index, whip in ipairs(GetEntitiesForTeam("Whip", 2)) do
-               if whip:GetIsBuilt() and who:GetDistance(whip) >= 16 and not (whip:GetHasOrder() or whip.moving) then 
+               if not whip:isa("PowerDrainer") and whip:GetIsBuilt() and who:GetDistance(whip) >= 16 and not (whip:GetHasOrder() or whip.moving) then 
                 local success = whip:GiveOrder(kTechId.Move, who:GetId(), who:GetOrigin(), nil, true, true) 
                if success then break end
                 end
+                
 
 end
                 

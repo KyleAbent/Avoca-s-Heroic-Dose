@@ -1,5 +1,6 @@
 -- Kyle 'Avoca' Abent
 
+
 class 'Conductor' (Entity)
 Conductor.kMapName = "conductor"
 
@@ -27,7 +28,7 @@ end
 local function AddPlayerResources(harvesters, extractors)
   --Settling with this cheap stuff for now to just see how it works without spending too much time on it
    for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do      --4% PRES increase for 'being' in AirLock.
-         local presamount = kPlayerResPerInterval * ConditionalValue(GetIsInAirLock(player), 1.04, 1)
+         local presamount = kPlayerResPerInterval * ConditionalValue(GetIsInAirLock(player), 1.3, 1)
           if presamount > kPlayerResPerInterval then Print("Player Pres Bonus: %s", math.min(presamount - kPlayerResPerInterval) * extractors) end
          if player:GetTeamNumber() == 1 then
             player:AddResources(presamount * extractors)
@@ -259,12 +260,14 @@ end
 end
 local function FindOrCreateKingCyst(where, which)
  local king = false
- local temphack =  GetNearest(where, "Player", nil, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() and ent:GetIsOnGround() end) 
- local toplace = FindFreeSpace(where, 4)
+ local temphack =  GetNearest(where, "Player", nil, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() end) 
+  if not temphack then return end
+ local toplace = GetRandomBuildPosition( kTechId.Whip, temphack:GetOrigin(), 8 )
+     if not toplace then return end
+   toplace = GetGroundAtPosition(toplace, nil, PhysicsMask.CommanderBuild)
+
      if toplace then 
-     
-       if temphack then  temphack = temphack:GetOrigin() toplace.y = temphack.y end
-     
+
            for _, kingcyst in ientitylist(Shared.GetEntitiesWithClassname("CystAvoca")) do
              hasking = true
              king = kingcyst
@@ -352,7 +355,10 @@ function Conductor:SetMainRoom(where, which)
         FindOrCreateKingCyst(where, which)
 end
 function Conductor:Automations()
+              self:InitiateBalancer()
               self:CollectResources()
+              self:MaintainHiveDefense()
+              self:HandoutMarineBuffs()
               return true
 end
 function Conductor:CollectResources()
