@@ -91,7 +91,7 @@ local function TrySomethingElse(self)
                end
               
          end
-self:SpawnBaseEntities(self, cc)    
+--self:SpawnBaseEntities(self, cc)    
  
 local hive = nil
 local tech = nil

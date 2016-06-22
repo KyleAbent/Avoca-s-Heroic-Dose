@@ -99,6 +99,7 @@ local function MoveEggs(self)
            end
 end
 function CystAvoca:Synchronize()
+    if not self:GetIsMature() then return true end
                      MoveEggs(self)
                      local whips = GetEntitiesForTeamWithinRange("Whip", 2, self:GetOrigin(), 999999)
                      local crags = GetEntitiesForTeamWithinRange("Crag", 2, self:GetOrigin(), 999999)

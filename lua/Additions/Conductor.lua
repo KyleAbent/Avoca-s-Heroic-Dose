@@ -29,7 +29,7 @@ local function AddPlayerResources(harvesters, extractors)
   --Settling with this cheap stuff for now to just see how it works without spending too much time on it
    for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do      --4% PRES increase for 'being' in AirLock.
          local presamount = kPlayerResPerInterval * ConditionalValue(GetIsInAirLock(player), 1.3, 1)
-          if presamount > kPlayerResPerInterval then Print("Player Pres Bonus: %s", math.min(presamount - kPlayerResPerInterval) * extractors) end
+          --if presamount > kPlayerResPerInterval then Print("Player Pres Bonus: %s", math.min(presamount - kPlayerResPerInterval) * extractors) end
          if player:GetTeamNumber() == 1 then
             player:AddResources(presamount * extractors)
          elseif player:GetTeamNumber() == 2 then
@@ -152,7 +152,7 @@ local function EntityIsaPowerPoint(nearestenemy)
  return nearestenemy:isa("PowerPoint") and nearestenemy:GetIsBuilt() and not nearestenemy:GetIsDisabled()
 end
 local function CreateAlienMarker(where)
-
+  /*
        local gameLength = Shared.GetTime() - GetGamerules():GetGameStartTime()
       if gameLength <= 300  then
            local hive = nil
@@ -166,6 +166,7 @@ local function CreateAlienMarker(where)
          return 
     end
       end
+      */
         local nearestenemy = GetNearestMixin(where, "Combat", 1, function(ent) return not ent:isa("Commander") and ent:GetIsAlive()  end)
         if not nearestenemy then return end -- hopefully not. Just for now this should be useful anyway.
         local inCombat = (nearestenemy.timeLastDamageDealt + 8 > Shared.GetTime()) or (nearestenemy.lastTakenDamageTime + 8 > Shared.GetTime())
@@ -212,7 +213,7 @@ local function SendTheMarineOrdersHere(who, where, which)
  local defense = nil 
  local move = nil  
 
-
+ /*
              local gameLength = Shared.GetTime() - GetGamerules():GetGameStartTime()
       if gameLength <= 300  then
            local cc = nil
@@ -232,7 +233,7 @@ local function SendTheMarineOrdersHere(who, where, which)
     end
       end
       
-      
+      */
            offense = FindMarineOffense(where)
                 if offense ~= nil then
                 who:GiveOrder(kTechId.Attack, offense:GetId(), offense:GetOrigin(), nil, true, true)
@@ -329,14 +330,6 @@ function Conductor:OnCreate()
               self:AddTimedCallback(Conductor.PickMainRoom, 16)
               self:AddTimedCallback(Conductor.Automations, 8)
             end
-end
-function Conductor:OnDestroy()
-     if Server then
-          for _, imagination in ientitylist(Shared.GetEntitiesWithClassname("Imaginator")) do
-             DestroyEntity(imagination)  --how cruel
-          end
-      end
-
 end
 function Conductor:PickMainRoom()
        --Print("Picking main room")

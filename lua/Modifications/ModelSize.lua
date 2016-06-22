@@ -26,3 +26,14 @@ end
    
     return coords
 end
+
+function ARC:OnAdjustModelCoords(coords)
+    
+    	local scale = 1.5 
+        coords.xAxis = coords.xAxis * scale
+        coords.yAxis = coords.yAxis * scale
+        coords.zAxis = coords.zAxis * scale
+        
+    return coords
+    
+end

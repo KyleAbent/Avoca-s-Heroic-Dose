@@ -12,7 +12,7 @@ function Conductor:MaintainHiveDefense()
                  table.insert(which, hive)
                 end
           end
-          
+          if #which == 0 then return true end --false?
           local hive = table.random(which)
           self:HiveDefenseMain(hive, GetDefenseEntsInRange(hive))
           

@@ -17,7 +17,7 @@ local function GetArcsAmount()
 end
 local function ArcQualifications(self)
  local boolean = false
-     if GetArcsAmount() <= 11 and
+     if GetArcsAmount() <= 0 and
        -- self:GetTeam():GetTeamResources() >= kARCCost and 
       --    ( kMaxSupply - GetSupplyUsedByTeam(1) >= LookupTechData(kTechId.ARC, kTechDataSupply, 0)) and 
             self.deployed and 
@@ -52,16 +52,13 @@ function RoboticsFactory:OnTag(tagName)
     if self.open and self.researchId ~= Entity.invalidId and tagName == "end" then
 
         self.builtEntity:Rollout(self, RoboticsFactory.kRolloutLength)
-        
-        
-          if Server then
+          
+           if Server then
                 local entity = self.builtEntity
                 if entity:isa("ARC") then
-                   entity:MoveToHives()
+                   entity:BeginTimer()
                 end
-          end
-          
-          self.builtEntity = nil
+end
           
     end
     
