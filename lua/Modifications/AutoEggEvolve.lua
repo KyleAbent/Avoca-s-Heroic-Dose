@@ -72,6 +72,55 @@ function Egg:OnResearchComplete(techId)
     
 end
 
+/*
+function Egg:UpdateResearch(deltaTime)
+ if not self.timeLastUpdateCheck or self.timeLastUpdateCheck + 4 < Shared.GetTime() then 
+   //Kyle Abent Siege 10.25.15 morning writing twtich.tv/kyleabent
+   //11.10 updating to improve - Add in the adition of dynamic timers rather than set static timers
+   //11.10 updating to improve - Performance via adding 15 seconds delay between reseearch updates rather than 25x per second.
+    local researchNode = self:GetTeam():GetTechTree():GetTechNode(self.researchingId)
+    if researchNode then
+        local gameRules = GetGamerules()
+        local projectedminutemarktounlock = 60
+        local currentroundlength = ( Shared.GetTime() - gameRules:GetGameStartTime() )
+        if researchNode:GetTechId() == kTechId.GorgeEgg then
+           projectedminutemarktounlock = math.random(30, 60)
+        elseif researchNode:GetTechId() == kTechId.LerkEgg then
+           projectedminutemarktounlock = math.random(120, 240)
+          elseif researchNode:GetTechId() == kTechId.FadeEgg then
+           projectedminutemarktounlock =  math.random(240,300)
+         elseif researchNode:GetTechId() == kTechId.OnosEgg then
+           projectedminutemarktounlock = math.random(310, 400)
+        end --
+      
+       
+      local progress = Clamp(currentroundlength / projectedminutemarktounlock, 0, 1)
+        //Print("%s", progress)
+        
+        if progress ~= self.researchProgress then
+        
+            self.researchProgress = progress
 
+            researchNode:SetResearchProgress(self.researchProgress)
+            
+            local techTree = self:GetTeam():GetTechTree()
+            techTree:SetTechNodeChanged(researchNode, string.format("researchProgress = %.2f", self.researchProgress))
+            
+            // Update research progress
+            if self.researchProgress == 1 then
 
+                // Mark this tech node as researched
+                researchNode:SetResearched(true)
+                
+                techTree:QueueOnResearchComplete(self.researchingId, self)
+                
+            end --
+        
+        end --
+        
+    end --
+       end
+        self.timeLastUpdateCheck = Shared.GetTime()
+    end
+*/
 end

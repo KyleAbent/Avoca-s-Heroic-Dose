@@ -68,6 +68,8 @@ return true
 end
 function PowerPoint:PreOnKill(attacker, doer, point, direction)
 self:AddTimedCallback(PowerPoint.CystBrothersActivate, 6)
+local location = GetLocationForPoint(self:GetOrigin())
+SealAirLock(location.name)
 end 
     function PowerPoint:CystBrothersActivate()
        local location = GetLocationForPoint(self:GetOrigin())

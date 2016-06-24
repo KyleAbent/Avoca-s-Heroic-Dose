@@ -6,6 +6,8 @@ Script.Load("lua/Additions/AutoCyst.lua")
 Script.Load("lua/Additions/Functions.lua")      
 Script.Load("lua/Additions/Balancer.lua")   
 Script.Load("lua/Additions/HiveDefense.lua") 
+Script.Load("lua/Additions/Vaporizer.lua") 
+
 
 function Location:MakeSureRoomIsntEmpty()
           --So that the room lights being changed are actually observed, otherwise useless :)

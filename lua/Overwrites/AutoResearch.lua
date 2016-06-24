@@ -192,10 +192,10 @@ function Armory:UpdatePassive()
     techid = kTechId.GrenadeTech
     elseif GetHasTech(self, kTechId.GrenadeTech) and not GetHasTech(self, kTechId.ShotgunTech) then
     techid = kTechId.ShotgunTech
-    elseif GetHasTech(self, kTechId.ShotgunTech) and not GetHasTech(self, kTechId.HeavyMachineGunTech) then
-    techid = kTechId.HeavyMachineGunTech   
-    elseif GetHasTech(self, kTechId.HeavyMachineGunTech) and not GetHasTech(self, kTechId.AdvancedArmoryUpgrade) then
+    elseif GetHasTech(self, kTechId.ShotgunTech) and not GetHasTech(self, kTechId.AdvancedWeaponry) then
     techid = kTechId.AdvancedArmoryUpgrade   
+    elseif GetHasTech(self, kTechId.AdvancedWeaponry) and not GetHasTech(self, kTechId.HeavyMachineGunTech) then
+    techid = kTechId.HeavyMachineGunTech   
     else
        return  
     end
@@ -217,10 +217,10 @@ function Armory:UpdateResearch(deltaTime)
           projectedminutemarktounlock = math.random(30, 60)
         elseif researchNode:GetTechId() == kTechId.ShotgunTech then
           projectedminutemarktounlock = math.random(60, 120)
-        elseif researchNode:GetTechId() == HeavyMachineGunTech then
-           projectedminutemarktounlock = math.random(150, 180)
          elseif researchNode:GetTechId() == kTechId.AdvancedArmoryUpgrade then
-          projectedminutemarktounlock = math.random(180, 300)
+          projectedminutemarktounlock = math.random(150, 180)
+        elseif researchNode:GetTechId() == kTechId.HeavyMachineGunTech then
+           projectedminutemarktounlock = math.random(180, 300)
          end
         
        

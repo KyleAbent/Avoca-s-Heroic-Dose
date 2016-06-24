@@ -10,7 +10,7 @@ Script.Load("lua/Modifications/AutoBioMass.lua")
 Script.Load("lua/Modifications/AutoEggEvolve.lua")
 Script.Load("lua/Modifications/AvocaArc.lua")
 Script.Load("lua/Modifications/HiveCrag.lua")
-
+Script.Load("lua/Modifications/SentryAvoca.lua")
 
 
 Script.Load("lua/Modifications/GameStart.lua")
@@ -69,9 +69,7 @@ function Location:GetTrackEntity(enterEnt)
     return
 end
 */
-function PowerPoint:ModifyDamageTaken(damageTable, attacker, doer, damageType)
-       if attacker and attacker:isa("PowerDrainer") then damageTable.damage = damageTable.damage * 1.3 end
-end
+
 
 function Whip:UpdateRootState()
     
@@ -88,24 +86,36 @@ function Whip:UpdateRootState()
     end
     
 end
-
-
 /*
+local function InstaRespawn(who, where)
+CreateEntity(who, where, 1)
+end
+local function GetIsMarineBase(where)
+            local cc =  GetNearest(where, "CommandStation", 1)
+               if cc then
+               
+               local origin = self:GetOrigin()
+               local location = GetLocationForPoint(origin)
+               local name = location.name
+               
+               local ccorigin = cc:GetOrigin()
+               local cclocation = GetLocationForPoint(ccorigin)
+               local ccname = cclocation.name
+               
+               local boolean = name == ccname
+               return boolean
+            end
+            return false
+end
+
  function ConstructMixin:PreOnKill(attacker, doer, point, direction)
-      if not self:isa("PowerPoint") and not self:isa("Extractor") and not self:isa("ARC") then
-                  local gameRules = GetGamerules()
-              if gameRules then
-              
-                 local origin = self:GetOrigin()
-                 if self:isa("ArmsLab") then
-                   local nearestCC = GetNearest(origin, "CommandStation", 1)  
-                   if nearestCC then 
-                     origin = nearestCC:FindFreeSpace()
-                     end
-                  end
-  
-                 gameRules:DelayedAllowance(origin, self:TypesOfSelfInRoomNonCredit(), self:GetTechId(), self:GetMapName())
-               end
+      if self:GetTeamNumber() == 1 then
+        if not self:isa("PowerPoint") and not self:isa("CommandStation") and not self:isa("Extractor") and not self:isa("ARC") then
+           local origin = self:GetOrigin()
+         if GetIsMarineBase(origin) then
+           InstaRespawn(self:GetMapName(), origin)
+            end
+       end
        end
     end
 */
@@ -186,4 +196,15 @@ end
         
     end
 
+end
+
+
+--low grav with catpack for the lulz
+
+function Marine:ModifyGravityForce(gravityTable)
+      if self:GetIsOnGround() then
+            gravityTable.gravity = 0
+      elseif self:GetHasCatpackBoost() then
+            gravityTable.gravity = -5
+       end
 end

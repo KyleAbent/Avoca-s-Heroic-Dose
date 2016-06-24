@@ -11,25 +11,11 @@ local networkVars =
 {
 }
 
- function GetIsInAirLock(who)  --I don't want to rely on networkvars.
-local boolean = false
-if who:isa("Spectator") then return false end
 
-            for _, airlock in ientitylist(Shared.GetEntitiesWithClassname("AirLock")) do
-               local location = GetLocationForPoint(who:GetOrigin())
-               boolean = location and airlock.name == location.name -- Smart ! -- Better than OnUpdate too.
-               break
-          end
-   
- --Print("who in airlock is %s", boolean)
-return boolean
-
-end
 local function AddPlayerResources(harvesters, extractors)
   --Settling with this cheap stuff for now to just see how it works without spending too much time on it
-   for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do      --4% PRES increase for 'being' in AirLock.
-         local presamount = kPlayerResPerInterval * ConditionalValue(GetIsInAirLock(player), 1.3, 1)
-          --if presamount > kPlayerResPerInterval then Print("Player Pres Bonus: %s", math.min(presamount - kPlayerResPerInterval) * extractors) end
+   for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do     
+         local presamount = kPlayerResPerInterval 
          if player:GetTeamNumber() == 1 then
             player:AddResources(presamount * extractors)
          elseif player:GetTeamNumber() == 2 then
@@ -37,42 +23,10 @@ local function AddPlayerResources(harvesters, extractors)
          end
     end
 end
-local function MarinesInAirLock()
-   local marines = GetGamerules():GetTeam1():GetNumPlayers()
-  local count = 0
-  local bonusper = 1
-   for _, player in ientitylist(Shared.GetEntitiesWithClassname("Marine")) do 
-        if player:GetIsAlive() and GetIsInAirLock(player) then
-         count = count + 1
-        --Print("marines count is %s", count)
-         end
-   end
-      local total = (count/marines)*bonusper
-      --Print("marines total is %s", total)
-     return (count/marines)*bonusper
-end
-local function AliensInAirLock()
-    local aliens = GetGamerules():GetTeam2():GetNumPlayers()
-  local count = 0
-  local bonusper = 1
-   for _, player in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do 
-        if player:GetIsAlive() and GetIsInAirLock(player) then
-         count = count + 1
-           --Print("aliens count is %s", count)
-         end
-   end
-      local total = (count/aliens)*bonusper
-      --Print("aliens total is %s", total)
-     return (count/aliens)*bonusper
-end
 local function AddTeamResources(harvesters, extractors)
-               local tresamount = kTeamResourcePerTick + MarinesInAirLock()
-               if tresamount > kTeamResourcePerTick then Print("Marine team Tres Bonus: %s", math.min(tresamount - kTeamResourcePerTick) * extractors ) end
+               local tresamount = kTeamResourcePerTick 
                GetGamerules():GetTeam1():AddTeamResources(tresamount  * extractors)
-               local tresamount = kTeamResourcePerTick + AliensInAirLock()
-               if tresamount > kTeamResourcePerTick then Print("Alien team Tres Bonus: %s", math.min(tresamount - kTeamResourcePerTick) * harvesters ) end
                GetGamerules():GetTeam2():AddTeamResources(tresamount  * harvesters)
-               Print("derp")
 end
     
               
@@ -184,12 +138,17 @@ local function CreateAlienMarker(where)
            end
       
 end
-local function FindMarineMove(which)
-      local random = GetPowerPointForLocation(which.name)
-         if random then
-              return random:GetOrigin()
+local function FindMarineMove(where, which)
+local random = {}
+      local powerpoint = GetPowerPointForLocation(which.name)
+         if powerpoint then
+              return table.insert(random, powerpoint)
         end
-        return nil
+          local payload = GetNearest(where, "ARC", 1)
+         if payload then
+              return table.insert(random, payload)
+        end
+        return table.random(random)
 end
 local function FindMarineOffense(where)
           local nearestalien = GetNearestMixin(where, "Combat", 2, function(ent) return not ent:isa("Commander") and not HasMixin(ent, "Construct") and ent:GetIsAlive() and ent:GetIsInCombat() end)
@@ -199,7 +158,7 @@ local function FindMarineOffense(where)
         return nil
 end
 local function FindMarineDefense(where)
-          local nearesttodefend = GetNearestMixin(where, "Combat", 1)
+          local nearesttodefend = GetNearestMixin(where, "Combat", 1, function(ent) return HasMixin(ent, "Construct") end)
          if nearesttodefend then
             local inCombat = (nearesttodefend.timeLastDamageDealt + 8 > Shared.GetTime()) or (nearesttodefend.lastTakenDamageTime + 8 > Shared.GetTime())
              if inCombat then 
@@ -208,32 +167,12 @@ local function FindMarineDefense(where)
         end
         return nil
 end
+
 local function SendTheMarineOrdersHere(who, where, which) 
  local offense = nil 
  local defense = nil 
  local move = nil  
 
- /*
-             local gameLength = Shared.GetTime() - GetGamerules():GetGameStartTime()
-      if gameLength <= 300  then
-           local cc = nil
-          local team1avgorigin = Vector(0, 0, 0)
-          local marines = 1
-          
-            for _, marine in ientitylist(Shared.GetEntitiesWithClassname("Marine")) do
-            if marine:GetIsAlive() and not marine:isa("Commander") then marines = marines + 1 team1avgorigin = team1avgorigin + marine:GetOrigin() end
-             end
-             
-            team1avgorigin  = (team1avgorigin / marines )
-
-        local nearestbuildable = GetNearestMixin(team1avgorigin, "Construct", 1, function(ent) return not ent:GetIsBuilt() end)
-    if nearestbuildable then
-        who:GiveOrder(kTechId.Build, nearestbuildable:GetId(), nearestbuildable:GetOrigin(), nil, true, true)
-         return 
-    end
-      end
-      
-      */
            offense = FindMarineOffense(where)
                 if offense ~= nil then
                 who:GiveOrder(kTechId.Attack, offense:GetId(), offense:GetOrigin(), nil, true, true)
@@ -245,17 +184,31 @@ local function SendTheMarineOrdersHere(who, where, which)
               return
               end
               
-           move =  FindMarineMove(which)
+           move =  FindMarineMove(where, which)
            if move ~= nil  then
                 who:GiveOrder(kTechId.Move, nil, move, nil, true, true)
                 return
            end
 
-end   
+end
+   
+local function DefendPayLoad(player, where, which)
+         local payload = GetNearest(where, "ARC", 1)
+         if payload then
+         local range = 0
+               range = player:GetDistance(payload)
+               Print("player to payload distance is %s", range)
+               if range <= 32 and payload.deployMode ~= ARC.kDeployMode.Deployed  then
+               player:GiveOrder(kTechId.Defend, payload:GetId(), payload:GetOrigin(), nil, true, true)
+               return
+               end
+        end
+        SendTheMarineOrdersHere(player,where, which)
+end
  local function ForAllMarinesSendWP(where, which)
           for _, player in ipairs(GetEntitiesWithinRange("Marine", where, 999)) do
            if player:GetIsAlive() and not player:isa("Commander") then
-               SendTheMarineOrdersHere(player,where, which)
+               DefendPayLoad(player, where, which)
            end
          end
 end
@@ -290,24 +243,7 @@ local function FindOrCreateKingCyst(where, which)
        if king then Print("King Cyst located in %s", which.name) end
 
 end
-local function BreachAirLock(where, which)
-  local airlock = CreateEntity(AirLock.kMapName, where)
-  airlock.scale = which.scale
-  airlock.name = which.name
-  airlock:SetBox(airlock.scale)  -- Rather than trigger init?
-  Print("Airlock @ %s", which.name)
-  
 
-  
-  
-end
-local function SealAirLock()
-
-          for _, airlock in ientitylist(Shared.GetEntitiesWithClassname("AirLock")) do
-             DestroyEntity(airlock)
-          end
-
-end
 local function BuildAllNodes(self)
 
           for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
@@ -333,17 +269,16 @@ function Conductor:OnCreate()
 end
 function Conductor:PickMainRoom()
        --Print("Picking main room")
-       SealAirLock()
        local location = self:GetLocationWithMostMixedPlayers()
        if not location then return true end
        self:SetMainRoom(location:GetOrigin(), location) 
+       --self:OnPickMainRoom(location)
        return true
 end
 function Conductor:SetMainRoom(where, which)
        if Server then MoveMacs(where) end
         CoordinateWithPowerNode(which.name)
         CreateAlienMarker(where)
-        BreachAirLock(where, which)
         ForAllMarinesSendWP(where, which)
         FindOrCreateKingCyst(where, which)
 end
@@ -367,6 +302,10 @@ function Conductor:GetLocationWithMostMixedPlayers()
 --so far v1.23 shows this works okay except for picking empty res rooms for some reason -.-
 //Print("GetLocationWithMostMixedPlayers")
 
+            for _, mainent in ientitylist(Shared.GetEntitiesWithClassname("CommandStructure")) do
+                    if mainent:GetIsInCombat() then return mainent end
+             end
+             
 local team1avgorigin = Vector(0, 0, 0)
 local marines = 1
 local team2avgorigin = Vector(0, 0, 0)
@@ -384,7 +323,7 @@ local neutralavgorigin = Vector(0, 0, 0)
          neutralavgorigin =  team1avgorigin + team2avgorigin
          neutralavgorigin =  neutralavgorigin / (marines+aliens) --better as a table i know
      //    Print("neutralavgorigin is %s", neutralavgorigin)
-     local nearest = GetNearest(neutralavgorigin, "Location", nil, function(ent) local powerpoint = GetPowerPointForLocation(ent.name) return ent:MakeSureRoomIsntEmpty() and  powerpoint ~= nil end)
+     local nearest = GetNearest(neutralavgorigin, "Location", nil, function(ent) local powerpoint = GetPowerPointForLocation(ent.name) return powerpoint ~= nil end)
     if nearest then
    // Print("nearest is %s", nearest.name)
         return nearest

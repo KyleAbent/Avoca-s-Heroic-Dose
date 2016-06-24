@@ -1,7 +1,7 @@
 -- Kyle 'Avoca' Abent
   --Though pretty much EEM and Location / Basic Triggers 'etc' :P
 
-Script.Load("lua/Trigger.lua") --prolly not necessary
+Script.Load("lua/Trigger.lua")
 
 class 'AirLock' (Trigger)
 AirLock.kMapName = "airlock"
@@ -12,6 +12,34 @@ local kAirLockMaterial = PrecacheAsset("materials/power/powered_decal.material")
 local networkVars =
 {
 }
+ function GetIsInAirLock(who)  --I don't want to rely on networkvars.
+local boolean = false
+if who:isa("Spectator") then return false end
+
+            for _, airlock in ientitylist(Shared.GetEntitiesWithClassname("AirLock")) do
+               local location = GetLocationForPoint(who:GetOrigin())
+               boolean = location and airlock.name == location.name -- Smart ! -- Better than OnUpdate too.
+               break
+          end
+   
+ --Print("who in airlock is %s", boolean)
+return boolean
+
+end
+local function AliensInAirLock()
+    local aliens = GetGamerules():GetTeam2():GetNumPlayers()
+  local count = 0
+  local bonusper = 1
+   for _, player in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do 
+        if player:GetIsAlive() and GetIsInAirLock(player) then
+         count = count + 1
+           --Print("aliens count is %s", count)
+         end
+   end
+      local total = (count/aliens)*bonusper
+      --Print("aliens total is %s", total)
+     return (count/aliens)*bonusper
+end
 
 local function PowerSurgeMarines(self)
     --Print("PowerSurgeMarines being called")
@@ -61,6 +89,20 @@ function AirLock:OnUpdate(deltaTime)
 end
 function GetAirLocks()
     return EntityListToTable(Shared.GetEntitiesWithClassname("AirLock"))
+end
+function AirLock:MarinesInAirLock()
+  -- local marines = GetGamerules():GetTeam1():GetNumPlayers()
+  local count = 0
+  --local bonusper = 1
+   for _, player in ientitylist(Shared.GetEntitiesWithClassname("Marine")) do 
+        if player:GetIsAlive() and GetIsInAirLock(player) then
+         count = count + 1
+        --Print("marines count is %s", count)
+         end
+   end
+      --local total = (count/marines)*bonusper
+      --Print("marines total is %s", total)
+     return count --(count/marines)*bonusper
 end
 function GetIsPointInAirLock(point)  --Maybe a 'workaround' for other entities than players
                                                       --to use this airlock entity rather than relying onupdate, maybe.. who knows.

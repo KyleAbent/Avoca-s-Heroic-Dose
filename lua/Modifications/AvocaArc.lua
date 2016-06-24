@@ -19,18 +19,17 @@ local hives = {}
              SoTheGameCanEnd(self, ent)
           end
 end
-local function MoveToHives(who)
+local function MoveToHives(who) --Closest hive from origin
+local where = who:GetOrigin()
+ local hive =  GetNearest(where, "Hive", 2, function(ent) return not ent:GetIsDestroyed() end)
 
-local hives = {}
-
-           for _, hiveent in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
-             table.insert(hives, hiveent)
-          end
-         
-        local hive = table.random(hives)
-        local origin = FindArcSpace(hive:GetOrigin())
+ 
+               if hive then
+        local origin = hive:GetOrigin() -- The arc should auto deploy beforehand
         who:GiveOrder(kTechId.Move, nil, origin, nil, true, true)
-             
+                    return
+                end  
+     Print("No closest hive????")    
 end
 
 local function CheckForAndActAccordingly(who)
@@ -64,6 +63,9 @@ if #players >=1 then return false end
 return true
 end
 function ARC:SpecificRules()
+--How emberassing to have the 6.22 video show off broken lua but hey that what's given after only 6 hours
+--and saying i would come back to fix the hive origin and of course fix the actual function of the intention
+--of payload rules xD
 --local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) --or CheckForAndActAccordingly(self)  
 Print("SpecificRules")
 
@@ -77,7 +79,7 @@ Print("inradius is %s", inradius)
 
 local shouldstop = ShouldStop(self)
 Print("shouldstop is %s", shouldstop) 
-local shouldmove = not moving and not inradius
+local shouldmove = not shouldstop and not moving and not inradius
 Print("shouldmove is %s", shouldmove) 
 local shouldstop = moving and ShouldStop(self)
 Print("shouldstop is %s", shouldstop) 
@@ -85,23 +87,32 @@ local shouldattack = inradius and not attacking
 Print("shouldattack is %s", shouldattack) 
 local shouldundeploy = attacking and not inradius and not moving
 Print("shouldundeploy is %s", shouldundeploy) 
-
-    if shouldstop or (moving and shouldattack) then 
-     Print("StopOrder")
-     self:ClearOrders()
-     self:SetMode(ARC.kMode.Stationary)
-    elseif shouldmove and not shouldattack  then
+  
+  if moving then
+    
+    if shouldstop or shouldattack then 
+       Print("StopOrder")
+       self:ClearOrders()
+       self:SetMode(ARC.kMode.Stationary)
+      end 
+ elseif not moving then
+      
+    if shouldmove and not shouldattack  then
         if shouldundeploy then
          Print("ShouldUndeploy")
          GiveUnDeploy(self)
-       else
+       else --should move
        Print("GiveMove")
        MoveToHives(self)
        end
+       
    elseif shouldattack then
      Print("ShouldAttack")
      GiveDeploy(self)
     return true
+    
+ end
+ 
     end
     
 end

@@ -35,9 +35,16 @@ local techPointOrigin = nil or origin
         local ArmoryPoint = FindFreeSpace(IPspawnPoint2,4)
         local ArmsLabPoint = FindFreeSpace(ArmoryPoint,4)
         local Robotic = FindFreeSpace(ArmsLabPoint,4)
+        local MacPoint2 = FindFreeSpace(Robotic,4)
+        local MacPoint3 = FindFreeSpace(MacPoint2,4)
         local PrototypeLabPoint = FindFreeSpace(Robotic,4)
         local PhaseGatePoint = FindFreeSpace(PrototypeLabPoint,4)
         local ObsPoint = FindFreeSpace(PhaseGatePoint,4)
+        
+        local Sentry1 = FindFreeSpace(ObsPoint,4)
+        local Sentry2 = FindFreeSpace(Sentry1,4)
+        local Sentry3 = FindFreeSpace(Sentry2,4)
+        local Sentry4 = FindFreeSpace(Sentry3,4)
   
     CreateEntity(InfantryPortal.kMapName, IPspawnPoint1, 1)
     CreateEntity(InfantryPortal.kMapName, IPspawnPoint2, 1)
@@ -49,6 +56,11 @@ local techPointOrigin = nil or origin
     CreateEntity(PrototypeLab.kMapName, PrototypeLabPoint, 1)
     CreateEntity(PhaseGate.kMapName, PhaseGatePoint, 1)
     CreateEntity(Observatory.kMapName, ObsPoint, 1)
+    
+   CreateEntity(SentryAvoca.kMapName, Sentry1, 1)
+   CreateEntity(SentryAvoca.kMapName, Sentry2, 1)
+   CreateEntity(SentryAvoca.kMapName, Sentry3, 1)
+   CreateEntity(SentryAvoca.kMapName, Sentry4, 1)
     
     --if #cc < 3 then
    --   SpawnChairThenSpawnBase(self)
@@ -81,7 +93,7 @@ local function TrySomethingElse(self)
         if ccs and #ccs == 1 then
             cc = ccs[1]:GetOrigin()
         end
-        
+        /*
          for i = 1, 2 do
               if Server then
               local techpoint = CreateEntity(TechPoint.kMapName, FindFreeSpace(cc, 8), nil) 
@@ -89,8 +101,17 @@ local function TrySomethingElse(self)
                 chair:SetConstructionComplete()
               techpoint:SetIsVisible(false)
                end
-              
-         end
+             end
+        */
+
+              local ccs = GetEntitiesForTeam("CommandStation", 1)
+              for i = 1, #ccs do
+                local chair = ccs[i]
+                CreateEntity(Vaporizer.kMapName, chair:GetOrigin(), 1)
+              end 
+
+   
+
 --self:SpawnBaseEntities(self, cc)    
  
 local hive = nil
