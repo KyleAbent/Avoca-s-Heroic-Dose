@@ -64,7 +64,8 @@ function ConstructMixin:OnConstructUpdate(deltaTime)
          --and is not in sync with the fast gameplay that I have going on here.
          --maybe this will be better than ns2siege where i had dynamic build speed based on playercount & roundlength?
         local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
-        if #marines >= 1 then
+        local macs = GetEntitiesWithinRange("MAC", self:GetOrigin(), 4)
+        if #marines >= 1 or #macs >= 1 then
         canauto = GetIsPowered(self:GetOrigin())
         end
       end
@@ -76,8 +77,11 @@ function ConstructMixin:OnConstructUpdate(deltaTime)
             multiplier = multiplier * ( (HasMixin(self, "Catalyst") and self:GetIsCatalysted()) and kNutrientMistAutobuildMultiplier or 1 )
             else
            local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
+           local macs = GetEntitiesWithinRange("MAC", self:GetOrigin(), 4)
            marines = Clamp(#marines, 1, 4)
+           macs = Clamp(#macs, 1, 4)
            multiplier = 1 + (marines/4) * 1
+           multiplier = 1 + (macs/4) * 1
             end
             self:Construct(deltaTime * multiplier)
         end --canauto

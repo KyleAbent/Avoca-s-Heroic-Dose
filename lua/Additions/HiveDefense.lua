@@ -14,11 +14,20 @@
         
         return count
     end
+local function GetCragsCount(where)
+local crags = 0
+          for _, crag in ientitylist(Shared.GetEntitiesWithClassname("Crag")) do
+             if crag:GetIsAlive() and not crag:isa("HiveCrag") then crags = crags + 1 end
+          end
+          return crags
+
+end
 local function GetDefenseEntsInRange(who)
  local shifts = GetEntitiesForTeamWithinRange("Shift", 2, who:GetOrigin(), 24)
- local crags = GetEntitiesForTeamWithinRange("Crag", 2, who:GetOrigin(), 24)
+ local crags = GetCragsCount(who:GetOrigin())
+ local hivecrags = GetEntitiesWithinRange("HiveCrag", who:GetOrigin(), 24)
  local shades = GetEntitiesForTeamWithinRange("Shade", 2, who:GetOrigin(), 24)
-return shifts, crags, shades
+return shifts, crags, hivecrags, shades
 end
 local function UpdateTypeOfHive(who)
 local hasshade = false
@@ -87,7 +96,7 @@ local function DamagePowerPoint(hive)
       end
     return false
 end
-function Conductor:HiveDefenseMain(hive, shifts, crags, shades)
+function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades)
         -- local tres = kStructureDropCost
          DamagePowerPoint(hive)
          local spawned = false
@@ -123,8 +132,18 @@ function Conductor:HiveDefenseMain(hive, shifts, crags, shades)
                       shift:SetConstructionComplete()
                   --    end
                     end
-                    
-                    if #crags <= math.random(1,3) then
+
+                    if crags <= math.random(1,3) then
+                      if not spawned then
+                    --  if self:GetCanSpawnAlienEntity(tres, 0) then  
+                   --   self.team2:SetTeamResources(self.team2:GetTeamResources()  - tres)  
+                      local crag = CreateEntity(Crag.kMapName, FindFreeSpace(origin ), 2) 
+                      crag:SetConstructionComplete()
+                    --  end
+                      end
+                    end
+      
+                    if #hivecrags <= math.random(1,3) then
                       if not spawned then
                     --  if self:GetCanSpawnAlienEntity(tres, 0) then  
                    --   self.team2:SetTeamResources(self.team2:GetTeamResources()  - tres)  

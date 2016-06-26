@@ -181,7 +181,7 @@ function ArmsLab:UpdateResearch(deltaTime)
 function Armory:UpdatePassive()
    //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
     local researchNode = self:GetTeam():GetTechTree():GetTechNode(self.researchingId)
-    if GetHasTech(self, kTechId.AdvancedArmoryUpgrade) or not  GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
+    if (self:isa("AdvancedArmory") and GetHasTech(self, kTechId.HeavyMachineGunTech) ) or not  GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
 
     
     local techid = nil

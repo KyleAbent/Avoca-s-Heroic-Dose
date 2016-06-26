@@ -54,14 +54,34 @@ function CystAvoca:EnergizeInRange()
     return self:GetIsAlive()
 end
  
-local function SynchronizeCystEntities(whips, crags, cyst, origin)
-            local spawned = false 
+function CystAvoca:SpawnWhipsAtKing(whips, crags, cyst, origin)
+            --local spawned = false 
           --  local tres = not self.doorsopened and kStructureDropCost * .5 or kStructureDropCost
            -- self.alienteamcanupgeggs = ConditionalValue(self.team2:GetTeamResources()>= 100, true,false)
      --   if self:GetCanSpawnAlienEntity(tres, nil, cyst:GetIsInCombat()) then
+         local maxwhips = 24
+         local currentwhips = #whips
+         local whipstospawn = math.abs(maxwhips - currentwhips)
+          whipstospawn = Clamp(whipstospawn, 0, 4)
          
+         if whipstospawn >= 1 then
+         
+         for i = 1, whipstospawn do
+                     self:AddTimedCallback(function() 
+                     local autoconstructspawnchance = math.random(1,2)
+                     local whip = CreateEntity(Whip.kMapName, FindFreeSpace(origin), 2) 
+                      if autoconstructspawnchance == 1 then
+                        whip:SetConstructionComplete()
+                      end
+                     end, 4)
+
+         end
         
-                    if #whips <= math.random(1,7) then
+        
+        end
+         
+        /*
+                    if #whips <= math.random(1,15) then
                        if not spawned then
                       local whip = CreateEntity(Whip.kMapName, origin, 2) 
                       --self.lastaliencreatedentity = Shared.GetTime()
@@ -69,14 +89,14 @@ local function SynchronizeCystEntities(whips, crags, cyst, origin)
                       end
                     end
                     
-                    if #crags <= math.random(1,7) then
+                    if crags <= math.random(1,15) then
                        if not spawned then
                       local crag = CreateEntity(Crag.kMapName, origin, 2) 
                      -- self.lastaliencreatedentity = Shared.GetTime()
                         spawned = true
                       end
                     end
-                    
+                   */ 
       --  end   
         
 
@@ -98,13 +118,20 @@ local function MoveEggs(self)
                 end
            end
 end
+local function GetCragsCount()
+local crags = 0
+          for _, crag in ientitylist(Shared.GetEntitiesWithClassname("Crag")) do
+             if crag:GetIsAlive() and not crag:isa("HiveCrag") then crags = crags + 1 end
+          end
+          return crags
+
+end
 function CystAvoca:Synchronize()
     if not self:GetIsMature() then return true end
                      MoveEggs(self)
                      local whips = GetEntitiesForTeamWithinRange("Whip", 2, self:GetOrigin(), 999999)
-                     local crags = GetEntitiesForTeamWithinRange("Crag", 2, self:GetOrigin(), 999999)
-                     local tospawn = GetRandomBuildPosition( kTechId.Whip, self:GetOrigin(), 8 )
-                     SynchronizeCystEntities(whips, crags, self, tospawn)
+                     local crags = GetCragsCount()
+                     self:SpawnWhipsAtKing(whips, crags, self, self:GetOrigin())
                      local cysts, ratio, tableof = GetCystsInLocation(GetLocationForPoint(self:GetOrigin()))
                      for i = 1, #tableof do
                         local autocyst = tableof[i]
@@ -122,7 +149,7 @@ end
 function MagnetizeStructures(who)
 
           for index, crag in ipairs(GetEntitiesForTeam("Crag", 2)) do
-               if crag:GetIsBuilt() and who:GetDistance(crag) >= 16 and not (crag:GetHasOrder() or crag.moving) then 
+               if not crag:isa("HiveCrag") and crag:GetIsBuilt() and who:GetDistance(crag) >= 16 and not (crag:GetHasOrder() or crag.moving) then 
                  local success = crag:GiveOrder(kTechId.Move, who:GetId(), who:GetOrigin(), nil, true, true) 
                  if success then break end
                 end

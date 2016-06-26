@@ -4,8 +4,12 @@ PowerDrainer.kMapName = "powerdrainer"
 
 local kHallucinationMaterial = PrecacheAsset("materials/power/powered_decal.material")
 
+PowerDrainer.kAnimationGraph = PrecacheAsset("models/alien/powerdrainer/powerdrainer.animation_graph")
+
 function PowerDrainer:OnInitialized()
   Whip.OnInitialized(self)
+      self:SetModel(Whip.kModelName, PowerDrainer.kAnimationGraph)
+      
   
   if Server then
         local targetTypes = { kAlienStaticTargets, kAlienMobileTargets }

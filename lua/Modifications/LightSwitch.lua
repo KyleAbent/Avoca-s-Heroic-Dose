@@ -3,7 +3,7 @@
   airlock.scale = which.scale
   airlock.name = which.name
   airlock:SetBox(airlock.scale)  -- Rather than trigger init?
-  Print("Airlock @ %s", which.name)
+ -- Print("Airlock @ %s", which.name)
 end
 function SealAirLock(nameofwhich)
 
@@ -29,7 +29,7 @@ local boolean = false
             for _, airlock in ientitylist(Shared.GetEntitiesWithClassname("AirLock")) do
              if airlock and airlock.name == nameofwhich then boolean = true end
            end
-Print("HasAirLockInRoom in %s is %s", nameofwhich, boolean)    
+--Print("HasAirLockInRoom in %s is %s", nameofwhich, boolean)    
 return boolean
 end
  function Location:OnTriggerEntered(entity, triggerEnt)

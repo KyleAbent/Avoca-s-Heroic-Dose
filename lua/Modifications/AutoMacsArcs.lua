@@ -17,7 +17,7 @@ local function GetArcsAmount()
 end
 local function ArcQualifications(self)
  local boolean = false
-     if GetArcsAmount() <= 0 and
+     if GetArcsAmount() <= 7 and
        -- self:GetTeam():GetTeamResources() >= kARCCost and 
       --    ( kMaxSupply - GetSupplyUsedByTeam(1) >= LookupTechData(kTechId.ARC, kTechDataSupply, 0)) and 
             self.deployed and 
@@ -45,6 +45,23 @@ local function MacQualifications(self)
       return boolean
         
 end
+local function HasPayLoad(where)
+
+        for _, avocaarc in ipairs(GetEntitiesWithinRange("AvocaArc", where, 999)) do
+            if avocaarc then return true end
+       end
+       return false
+end
+function RoboticsFactory:ChangeTo(who,mapname)
+                      if Server then  
+                      self:AddTimedCallback(function() 
+                      local payload = CreateEntity(mapname, who:GetOrigin(), 1)
+                      payload:BeginTimer()
+                      DestroyEntity(who)
+                     self.builtEntity = nil
+                     end, 4) 
+                     end
+end
 function RoboticsFactory:OnTag(tagName)
     
     PROFILE("RoboticsFactory:OnTag")
@@ -56,8 +73,14 @@ function RoboticsFactory:OnTag(tagName)
            if Server then
                 local entity = self.builtEntity
                 if entity:isa("ARC") then
-                   entity:BeginTimer()
-                end
+                   if not HasPayLoad(entity:GetOrigin()) then
+                        self:ChangeTo(entity, AvocaArc.kMapName)
+                   else
+                        self:ChangeTo(entity, MainRoomArc.kMapName)
+                   end
+               else
+                   self.builtEntity = nil
+               end
 end
           
     end

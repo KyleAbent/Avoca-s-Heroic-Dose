@@ -102,6 +102,7 @@ local function MoveMacs(where)
            end
        end
 end
+
 local function EntityIsaPowerPoint(nearestenemy)
  return nearestenemy:isa("PowerPoint") and nearestenemy:GetIsBuilt() and not nearestenemy:GetIsDisabled()
 end
@@ -157,6 +158,21 @@ local function FindMarineOffense(where)
         end
         return nil
 end
+local function FindArcOrder(where)
+          local neareststructure = GetNearestMixin(where, "Construct", 2, function(ent) return ent:GetIsSighted() and not ent:isa("Harvester") end)
+         if neareststructure then
+              return neareststructure:GetOrigin()
+        end
+        return nil
+end
+local function MoveArcs(where)
+        for _, arc in ipairs(GetEntitiesWithinRange("MainRoomArc", where, 999)) do
+           if arc:GetCanMove()  then
+           arc.orderorigin = FindArcOrder(where)
+           end
+       end
+       
+end
 local function FindMarineDefense(where)
           local nearesttodefend = GetNearestMixin(where, "Combat", 1, function(ent) return HasMixin(ent, "Construct") end)
          if nearesttodefend then
@@ -198,7 +214,7 @@ local function DefendPayLoad(player, where, which)
          local range = 0
                range = player:GetDistance(payload)
                Print("player to payload distance is %s", range)
-               if range <= 32 and payload.deployMode ~= ARC.kDeployMode.Deployed  then
+               if range <= 32 and ( payload.deployMode ~= ARC.kDeployMode.Deployed  and not payload:InRadius() ) then
                player:GiveOrder(kTechId.Defend, payload:GetId(), payload:GetOrigin(), nil, true, true)
                return
                end
@@ -276,7 +292,7 @@ function Conductor:PickMainRoom()
        return true
 end
 function Conductor:SetMainRoom(where, which)
-       if Server then MoveMacs(where) end
+       if Server then MoveMacs(where) MoveArcs(where) end
         CoordinateWithPowerNode(which.name)
         CreateAlienMarker(where)
         ForAllMarinesSendWP(where, which)

@@ -9,6 +9,7 @@ Script.Load("lua/Modifications/PowerPointAvoca.lua")
 Script.Load("lua/Modifications/AutoBioMass.lua")
 Script.Load("lua/Modifications/AutoEggEvolve.lua")
 Script.Load("lua/Modifications/AvocaArc.lua")
+Script.Load("lua/Modifications/MainRoomArc.lua")
 Script.Load("lua/Modifications/HiveCrag.lua")
 Script.Load("lua/Modifications/SentryAvoca.lua")
 
@@ -123,7 +124,7 @@ end
 local function GetDestinationGate(self)
     local phaseGates = {} 
     
-    for index, payload  in ipairs( GetEntitiesForTeam("ARC", self:GetTeamNumber()) ) do
+    for index, payload  in ipairs( GetEntitiesForTeam("AvocaArc", self:GetTeamNumber()) ) do
         if GetIsUnitActive(payload) then
             table.insert(phaseGates, payload)
         end

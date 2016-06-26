@@ -45,7 +45,7 @@ local function PowerSurgeMarines(self)
     --Print("PowerSurgeMarines being called")
         for _, entity in ipairs(self:GetEntitiesInTrigger()) do
             if HasMixin(entity, "PowerConsumer") then
-             entity:SetPowerSurgeDuration(4) Print("PowerSurged structure") 
+             entity:SetPowerSurgeDuration(4) --Print("PowerSurged structure") 
           end
     end
 end
@@ -125,7 +125,7 @@ end
 
 function Player:GetIsInAirLock()  --I don't want to rely on networkvars.
 local boolean = GetIsPointInAirLock(self:GetOrigin())
- Print("player inairlock is %s", boolean)
+ --Print("player inairlock is %s", boolean)
 return boolean
 
 end
