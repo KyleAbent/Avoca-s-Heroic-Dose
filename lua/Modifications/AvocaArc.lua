@@ -126,6 +126,7 @@ function AvocaArc:GetUnitNameOverride(viewer)
     end
 return unitName
 end  
+
 function AvocaArc:GetCanFireAtTargetActual(target, targetPoint)    
 
     if not target.GetReceivesStructuralDamage or not target:GetReceivesStructuralDamage() then        
@@ -216,5 +217,7 @@ function AvocaArc:Instruct()
    self:SpecificRules()
    return true
 end
+
+
 
 Shared.LinkClassToMap("AvocaArc", AvocaArc.kMapName, networkVars)

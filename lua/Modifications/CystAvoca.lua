@@ -61,19 +61,22 @@ function CystAvoca:SpawnWhipsAtKing(whips, crags, cyst, origin)
      --   if self:GetCanSpawnAlienEntity(tres, nil, cyst:GetIsInCombat()) then
          local maxwhips = 24
          local currentwhips = #whips
+         Print("Currentwhips is %s", currentwhips)
          local whipstospawn = math.abs(maxwhips - currentwhips)
+         Print("whipstospawn is %s", whipstospawn)
           whipstospawn = Clamp(whipstospawn, 0, 4)
+         Print("whipstospawn is %s", whipstospawn)
          
          if whipstospawn >= 1 then
          
          for i = 1, whipstospawn do
-                     self:AddTimedCallback(function() 
+                   --  self:AddTimedCallback(function() 
                      local autoconstructspawnchance = math.random(1,2)
                      local whip = CreateEntity(Whip.kMapName, FindFreeSpace(origin), 2) 
                       if autoconstructspawnchance == 1 then
                         whip:SetConstructionComplete()
                       end
-                     end, 4)
+                     --end, 4)
 
          end
         
@@ -113,7 +116,10 @@ local function MoveEggs(self)
                if self:GetDistance(egg) >= 16 and egg:GetIsFree() then 
                 local toplace = GetRandomBuildPosition( kTechId.Egg, self:GetOrigin(), 8 )
                    if toplace then
-                        egg:SetOrigin(toplace)
+                        toplace = GetGroundAtPosition(toplace, nil, PhysicsMask.AllButPCs, extents)
+                             if toplace then
+                             egg:SetOrigin(toplace)
+                             end
                      end
                 end
            end

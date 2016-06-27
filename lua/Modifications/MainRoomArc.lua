@@ -3,11 +3,20 @@ class 'MainRoomArc' (ARC)
 MainRoomArc.kMapName = "mainroomarc"
 
 
-local networkvars = { orderorigin = "position" }
+local kMoveParam = "move_speed"
+local kMuzzleNode = "fxnode_arcmuzzle"
+
+local kNanoshieldMaterial = PrecacheAsset("cinematics/vfx_materials/nanoshield.material")
+MainRoomArc.kAnimationGraph = PrecacheAsset("models/marine/mainroompayload/mainroompayload.animation_graph")
+
+local networkvars = { }
 
 function MainRoomArc:OnCreate()
  ARC.OnCreate(self)
- self.orderorigin = nil
+end
+function MainRoomArc:OnInitialized()
+ ARC.OnInitialized(self)
+    self:SetModel(ARC.kModelName, MainRoomArc.kAnimationGraph)
 end
 
 local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
@@ -42,7 +51,7 @@ return  GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingl
 end
 local function ShouldStop(who)
 
-local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 4)
+local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
 if #players >=1 then return false end
 return true
 end
@@ -61,10 +70,13 @@ local function GiveUnDeploy(who)
      who:TriggerEffects("arc_stop_charge")
      who:TriggerEffects("arc_undeploying")
 end
-local function MoveToSavedOrigin(self)
-      if self.orderorigin ~= nil then
-        self:GiveOrder(kTechId.Move, nil, self.orderorigin, nil, true, true)
-      end
+local function MoveToMainRoom(self)
+            for index, pheromone in ientitylist(Shared.GetEntitiesWithClassname("Pheromone")) do
+            self:GiveOrder(kTechId.Move, nil, pheromone:GetOrigin(), nil, true, true)
+            break
+           end
+           
+
 end
 function MainRoomArc:SpecificRules()
 --How emberassing to have the 6.22 video show off broken lua but hey that what's given after only 6 hours
@@ -107,7 +119,7 @@ local shouldundeploy = attacking and not inradius and not moving
          GiveUnDeploy(self)
        else --should move
        --Print("CanMove")
-       MoveToSavedOrigin(self)
+       MoveToMainRoom(self)
        end
        
    elseif shouldattack then
@@ -134,8 +146,6 @@ function MainRoomArc:OnGetMapBlipInfo()
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
 function MainRoomArc:GetCanMove()
-local noorder = self.orderorigin == nil
-   if noorder == false then if self:GetOrigin() == self.orderorgin then return true end end
 local moving = self.mode == ARC.kMode.Moving          
 local attacking = self.deployMode == ARC.kDeployMode.Deployed
 local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self)  
@@ -182,5 +192,72 @@ function MainRoomArc:Instruct()
    self:SpecificRules()
    return true
 end
+if Server then
+function MainRoomArc:UpdateMoveOrder(deltaTime)
+
+    local currentOrder = self:GetCurrentOrder()
+    ASSERT(currentOrder)
+    
+    self:SetMode(ARC.kMode.Moving)  
+    
+    local moveSpeed = ( self:GetIsInCombat() or self:GetGameEffectMask(kGameEffect.OnInfestation) ) and 1.2 or 3
+    local maxSpeedTable = { maxSpeed = moveSpeed }
+    self:ModifyMaxSpeed(maxSpeedTable)
+    
+    self:MoveToTarget(PhysicsMask.AIMovement, currentOrder:GetLocation(), maxSpeedTable.maxSpeed, deltaTime)
+    
+    self:AdjustPitchAndRoll()
+    
+    if self:IsTargetReached(currentOrder:GetLocation(), kAIMoveOrderCompleteDistance) then
+    
+        self:CompletedCurrentOrder()
+        self:SetPoseParam(kMoveParam, 0)
+        
+        -- If no more orders, we're done
+        if self:GetCurrentOrder() == nil then
+            self:SetMode(ARC.kMode.Stationary)
+        end
+        
+    else
+        self:SetPoseParam(kMoveParam, .5)
+    end
+    
+end
+function MainRoomArc:ModifyDamageTaken(damageTable, attacker, doer, damageType)
+local damage = self:GetInAttackMode() and 0.7 or 1
+        damageTable.damage = damageTable.damage * damage
+end
+elseif Client then
+
+    function MainRoomArc:OnUpdateRender()
+          local showMaterial = self:GetInAttackMode()
+    
+        local model = self:GetRenderModel()
+        if model then
+
+            model:SetMaterialParameter("glowIntensity", 4)
+
+            if showMaterial then
+                
+                if not self.hallucinationMaterial then
+                    self.hallucinationMaterial = AddMaterial(model, kNanoshieldMaterial)
+                end
+                
+                self:SetOpacity(0.5, "hallucination")
+            
+            else
+            
+                if self.hallucinationMaterial then
+                    RemoveMaterial(model, self.hallucinationMaterial)
+                    self.hallucinationMaterial = nil
+                end//
+                
+                self:SetOpacity(1, "hallucination")
+            
+            end //showma
+            
+        end//omodel
+end //up render
+end -- client/server
 
 Shared.LinkClassToMap("MainRoomArc", MainRoomArc.kMapName, networkVars)

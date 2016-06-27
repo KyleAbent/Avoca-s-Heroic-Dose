@@ -192,9 +192,9 @@ function Armory:UpdatePassive()
     techid = kTechId.GrenadeTech
     elseif GetHasTech(self, kTechId.GrenadeTech) and not GetHasTech(self, kTechId.ShotgunTech) then
     techid = kTechId.ShotgunTech
-    elseif GetHasTech(self, kTechId.ShotgunTech) and not GetHasTech(self, kTechId.AdvancedWeaponry) then
+    elseif GetHasTech(self, kTechId.ShotgunTech) and not self:isa("AdvancedArmory") then
     techid = kTechId.AdvancedArmoryUpgrade   
-    elseif GetHasTech(self, kTechId.AdvancedWeaponry) and not GetHasTech(self, kTechId.HeavyMachineGunTech) then
+    elseif self:isa("AdvancedArmory") and not GetHasTech(self, kTechId.HeavyMachineGunTech) then
     techid = kTechId.HeavyMachineGunTech   
     else
        return  

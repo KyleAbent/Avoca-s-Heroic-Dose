@@ -76,7 +76,7 @@ end
         if location then
        ReallySpawnCysts(self, location)
        end
-       return self:GetIsDisabled() or not self:GetIsBuilt()
+       return self:GetIsDisabled() and not self:GetIsBuilt()
     
 end
 

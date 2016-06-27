@@ -1,3 +1,11 @@
+function AddPayLoadTime(seconds)
+    local entityList = Shared.GetEntitiesWithClassname("Conductor")
+    if entityList:GetSize() > 0 then
+               local conductor = entityList:GetEntityAtIndex(0)
+                conductor:SendNotification(seconds)
+                conductor.payLoadTime = conductor.payLoadTime + seconds
+    end    
+end
 function FindFreeSpace(where, mindistance, maxdistance)    
      if not mindistance then mindistance = .5 end
      if not maxdistance then maxdistance = 24 end

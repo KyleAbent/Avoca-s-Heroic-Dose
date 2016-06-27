@@ -2,16 +2,30 @@ local kOpenSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactor
 local kCloseSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_close")
 
 local function GetMacsAmount()
-    local macs = 0
+    local macavoca = 0
+    local basemac = 0
+    local playermac = 0
+    local bigmac = 0
+    local total = 0
         for index, mac in ientitylist(Shared.GetEntitiesWithClassname("MAC")) do
-                macs = macs + 1
+             if mac:isa("BaseMac") then
+             basemac = basemac + 1
+             elseif mac:isa("PlayerMac") then
+             playermac = playermac + 1
+             elseif mac:isa("BigMac") then
+             basemac = basemac + 1
+             elseif mac:isa("MacAvoca") then
+             macavoca = macavoca + 1
+             end
+             
          end
-    return  macs
+         total = macavoca + basemac + playermac + bigmac
+    return  macavoca, basemac, playermac, bigmac, total
 end
 local function GetArcsAmount()
     local arcs = 0
         for index, ARC in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
-                arcs = arcs + 1
+               if not ARC:isa("AvocaArc") then arcs = arcs + 1 end
          end
     return  arcs
 end
@@ -30,9 +44,9 @@ local function ArcQualifications(self)
       return boolean
 end
 local function MacQualifications(self)
-
+    local macavoca,basemac, playermac,bigmac, total = GetMacsAmount()
  local boolean = false
-     if GetMacsAmount() <= 7 and
+     if total <= 7 and
       --  self:GetTeam():GetTeamResources() >= kMACCost and 
        --   ( kMaxSupply - GetSupplyUsedByTeam(1) >= LookupTechData(kTechId.MAC, kTechDataSupply, 0)) and 
             self.deployed and 
@@ -55,12 +69,24 @@ end
 function RoboticsFactory:ChangeTo(who,mapname)
                       if Server then  
                       self:AddTimedCallback(function() 
-                      local payload = CreateEntity(mapname, who:GetOrigin(), 1)
-                      payload:BeginTimer()
+                      local newentity = CreateEntity(mapname, who:GetOrigin(), 1)
+                      if newentity.BeginTimer then newentity:BeginTimer() end
                       DestroyEntity(who)
-                     self.builtEntity = nil
                      end, 4) 
                      end
+end
+function RoboticsFactory:ChangeMacsAccordinglyHere(entity)
+   local macavoca,basemac, playermac,bigmac, total = GetMacsAmount()
+   if macavoca <= 2 then
+   self:ChangeTo(entity, MacAvoca.kMapName)
+   elseif basemac<= 2 then
+   self:ChangeTo(entity, BaseMac.kMapName)
+   elseif playermac <=2 then
+   self:ChangeTo(entity, PlayerMac.kMapName)
+   elseif bigmac == 0 then
+   self:ChangeTo(entity, BigMac.kMapName)
+   end
+
 end
 function RoboticsFactory:OnTag(tagName)
     
@@ -78,9 +104,10 @@ function RoboticsFactory:OnTag(tagName)
                    else
                         self:ChangeTo(entity, MainRoomArc.kMapName)
                    end
-               else
-                   self.builtEntity = nil
+               elseif entity:isa("MAC") then
+                    self:ChangeMacsAccordinglyHere(entity)
                end
+                 self.builtEntity = nil
 end
           
     end

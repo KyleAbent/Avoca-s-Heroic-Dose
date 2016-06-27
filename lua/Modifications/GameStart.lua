@@ -26,41 +26,30 @@ local techPointOrigin = nil or origin
         if cc and #cc > 0 and not techPointOrigin then
             techPointOrigin = cc[1]:GetOrigin()
         end
-      
-     -- if AlreadySpawned(self, techPointOrigin) then return end -- For when things get reversed
 
-  
-        local IPspawnPoint1 = GetRandomBuildPosition( kTechId.InfantryPortal, techPointOrigin, 8 )
-        local IPspawnPoint2 = FindFreeSpace(IPspawnPoint1,4)
-        local ArmoryPoint = FindFreeSpace(IPspawnPoint2,4)
-        local ArmsLabPoint = FindFreeSpace(ArmoryPoint,4)
-        local Robotic = FindFreeSpace(ArmsLabPoint,4)
-        local MacPoint2 = FindFreeSpace(Robotic,4)
-        local MacPoint3 = FindFreeSpace(MacPoint2,4)
-        local PrototypeLabPoint = FindFreeSpace(Robotic,4)
-        local PhaseGatePoint = FindFreeSpace(PrototypeLabPoint,4)
-        local ObsPoint = FindFreeSpace(PhaseGatePoint,4)
-        
-        local Sentry1 = FindFreeSpace(ObsPoint,4)
-        local Sentry2 = FindFreeSpace(Sentry1,4)
-        local Sentry3 = FindFreeSpace(Sentry2,4)
-        local Sentry4 = FindFreeSpace(Sentry3,4)
-  
-    CreateEntity(InfantryPortal.kMapName, IPspawnPoint1, 1)
-    CreateEntity(InfantryPortal.kMapName, IPspawnPoint2, 1)
-    CreateEntity(Armory.kMapName, ArmoryPoint, 1)
-    CreateEntity(ArmsLab.kMapName, ArmsLabPoint, 1)
-    CreateEntity(RoboticsFactory.kMapName, Robotic, 1)
-    CreateEntity(MAC.kMapName, MacPoint2, 1)
-    CreateEntity(MAC.kMapName, MacPoint3, 1)
-    CreateEntity(PrototypeLab.kMapName, PrototypeLabPoint, 1)
-    CreateEntity(PhaseGate.kMapName, PhaseGatePoint, 1)
-    CreateEntity(Observatory.kMapName, ObsPoint, 1)
+    CreateEntity(InfantryPortal.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(InfantryPortal.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(Armory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(ArmsLab.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(RoboticsFactory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+
+    CreateEntity(MacAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(MacAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     
-   CreateEntity(SentryAvoca.kMapName, Sentry1, 1)
-   CreateEntity(SentryAvoca.kMapName, Sentry2, 1)
-   CreateEntity(SentryAvoca.kMapName, Sentry3, 1)
-   CreateEntity(SentryAvoca.kMapName, Sentry4, 1)
+    CreateEntity(BaseMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(BaseMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    
+    CreateEntity(PlayerMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(PlayerMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    
+    CreateEntity(BigMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+
+    CreateEntity(PrototypeLab.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(PhaseGate.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(Observatory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    for i = 1, 4 do
+   CreateEntity(SentryAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+   end
     
     --if #cc < 3 then
    --   SpawnChairThenSpawnBase(self)
@@ -107,7 +96,9 @@ local function TrySomethingElse(self)
               local ccs = GetEntitiesForTeam("CommandStation", 1)
               for i = 1, #ccs do
                 local chair = ccs[i]
-                CreateEntity(Vaporizer.kMapName, chair:GetOrigin(), 1)
+                local location = GetLocationForPoint(self:GetOrigin())
+                local vaporizer = CreateEntity(Vaporizer.kMapName, chair:GetOrigin(), 1)
+               -- vaporizer.scale = location.scale
               end 
 
    

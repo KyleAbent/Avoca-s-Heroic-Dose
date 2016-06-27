@@ -10,7 +10,7 @@ Script.Load("lua/SleeperMixin.lua")
 class 'Vaporizer' (ScriptActor) 
 Vaporizer.kMapName = "vaporizer"
 
-local networkVars = { }
+local networkVars = { scale = "vector" }
 
 Vaporizer.kModelName = PrecacheAsset("models/effects/proximity_force_field_noentry.model")
 
@@ -42,6 +42,10 @@ function Vaporizer:OnCreate()
     self:SetPhysicsType(PhysicsType.Kinematic)
     self:SetPhysicsGroup(PhysicsGroup.BigStructuresGroup)
     self:UpdateModelStuffMaybe()
+    
+    self.scale.x =  32.22
+    self.scale.y =  14.36
+    self.scale.z =  24.14
 end
 
 function Vaporizer:OnInitialized()
@@ -61,9 +65,9 @@ return not self:GetIsInCombat()
 end
 function Vaporizer:OnAdjustModelCoords(coords)
     
-        coords.xAxis = coords.xAxis * 32.22
-        coords.yAxis = coords.yAxis * 14.36
-        coords.zAxis = coords.zAxis * 24.14
+        coords.xAxis = coords.xAxis * self.scale.x
+        coords.yAxis = coords.yAxis * self.scale.y
+        coords.zAxis = coords.zAxis * self.scale.z
         
     return coords
     

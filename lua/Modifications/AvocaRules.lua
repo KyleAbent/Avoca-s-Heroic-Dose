@@ -12,6 +12,14 @@ AvocaRules.kMapName = "avocarules"
 -- But dont worry ill keep trying my best to explain whats in my head the best i can because for me this all makes sense :s
 
 
+function AvocaRules:OnCreate()
+
+NS2GameRules.OnCreate(self)
+
+Print("Avoca Rules Created")
+
+end
+
 
 
 

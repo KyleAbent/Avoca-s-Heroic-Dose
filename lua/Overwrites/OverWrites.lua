@@ -5,6 +5,9 @@ if Server then
 Script.Load("lua/Overwrites/AutoResearch.lua")
 end
 
+
+
+
 function CommandStructure:LoginPlayer(player,forced)
  return
 end
@@ -17,7 +20,7 @@ end
 
 function ConstructMixin:GetCanConstruct(constructor)
 
-return self:isa("PowerPoint")
+return self:isa("PowerPoint") or constructor:isa("MAC")
     
 end
 /*
@@ -132,6 +135,24 @@ local function GetNumEggs(self)
     return numEggs
     
 end
+local function SpawnRandomEgg(who, where)
+
+
+      local eggmapnames = {}
+      table.insert(eggmapnames, Egg.kMapName)
+      local gorgechance = math.random(1,2)
+      local lerkchance = math.random(1,3)
+      local fadechance = math.random(1,4)
+      local onoschance = math.random(1,5)
+      if gorgechance == 1 then  table.insert(eggmapnames, GorgeEgg.kMapName) end
+      if lerkchance == 1 then   table.insert(eggmapnames, LerkEgg.kMapName) end
+      if fadechance == 1 then   table.insert(eggmapnames, FadeEgg.kMapName) end
+      if onoschance == 1 then   table.insert(eggmapnames, OnosEgg.kMapName) end
+      local randomegg = table.random(eggmapnames)
+      local egg = CreateEntity(randomegg, where, 2)
+      egg:SetHive(who)
+      return egg
+end
 local function SpawnEgg(self, eggCount)
 
     if self.eggSpawnPoints == nil or #self.eggSpawnPoints == 0 then
@@ -154,9 +175,8 @@ local function SpawnEgg(self, eggCount)
         local validForEgg = GetCanEggFit(position)
 
         if validForEgg then
-        
-            local egg = CreateEntity(Egg.kMapName, position, self:GetTeamNumber())
-            egg:SetHive(self)
+               local egg = SpawnRandomEgg(self,position)
+
             
 
             if egg ~= nil then
@@ -200,6 +220,57 @@ function Hive:UpdateSpawnEgg()
 
 end
 
-
+function GorgeEgg:OnGetMapBlipInfo()
+    local success = false
+    local blipType = kMinimapBlipType.Undefined
+    local blipTeam = -1
+    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
+    blipType = kMinimapBlipType.Egg
+     blipTeam = self:GetTeamNumber()
+    if blipType ~= 0 then
+        success = true
+    end
+    
+    return success, blipType, blipTeam, isAttacked, false --isParasited
+end
+function LerkEgg:OnGetMapBlipInfo()
+    local success = false
+    local blipType = kMinimapBlipType.Undefined
+    local blipTeam = -1
+    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
+    blipType = kMinimapBlipType.Egg
+     blipTeam = self:GetTeamNumber()
+    if blipType ~= 0 then
+        success = true
+    end
+    
+    return success, blipType, blipTeam, isAttacked, false --isParasited
+end
+function FadeEgg:OnGetMapBlipInfo()
+    local success = false
+    local blipType = kMinimapBlipType.Undefined
+    local blipTeam = -1
+    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
+    blipType = kMinimapBlipType.Egg
+     blipTeam = self:GetTeamNumber()
+    if blipType ~= 0 then
+        success = true
+    end
+    
+    return success, blipType, blipTeam, isAttacked, false --isParasited
+end
+function OnosEgg:OnGetMapBlipInfo()
+    local success = false
+    local blipType = kMinimapBlipType.Undefined
+    local blipTeam = -1
+    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
+    blipType = kMinimapBlipType.Egg
+     blipTeam = self:GetTeamNumber()
+    if blipType ~= 0 then
+        success = true
+    end
+    
+    return success, blipType, blipTeam, isAttacked, false --isParasited
+end
 
 end -- Server

@@ -9,6 +9,7 @@ Conductor.kMapName = "conductor"
 local networkVars = 
 
 {
+   payLoadTime = "float"
 }
 
 
@@ -75,6 +76,7 @@ local function GetIsWeldedByOtherMAC(self, target)
     
 end
 local function FindAppropriateOrder(mac,where)
+  if mac:isa("BigMac") then 
             local constructable =  GetNearestMixin(where, "Construct", 1, function(ent) return not ent:GetIsBuilt() and ent:GetCanConstruct(mac) and mac:CheckTarget(ent:GetOrigin())  end)
                if constructable then
                     mac:GiveOrder(kTechId.Construct, constructable:GetId(), constructable:GetOrigin())
@@ -93,11 +95,37 @@ local function FindAppropriateOrder(mac,where)
                     return
                     end
                  end
+   elseif mac:isa("MacAvoca") then --powerpoints and extractors only
+            local constructable =  GetNearestMixin(where, "Construct", 1, function(ent) return  ( ent:isa("Extractor") or ent:isa("PowerPoint") ) and not ent:GetIsBuilt() and ent:GetCanConstruct(mac) and mac:CheckTarget(ent:GetOrigin())  end)
+               if constructable then
+                    mac:GiveOrder(kTechId.Construct, constructable:GetId(), constructable:GetOrigin())
+                    return
+                end
+            
+                // Look for entities to heal with weld.
+                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", 1, where, 24)
+                for w = 1, #weldables do
+                
+                    local weldable = weldables[w]
+                    // There are cases where the weldable's weld percentage is very close to
+                    // 100% but not exactly 100%. This second check prevents the MAC from being so pedantic.
+                    if ( weldable:isa("Extractor") or weldable:isa("PowerPoint") ) and  weldable:GetCanBeWelded(mac) and weldable:GetWeldPercentage() < 1 and not GetIsWeldedByOtherMAC(mac, weldable) then
+                    mac:GiveOrder(kTechId.Construct, weldable:GetId(), weldable:GetOrigin())
+                    return
+                    end
+                 end
+         elseif mac:isa("PlayerMac") then
+             local nearestplayer = GetNearestMixin(where, "Weldable", 1, function(ent) return ent:isa("Player") and ent:GetCanBeWelded(mac) and ent:GetWeldPercentage() < 1  end)
+                 if nearestplayer then
+                        mac:GiveOrder(kTechId.AutoWeld, nearestplayer:GetId(), nearestplayer:GetOrigin())
+                 end
+  
+  end
         
 end
 local function MoveMacs(where)
         for _, mac in ipairs(GetEntitiesWithinRange("MAC", where, 999)) do
-           if mac:GetIsAlive() and not mac:GetHasOrder() and not MatchOrigins(mac, where) then
+           if not mac:isa("BaseMac") and mac:GetIsAlive() and not mac:GetHasOrder() and not MatchOrigins(mac, where) then
            FindAppropriateOrder(mac, where)
            end
        end
@@ -281,7 +309,12 @@ function Conductor:OnCreate()
               local CreateImagination = CreateEntity(Imaginator.kMapName)
               self:AddTimedCallback(Conductor.PickMainRoom, 16)
               self:AddTimedCallback(Conductor.Automations, 8)
+              self:AddTimedCallback(Conductor.PayloadTimer, 1)
             end
+   self.payLoadTime = 600
+end
+function Conductor:GetPayloadLength()
+ return self.payLoadTime
 end
 function Conductor:PickMainRoom()
        --Print("Picking main room")
@@ -298,7 +331,24 @@ function Conductor:SetMainRoom(where, which)
         ForAllMarinesSendWP(where, which)
         FindOrCreateKingCyst(where, which)
 end
+function Conductor:PayloadTimer()
+           local boolean = false
+           local gamestarttime = GetGamerules():GetGameStartTime()
+           local gameLength = Shared.GetTime() - gamestarttime
+       if  gameLength >= self.payLoadTime then
+          GetGamerules():SetGameState(kGameState.Team2Won)
+          -- for i = 1, 30 do
+          -- Print("DERP DERP TIMER COUNT DOWN TO 0 DERP DERP") 
+          -- end
+           boolean = true
+       end
+       return not boolean
+end
+function Conductor:SendNotification(who, seconds)
+--replace with shine plugin avocagamerules
+end
 function Conductor:Automations()
+
               self:InitiateBalancer()
               self:CollectResources()
               self:MaintainHiveDefense()

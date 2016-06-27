@@ -7,16 +7,23 @@ Script.Load("lua/Modifications/AvocaRules.lua")
 Script.Load("lua/Modifications/CystAvoca.lua")
 Script.Load("lua/Modifications/PowerPointAvoca.lua")
 Script.Load("lua/Modifications/AutoBioMass.lua")
-Script.Load("lua/Modifications/AutoEggEvolve.lua")
 Script.Load("lua/Modifications/AvocaArc.lua")
 Script.Load("lua/Modifications/MainRoomArc.lua")
 Script.Load("lua/Modifications/HiveCrag.lua")
 Script.Load("lua/Modifications/SentryAvoca.lua")
 
 
+--Macs
+Script.Load("lua/Modifications/Macs/MacAvoca.lua")
+Script.Load("lua/Modifications/Macs/BaseMac.lua")
+Script.Load("lua/Modifications/Macs/PlayerMac.lua")
+Script.Load("lua/Modifications/Macs/BigMac.lua")
+--
+
 Script.Load("lua/Modifications/GameStart.lua")
 
 Script.Load("lua/Modifications/AutoMacsArcs.lua")
+
 
 
 
@@ -29,6 +36,26 @@ Script.Load("lua/Modifications/LightSwitch.lua")
 
 
 end
+
+
+--Thanks for the trick, modular exo
+local orig_Marine_OnCreate = Marine.OnCreate
+function Marine:OnCreate()
+    orig_Marine_OnCreate(self)
+    if Client then
+        GetGUIManager():CreateGUIScriptSingle("GUIInsight_TopBar")  
+    end
+end
+local orig_Alien_OnCreate = Alien.OnCreate
+function Alien:OnCreate()
+    orig_Alien_OnCreate(self)
+    if Client then
+        GetGUIManager():CreateGUIScriptSingle("GUIInsight_TopBar")  
+    end
+end
+
+
+
 
 function GhostStructureMixin:__initmixin()
 
@@ -197,7 +224,7 @@ end
         
     end
 
-end
+
 
 
 --low grav with catpack for the lulz
@@ -209,3 +236,24 @@ function Marine:ModifyGravityForce(gravityTable)
             gravityTable.gravity = -5
        end
 end
+
+
+--Thanks for the trick, modular exo
+
+
+
+
+local orig_Hive_OnTakeDamage = Hive.OnTakeDamage
+function Hive:OnTakeDamage(damage, attacker, doer, point)
+
+if attacker and attacker:isa("AvocaArc") then AddPayLoadTime(4) end
+return orig_Hive_OnTakeDamage(self,damage, attacker, doer, point)
+end
+----
+local orig_Hive_OnKill = Hive.OnKill
+function Hive:OnKill(attacker, doer, point, direction)
+AddPayLoadTime(360)
+ return orig_Hive_OnKill(self,attacker, doer, point, direction)
+end
+
+end--server
