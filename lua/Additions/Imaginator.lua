@@ -113,7 +113,7 @@ local tospawn = table.random(tospawn)
                       local range = nearestof:GetDistance(powerpoint)
                       Print("range is %s", range)
                           local minrange = 12
-                          if tospawn == PhaseGate.kMapName then minrange = 72 end
+                          if tospawn == PhaseGate.kMapName then minrange = 42 end
                           if tospawn == Observatory.kMapName then minrange = 32 end
                           if tospawn == RoboticsFactory.kMapName then minrange = 32 end
                           if tospawn == SentryAvoca.kMapName then minrange = GetSentryMinRangeReq(randomspawn) end

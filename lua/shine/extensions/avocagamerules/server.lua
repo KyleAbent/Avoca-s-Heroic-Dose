@@ -21,8 +21,25 @@ self.Enabled = true
 return true
 end
 
+function Plugin:SetGameState( Gamerules, State, OldState )
+       if State == kGameState.Countdown then
+          for _, conductor in ientitylist(Shared.GetEntitiesWithClassname("Conductor")) do
+             DestroyEntity(conductor)
+          end
+      CreateEntity(Conductor.kMapName)
+        end
+        
+           if State == kGameState.Team1Won or State == kGameState.Team2Won or State == kGameState.Draw then
+          
+          for _, conductor in ientitylist(Shared.GetEntitiesWithClassname("Conductor")) do
+             DestroyEntity(conductor)
+          end
+end
+
+end  
 function Plugin:OnSendNotification(seconds)
     local who = nil
+    local entityList = Shared.GetEntitiesWithClassname("Conductor")
     if entityList:GetSize() > 0 then
                local conductor = entityList:GetEntityAtIndex(0)
                 who = conductor

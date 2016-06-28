@@ -49,17 +49,49 @@ local function PowerSurgeMarines(self)
           end
     end
 end
-
 function AirLock:OnInitialized()
    Trigger.OnInitialized(self) 
    self:SetUpdates(true)
    self:SetTriggerCollisionEnabled(true)
    self:SetPropagate(Entity.Propagate_Always)
 
-
+   if GetIsPointInMarineBase(self:GetOrigin()) then
+              self:InitiateDefense()
+   end
    
 end
+function AirLock:InitiateDefense()
+   self:AddTimedCallback(AirLock.BaseDefense, 4)
+end
+local function GetRandom(self, nameofwhich)
 
+local lottery = {}
+     for _, unit in ipairs(GetEntitiesWithMixinForTeamWithinRange("Live", 2, self:GetOrigin(), 24)) do
+     
+         local location = GetLocationForPoint(unit:GetOrigin())
+         if location and location.name == nameofwhich then
+              table.insert(lottery, unit)
+         end
+     end
+     
+     if table.count(lottery) ~= 0 then
+        local entity = table.random(lottery)
+        return entity:GetOrigin()
+     end
+     
+     return nil
+end
+function AirLock:BaseDefense() 
+  if Server then  
+                  Print("BaseDefense triggered")
+          local spawnpoint = GetRandom(self, self.name)
+            if spawnpoint ~= nil then 
+                  Print("SpawnDefense triggered")
+              CreateEntity(ClusterGrenade.kMapName, spawnpoint, 2) 
+           end
+   end
+     return not self:GetIsDestroyed()
+end
 local function ForTheLulz(self, who)
                local direction = Vector(math.random(-900,900),math.random(-900,900),math.random(-900,900))
                local current = who:GetVelocity()

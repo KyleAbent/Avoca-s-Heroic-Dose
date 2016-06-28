@@ -12,7 +12,7 @@ local unbuilt = 0
                    end
                 end
                
-               return Clamp(table.count(built) -3, 0, 20), unbuilt, table.random(built)
+               return Clamp(table.count(built) -4, 0, 20), unbuilt, table.random(built)
 
 end
 

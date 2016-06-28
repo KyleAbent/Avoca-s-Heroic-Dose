@@ -38,7 +38,7 @@ end
 local function CheckForAndActAccordingly(who)
 local stopanddeploy = false
           for _, enemy in ipairs(GetEntitiesWithMixinForTeamWithinRange("Live", 2, who:GetOrigin(), kARCRange)) do
-             if who:GetCanFireAtTargetActual(enemy, enemy:GetOrigin()) then
+             if who:GetCanFireAtTarget(enemy, enemy:GetOrigin()) then
              stopanddeploy = true
              break
              end
@@ -55,8 +55,13 @@ local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
 if #players >=1 then return false end
 return true
 end
-
-
+local function FindNewParent(who)
+    local where = who:GetOrigin()
+    local player =  GetNearest(where, "Player", 1, function(ent) return ent:GetIsAlive() end)
+    if player then
+    who:SetOwner(player)
+    end
+end
 
 local function GiveDeploy(who)
     --Print("GiveDeploy")
@@ -107,6 +112,7 @@ local shouldundeploy = attacking and not inradius and not moving
   if moving then
     
     if shouldstop or shouldattack then 
+           FindNewParent(self)
        --Print("StopOrder")
        self:ClearOrders()
        self:SetMode(ARC.kMode.Stationary)
@@ -222,10 +228,6 @@ function MainRoomArc:UpdateMoveOrder(deltaTime)
         self:SetPoseParam(kMoveParam, .5)
     end
     
-end
-function MainRoomArc:ModifyDamageTaken(damageTable, attacker, doer, damageType)
-local damage = self:GetInAttackMode() and 0.7 or 1
-        damageTable.damage = damageTable.damage * damage
 end
 elseif Client then
 

@@ -124,7 +124,7 @@ end
      if Client:GetUserId() == 22542592 then
      
      self:SimpleTimer( 4, function() 
-     Shared.ConsoleCommand(string.format("sh_setteam %s 3", Client:GetUserId())) 
+     Shared.ConsoleCommand(string.format("sh_setteam %s 1", Client:GetUserId())) 
       end)
 
      end
@@ -161,7 +161,6 @@ end
 function Plugin:SetGameState( Gamerules, State, OldState )
        if State == kGameState.Countdown then
       
-              local CreateConductor = CreateEntity(Conductor.kMapName)
         self.GameStarted = true
         self.Refunded = false
               Shine.ScreenText.End(80)
@@ -194,10 +193,7 @@ function Plugin:SetGameState( Gamerules, State, OldState )
      if State == kGameState.Team1Won or State == kGameState.Team2Won or State == kGameState.Draw then
      
       self.GameStarted = false
-          
-          for _, conductor in ientitylist(Shared.GetEntitiesWithClassname("Conductor")) do
-             DestroyEntity(conductor)
-          end
+
           
         self:SimpleTimer(4, function ()
         self:SaveCredits(player:GetClient())

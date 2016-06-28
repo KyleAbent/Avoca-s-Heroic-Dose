@@ -20,6 +20,9 @@ local hives = {}
              SoTheGameCanEnd(self, ent)
           end
 end
+function ARC:GetShowDamageIndicator()
+    return true
+end
 local function MoveToHives(who) --Closest hive from origin
 local where = who:GetOrigin()
  local hive =  GetNearest(where, "Hive", 2, function(ent) return not ent:GetIsDestroyed() end)
@@ -44,7 +47,13 @@ local stopanddeploy = false
         --Print("stopanddeploy is %s", stopanddeploy)
        return stopanddeploy
 end
-
+local function FindNewParent(who)
+    local where = who:GetOrigin()
+    local player =  GetNearest(where, "Player", 1, function(ent) return ent:GetIsAlive() end)
+    if player then
+    who:SetOwner(player)
+    end
+end
 local function GiveDeploy(who)
     --Print("GiveDeploy")
 who:GiveOrder(kTechId.ARCDeploy, who:GetId(), who:GetOrigin(), nil, true, true)
@@ -93,6 +102,7 @@ local shouldundeploy = attacking and not inradius and not moving
     
     if shouldstop or shouldattack then 
        --Print("StopOrder")
+       FindNewParent(self)
        self:ClearOrders()
        self:SetMode(ARC.kMode.Stationary)
       end 

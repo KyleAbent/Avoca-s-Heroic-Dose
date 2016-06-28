@@ -119,13 +119,17 @@ local function FindAppropriateOrder(mac,where)
                  if nearestplayer then
                         mac:GiveOrder(kTechId.AutoWeld, nearestplayer:GetId(), nearestplayer:GetOrigin())
                  end
-  
-  end
+       elseif mac:isa("BaseMac") then
+             local nearestinBase = GetNearestMixin(where, "Weldable", 1, function(ent) return not ent:isa("Player") and GetIsPointInMarineBase(ent:GetOrigin()) and ent:GetCanBeWelded(mac) and ent:GetWeldPercentage() < 1  end)
+                 if nearestinBase then
+                        mac:GiveOrder(kTechId.AutoWeld, nearestinBase:GetId(), nearestinBase:GetOrigin())
+                 end
+       end
         
 end
 local function MoveMacs(where)
         for _, mac in ipairs(GetEntitiesWithinRange("MAC", where, 999)) do
-           if not mac:isa("BaseMac") and mac:GetIsAlive() and not mac:GetHasOrder() and not MatchOrigins(mac, where) then
+           if mac:GetIsAlive() and not mac:GetHasOrder() and not MatchOrigins(mac, where) then
            FindAppropriateOrder(mac, where)
            end
        end
@@ -295,13 +299,7 @@ local function BuildAllNodes(self)
           end
 
 end
-function Conductor:OnCreate() 
-   for i = 1,8  do
-     Print("Conductor created")
-   end
-   
-
-   
+function Conductor:OnRoundStart() 
            if Server then
               BuildAllNodes(self)
               self:SpawnInitialStructures()
@@ -311,6 +309,12 @@ function Conductor:OnCreate()
               self:AddTimedCallback(Conductor.Automations, 8)
               self:AddTimedCallback(Conductor.PayloadTimer, 1)
             end
+end
+function Conductor:OnCreate() 
+   for i = 1,8  do
+     Print("Conductor created")
+   end
+   self:OnRoundStart()
    self.payLoadTime = 600
 end
 function Conductor:GetPayloadLength()

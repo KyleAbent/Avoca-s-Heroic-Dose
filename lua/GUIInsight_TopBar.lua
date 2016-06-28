@@ -286,16 +286,6 @@ function GUIInsight_TopBar:SendKeyEvent(key, down)
     return false
 
 end
-local function GetPayloadLength()
-    local entityList = Shared.GetEntitiesWithClassname("Conductor")
-    if entityList:GetSize() > 0 then
-               local conductor = entityList:GetEntityAtIndex(0)
-               local length = conductor:GetPayloadLength()
-               --Print("length is %s", length)
-               return length
-    end
-    return 0
-end
 function GUIInsight_TopBar:Update(deltaTime)
     
     PROFILE("GUIInsight_TopBar:Update")
@@ -321,7 +311,7 @@ function GUIInsight_TopBar:Update(deltaTime)
         local payloadTimetext = nil
         
         
-        local timerlength = GetPayloadLength()
+        local timerlength = PlayerUI_GetPayloadTime()
         local NowToFront = timerlength - (Shared.GetTime() - PlayerUI_GetGameStartTime())
         local FrontLength =  math.ceil( Shared.GetTime() + NowToFront - Shared.GetTime() )
         frontTime = FrontLength
@@ -333,7 +323,7 @@ function GUIInsight_TopBar:Update(deltaTime)
      payloadTimetext = string.format("payLoadtime: %d:%02d", minutes, seconds)
 
 
-           local timerlength = GetPayloadLength()
+           local timerlength = PlayerUI_GetPayloadTime()
            local NowToSiege = timerlength - (Shared.GetTime() - PlayerUI_GetGameStartTime())
            local SiegeLength =  math.ceil( Shared.GetTime() + NowToSiege - Shared.GetTime() )
            siegeTime = SiegeLength

@@ -1,10 +1,38 @@
 function AddPayLoadTime(seconds)
     local entityList = Shared.GetEntitiesWithClassname("Conductor")
     if entityList:GetSize() > 0 then
-               local conductor = entityList:GetEntityAtIndex(0)
-                conductor:SendNotification(seconds)
-                conductor.payLoadTime = conductor.payLoadTime + seconds
+                local gameLength = Shared.GetTime() - GetGamerules():GetGameStartTime()
+                 local conductor = entityList:GetEntityAtIndex(0)
+                 local currenttimeleft = math.abs(conductor.payLoadTime - gameLength )
+                 local amount = seconds
+             
+            if amount >= 60 then    
+                 if currenttimeleft + conductor.payLoadTime + seconds >= 1500 then
+                     local overflow = 0
+                    overflow = seconds + currenttimeleft
+                    overflow = overflow - (1500)
+                    amount = amount - overflow
+                 end
+                   amount = math.round(amount,0)
+            end
+            
+                conductor:SendNotification(amount)
+                conductor.payLoadTime = conductor.payLoadTime + amount
     end    
+end
+function GetIsPointInMarineBase(where)    
+    local cclocation = nil
+           for _, cc in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do
+        cclocation = GetLocationForPoint(cc:GetOrigin())
+        cclocation = cclocation.name
+             break
+          end
+    
+    local pointlocation = GetLocationForPoint(where)
+          pointlocation = pointlocation and pointlocation.name or nil
+          
+          return pointlocation == cclocation
+    
 end
 function FindFreeSpace(where, mindistance, maxdistance)    
      if not mindistance then mindistance = .5 end
@@ -20,7 +48,9 @@ function FindFreeSpace(where, mindistance, maxdistance)
         
            local location = spawnPoint and GetLocationForPoint(spawnPoint)
            local locationName = location and location:GetName() or ""
-           local sameLocation = spawnPoint ~= nil and locationName == GetLocationForPoint(where).name
+           local wherelocation = GetLocationForPoint(where)
+           wherelocation = wherelocation and wherelocation.name or nil
+           local sameLocation = spawnPoint ~= nil and locationName == wherelocation
         
            if spawnPoint ~= nil and sameLocation   then
               return spawnPoint

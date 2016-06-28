@@ -12,17 +12,21 @@ function SealAirLock(nameofwhich)
           end
 
 end
-local function LastMarineLeft(self)
+local function RoomIsEmpty(self)
                      local marines = 0
                      local entities = self:GetEntitiesInTrigger()
                      
-                     if #entities == 0 then return boolean end
+                     if #entities == 0 then return true end
                      
                      for i = 1, #entities do
                      local ent = entities[i]
-                     if ent:isa("Marine") and ent:GetIsAlive() and not ent:isa("Commander") then marines = marines + 1 end
+                     if ent:isa("Marine") and ent:GetIsAlive() and not ent:isa("Commander") then return false end
                      end
-return marines <= 1
+
+end
+local function IsPowerDown(self)
+ local powerpoint = GetPowerPointForLocation(self.name)
+ if powerpoint then return powerpoint:GetIsDisabled() and not powerpoint:GetIsBuilt()  end
 end
 local function HasAirLockInRoom(nameofwhich)
 local boolean = false
@@ -45,7 +49,7 @@ end
       end
   function Location:OnTriggerExited(entity, triggerEnt)
           ASSERT(self == triggerEnt)
-                    if entity:isa("Marine") and not entity:isa("Commander") and HasAirLockInRoom(self.name) and LastMarineLeft(self) then
+                    if not GetIsPointInMarineBase(self:GetOrigin()) and HasAirLockInRoom(self.name) and ( RoomIsEmpty(self) or IsPowerDown(self) ) then
                          SealAirLock(self.name)
                     end
     end

@@ -19,9 +19,9 @@ local function AlreadySpawned(self, origin)
         if ents and #ents >= 4 then return true else return false end
         
 end
-function Conductor:SpawnBaseEntities(self, origin)
+function Conductor:SpawnBaseEntities()
 //messy and mir-air. But whatever. Requires GetGroundPosition
-local techPointOrigin = nil or origin
+local techPointOrigin = nil
         local cc = GetEntitiesForTeam("CommandStructure", 1)
         if cc and #cc > 0 and not techPointOrigin then
             techPointOrigin = cc[1]:GetOrigin()
@@ -48,7 +48,7 @@ local techPointOrigin = nil or origin
     CreateEntity(PhaseGate.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     CreateEntity(Observatory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     for i = 1, 4 do
-   CreateEntity(SentryAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+   CreateEntity(BaseSentry.kMapName, FindFreeSpace(techPointOrigin,4), 1)
    end
     
     --if #cc < 3 then
@@ -96,9 +96,7 @@ local function TrySomethingElse(self)
               local ccs = GetEntitiesForTeam("CommandStation", 1)
               for i = 1, #ccs do
                 local chair = ccs[i]
-                local location = GetLocationForPoint(self:GetOrigin())
                 local vaporizer = CreateEntity(Vaporizer.kMapName, chair:GetOrigin(), 1)
-               -- vaporizer.scale = location.scale
               end 
 
    
@@ -113,13 +111,19 @@ local tech = nil
                           if tech:GetAttached() == nil then
                            local hive = tech:SpawnCommandStructure(2)
                           hive:SetConstructionComplete()
+                          local location = GetLocationForPoint(tech:GetOrigin())
+                          location = location and location.name or nil
+                          local powerpoint = GetPowerPointForLocation(location)
+                          if powerpoint and not powerpoint:GetIsDisabled() then powerpoint:Kill() end
                           end
                     end
          
          
-end
+end 
+ if Server then
 function Conductor:SpawnInitialStructures()
-    self:SpawnBaseEntities(self)
+    self:SpawnBaseEntities()
     TrySomethingElse(self)
     --SpawnAlienHives(self)
+end
 end

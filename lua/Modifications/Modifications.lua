@@ -11,6 +11,7 @@ Script.Load("lua/Modifications/AvocaArc.lua")
 Script.Load("lua/Modifications/MainRoomArc.lua")
 Script.Load("lua/Modifications/HiveCrag.lua")
 Script.Load("lua/Modifications/SentryAvoca.lua")
+Script.Load("lua/Modifications/BaseSentry.lua")
 
 
 --Macs
@@ -39,6 +40,47 @@ end
 
 
 --Thanks for the trick, modular exo
+
+if Client then
+function PlayerUI_GetPayloadTime()
+
+    local entityList = Shared.GetEntitiesWithClassname("Conductor")
+    if entityList:GetSize() > 0 then
+               local conductor = entityList:GetEntityAtIndex(0)
+               local length = conductor:GetPayloadLength()
+               --Print("length is %s", length)
+               return length
+    end
+    return 0
+end
+end
+
+local orig_Whip_OnInit = Whip.OnInitialized
+function Whip:OnInitialized()
+    orig_Whip_OnInit(self)
+  
+       if Server then
+        local targetTypes = { kAlienStaticTargets, kAlienMobileTargets }, { self.FilterTarget(self) }
+        self.slapTargetSelector = TargetSelector():Init(self, Whip.kRange, true, targetTypes)
+        self.bombardTargetSelector = TargetSelector():Init(self, Whip.kBombardRange, true, targetTypes)
+        end
+end
+
+function Whip:FilterTarget()
+
+    local attacker = self
+    return function (target, targetPosition) return attacker:GetCanFireAtTargetActual(target, targetPosition) end
+    
+end
+function Whip:GetCanFireAtTargetActual(target, targetPoint)    
+
+    if target:isa("AvocaArc") and target:GetInAttackMode() then
+    return false
+    end
+    
+    return true
+    
+end
 local orig_Marine_OnCreate = Marine.OnCreate
 function Marine:OnCreate()
     orig_Marine_OnCreate(self)
@@ -46,6 +88,12 @@ function Marine:OnCreate()
         GetGUIManager():CreateGUIScriptSingle("GUIInsight_TopBar")  
     end
 end
+local orig_NS2Gamerules_OnCreate = NS2Gamerules.OnCreate
+function NS2Gamerules:OnCreate()
+    orig_NS2Gamerules_OnCreate(self)
+
+end
+
 local orig_Alien_OnCreate = Alien.OnCreate
 function Alien:OnCreate()
     orig_Alien_OnCreate(self)
@@ -239,8 +287,24 @@ end
 
 
 --Thanks for the trick, modular exo
-
-
+/*
+local orig_GameInfo_SetStartTime = GameInfo.SetStartTime
+function GameInfo:SetStartTime(startTime)
+    orig_GameInfo_SetStartTime(self)
+        local entityList = Shared.GetEntitiesWithClassname("Conductor")
+    if entityList:GetSize() == 0 then
+     local Conductor = CreateEntity(Conductor.kMapName)
+     end
+end
+*/
+local orig_PowerPoint_OnKill = PowerPoint.OnKill
+    function PowerPoint:OnKill(attacker, doer, point, direction)
+    orig_PowerPoint_OnKill(self)
+       local nearestExtractor = GetNearest(self:GetOrigin(), "Extractor", 1, function(ent) return GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(self:GetOrigin())  end)
+       if nearestExtractor then
+         nearestExtractor:Kill()
+       end
+    end
 
 
 local orig_Hive_OnTakeDamage = Hive.OnTakeDamage
@@ -256,4 +320,16 @@ AddPayLoadTime(360)
  return orig_Hive_OnKill(self,attacker, doer, point, direction)
 end
 
+
+
+--Dont know why the other arcs damage players and eggs :/
+function LiveMixin:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil and ( attacker:isa("MainRoomArc") and not attacker:GetCanFireAtTarget(self, attacker:GetOrigin()) )then
+    
+        damageTable.damage = damageTable.damage * 0
+        
+    end
+
+end
 end--server

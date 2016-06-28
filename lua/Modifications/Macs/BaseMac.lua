@@ -22,42 +22,11 @@ local function GetAutomaticOrder(self)
             orderType = kTechId.AutoWeld
                     
         else
-
-            -- If there's a friendly entity nearby that needs constructing, constuct it.
-            local constructables = GetEntitiesWithMixinForTeamWithinRange("Construct", self:GetTeamNumber(), self:GetOrigin(), MAC.kOrderScanRadius)
-            for c = 1, #constructables do
-            
-                local constructable = constructables[c]
-                if constructable:GetCanConstruct(self) then
-                
-                    target = constructable
-                    orderType = kTechId.Construct
-                    break
-                    
-                end
-                
-            end
-            
-            if not target then
-            
-                -- Look for entities to heal with weld.
-                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", self:GetTeamNumber(), self:GetOrigin(), MAC.kOrderScanRadius)
-                for w = 1, #weldables do
-                
-                    local weldable = weldables[w]
-                    -- There are cases where the weldable's weld percentage is very close to
-                    -- 100% but not exactly 100%. This second check prevents the MAC from being so pedantic.
-                    if weldable:GetCanBeWelded(self) and weldable:GetWeldPercentage() < 1 and not weldable:isa("MAC") then
-                    
-                        target = weldable
-                        orderType = kTechId.AutoWeld
-                        break
-
-                    end
-                    
-                end
-            
-            end
+              local nearestinBase = GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return not ent:isa("Player") and GetIsPointInMarineBase(ent:GetOrigin()) and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  end)
+                 if nearestinBase then
+                 target = constructable
+                 orderType = kTechId.AutoWeld
+             end  
         
         end
 

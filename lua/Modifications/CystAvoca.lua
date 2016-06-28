@@ -59,8 +59,8 @@ function CystAvoca:SpawnWhipsAtKing(whips, crags, cyst, origin)
           --  local tres = not self.doorsopened and kStructureDropCost * .5 or kStructureDropCost
            -- self.alienteamcanupgeggs = ConditionalValue(self.team2:GetTeamResources()>= 100, true,false)
      --   if self:GetCanSpawnAlienEntity(tres, nil, cyst:GetIsInCombat()) then
-         local maxwhips = 24
-         local currentwhips = #whips
+         local maxwhips = 50
+         local currentwhips = Clamp(#whips, 0, 50)
          Print("Currentwhips is %s", currentwhips)
          local whipstospawn = math.abs(maxwhips - currentwhips)
          Print("whipstospawn is %s", whipstospawn)

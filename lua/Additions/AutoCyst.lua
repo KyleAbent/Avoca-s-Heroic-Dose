@@ -10,13 +10,8 @@ local cysts, ratio = GetCystsInLocation(location, powerpoint)
             
 
              if ratio >= 4 then
-
-                   local nearestcyst = GetNearest(powerpoint:GetOrigin(), "AutoCyst", 2, function(ent) return GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(powerpoint:GetOrigin()) end)
-                    if nearestcyst then
-                    --   Print("nearestcyst is %s", nearestcyst)
-                      local cyst = CreateEntity(AutoCyst.kMapName, FindFreeSpace(nearestcyst:GetOrigin(), kCystRedeployRange +1), 2)
-                         cyst:SetImmuneToRedeploymentTime(999)
-                      end
+               local cyst = CreateEntity(AutoCyst.kMapName, FindFreeSpace(powerpoint:GetOrigin(), kCystRedeployRange +1), 2)
+               cyst:SetImmuneToRedeploymentTime(999)
               end
             
 end
@@ -76,7 +71,7 @@ end
         if location then
        ReallySpawnCysts(self, location)
        end
-       return self:GetIsDisabled() and not self:GetIsBuilt()
+       return self:GetIsDisabled()
     
 end
 

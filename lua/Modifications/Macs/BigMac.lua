@@ -5,8 +5,8 @@ local networkVars = {}
 
 function BigMac:OnCreate()
  MAC.OnCreate(self)
- self:AdjustMaxHealth(self:GetMaxHealth())
- self:AdjustMaxArmor(self:GetMaxArmor())
+ self:AdjustMaxHealth(kMACHealth * 4)
+ self:AdjustMaxArmor(kMACArmor * 4)
 end
 local function GetAutomaticOrder(self)
 
@@ -196,12 +196,6 @@ function BigMac:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
-function BigMac:GetMaxHealth()
-    return kMACHealth * 4
-end
-function BigMac:GetMaxArmor()
-    return kMACArmor * 4
-end
 
 
 function BigMac:GetMoveSpeed()
@@ -295,7 +289,7 @@ function BigMac:ProcessWeldOrder(deltaTime, orderTarget, orderLocation, autoWeld
     if self.timeOfLastWeld == 0 or time > self.timeOfLastWeld + weldrate then
     
         -- Not allowed to weld after taking damage recently.
-        if Shared.GetTime() - self:GetTimeLastDamageTaken() <= 1.0 then
+        if Shared.GetTime() - self:GetTimeLastDamageTaken() <= 4.0 then
 
             return kOrderStatus.InProgress
             
