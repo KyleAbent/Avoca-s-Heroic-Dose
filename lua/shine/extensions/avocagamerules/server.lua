@@ -22,6 +22,7 @@ return true
 end
 
 function Plugin:OnSendNotification(seconds)
+    ---Fix this its not finding the conductor you derp head lol
     local who = nil
     if entityList:GetSize() > 0 then
                local conductor = entityList:GetEntityAtIndex(0)
