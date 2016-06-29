@@ -207,24 +207,31 @@ function Armory:UpdateResearch(deltaTime)
  if not self.timeLastUpdateCheck or self.timeLastUpdateCheck + 15 < Shared.GetTime() then 
    //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
     local researchNode = self:GetTeam():GetTechTree():GetTechNode(self.researchingId)
-    if researchNode then
+       local defaultresearch = false
+       local projectedminutemarktounlock = 60    
+         local researchDuration = 4
         local gameRules = GetGamerules()
-        local projectedminutemarktounlock = 60
         local currentroundlength = ( Shared.GetTime() - gameRules:GetGameStartTime() )
+    if researchNode  then
+   
+                    if researchNode:GetTechId() == kTechId.AdvancedArmoryUpgrade then
+                       researchDuration =  LookupTechData(researchNode:GetTechId(), kTechDataResearchTimeKey, 0.01)
+                       defaultresearch = true
+                    end
+     if not defaultresearch then 
         if researchNode:GetTechId() == kTechId.MinesTech then
            projectedminutemarktounlock = math.random(30, 90)
         elseif researchNode:GetTechId() == kTechId.GrenadeTech then
           projectedminutemarktounlock = math.random(30, 60)
         elseif researchNode:GetTechId() == kTechId.ShotgunTech then
           projectedminutemarktounlock = math.random(60, 120)
-         elseif researchNode:GetTechId() == kTechId.AdvancedArmoryUpgrade then
-          projectedminutemarktounlock = math.random(150, 180)
         elseif researchNode:GetTechId() == kTechId.HeavyMachineGunTech then
            projectedminutemarktounlock = math.random(180, 300)
          end
-        
-       
-        local progress = Clamp(currentroundlength / projectedminutemarktounlock, 0, 1)
+        end
+        local modified = Clamp(currentroundlength / projectedminutemarktounlock, 0, 1)
+        local default = self.researchProgress + deltaTime / researchDuration
+        local progress = not defaultresearch and modified or default
         //Print("%s", progress)
         if progress ~= self.researchProgress then
         

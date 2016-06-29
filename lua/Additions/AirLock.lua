@@ -87,7 +87,7 @@ function AirLock:BaseDefense()
           local spawnpoint = GetRandom(self, self.name)
             if spawnpoint ~= nil then 
                   Print("SpawnDefense triggered")
-              CreateEntity(ClusterGrenade.kMapName, spawnpoint, 2) 
+              CreateEntity(ClusterGrenade.kMapName, spawnpoint, 1) --oh fuck i had this set as team 2 LOL 
            end
    end
      return not self:GetIsDestroyed()

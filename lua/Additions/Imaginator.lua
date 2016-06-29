@@ -61,18 +61,6 @@ function Imaginator:Automations() --Does not use tres *yet* ..??
               self:AutoBuildResTowers()
               return true
 end
-local function GetSentryMinRangeReq(where)
-local count = 0
-            local ents = GetEntitiesForTeamWithinRange("Sentry", 1, where, 16)
-            for index, ent in ipairs(ents) do
-                  count = count + 1
-           end
-           
-           count = Clamp(count, 1, 4)
-           
-           return count*8
-                
-end
 local function FindRandomPerson(airlock, powerpoint)
 
   local ents = airlock:GetEntitiesInTrigger()
@@ -121,7 +109,7 @@ local tospawn = table.random(tospawn)
                           if tospawn == PhaseGate.kMapName then minrange = 72 end
                           if tospawn == Observatory.kMapName then minrange = 32 end
                           if tospawn == RoboticsFactory.kMapName then minrange = 52 end
-                          if tospawn == SentryAvoca.kMapName then minrange = GetSentryMinRangeReq(randomspawn) end
+                          if tospawn == SentryAvoca.kMapName then minrange = 24 end
                           if tospawn == PrototypeLab.kMapName then minrange = 52 end
                           if range >=  minrange then
                            local entity = CreateEntity(tospawn, randomspawn, 1)

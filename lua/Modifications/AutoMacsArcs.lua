@@ -71,9 +71,16 @@ local function GetArcsAmount()
          end
     return  arcs
 end
+local function HasPayLoad(where)
+
+        for _, avocaarc in ipairs(GetEntitiesWithinRange("AvocaArc", where, 999)) do
+            if avocaarc then return true end
+       end
+       return false
+end
 local function ArcQualifications(self)
  local boolean = false
-     if GetArcsAmount() <= 7 and
+     if (GetArcsAmount() <= 7 or not HasPayLoad(self:GetOrigin()) )  and
        -- self:GetTeam():GetTeamResources() >= kARCCost and 
       --    ( kMaxSupply - GetSupplyUsedByTeam(1) >= LookupTechData(kTechId.ARC, kTechDataSupply, 0)) and 
             self.deployed and 
@@ -84,13 +91,6 @@ local function ArcQualifications(self)
       end
       
       return boolean
-end
-local function HasPayLoad(where)
-
-        for _, avocaarc in ipairs(GetEntitiesWithinRange("AvocaArc", where, 999)) do
-            if avocaarc then return true end
-       end
-       return false
 end
 function RoboticsFactory:ChangeTo(who,mapname)
                       if Server then  

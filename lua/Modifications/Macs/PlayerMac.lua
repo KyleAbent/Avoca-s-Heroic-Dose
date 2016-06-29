@@ -81,6 +81,9 @@ local function UpdateOrders(self, deltaTime)
     end
     
 end
+function PlayerMac:GetDeathIconIndex()
+    return kDeathMessageIcon.MAC
+end
 function PlayerMac:OnUpdate(deltaTime)
   ScriptActor.OnUpdate(self, deltaTime)
     

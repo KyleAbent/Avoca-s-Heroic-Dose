@@ -109,6 +109,9 @@ local function UpdateOrders(self, deltaTime)
     end
     
 end
+function MacAvoca:GetDeathIconIndex()
+    return kDeathMessageIcon.MAC
+end
 function MacAvoca:OnUpdate(deltaTime)
   ScriptActor.OnUpdate(self, deltaTime)
     

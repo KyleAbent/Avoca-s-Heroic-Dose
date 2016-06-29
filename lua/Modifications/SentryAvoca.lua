@@ -31,6 +31,9 @@ end
 --Sentry retarded accuracy idea from someone that playtested NS2:Combat and came onto NS2Siege one day while playtesting
 --ns2_tinysiege. Basically the concept of Taking the 'Hydra' inaccuracy and putting that into the Sentry, to mimic
 --ns1 sentrys where one could circle the sentry to avoid the bullets rather than having ns2's concept of perfect aim 24/7
+function SentryAvoca:GetDeathIconIndex()
+    return kDeathMessageIcon.Sentry
+end
 function SentryAvoca:FireBullets()
 
     local startPoint = self:GetBarrelPoint()

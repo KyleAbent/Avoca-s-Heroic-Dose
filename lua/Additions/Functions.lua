@@ -3,8 +3,16 @@ function AddPayLoadTime(seconds)
     if entityList:GetSize() > 0 then
                  local conductor = entityList:GetEntityAtIndex(0) 
                 conductor:SendNotification(seconds)
-                conductor.payLoadTime = conductor.payLoadTime + seconds
+                conductor:AddTime(seconds) 
     end    
+end
+function GetPayLoadArc()
+    local entityList = Shared.GetEntitiesWithClassname("AvocaArc")
+    if entityList:GetSize() > 0 then
+                 local arc = entityList:GetEntityAtIndex(0) 
+                 return arc
+    end    
+    return nil
 end
 function GetIsPointInMarineBase(where)    
     local cclocation = nil

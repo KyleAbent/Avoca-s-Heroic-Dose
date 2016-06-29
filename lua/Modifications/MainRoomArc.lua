@@ -18,14 +18,15 @@ function MainRoomArc:OnInitialized()
  ARC.OnInitialized(self)
     self:SetModel(ARC.kModelName, MainRoomArc.kAnimationGraph)
 end
+function MainRoomArc:GetDamageType()
+return kDamageType.StructuresOnly
+end
 
 local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
    local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
    if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
 end
-function MainRoomArc:PreOnKill(attacker, doer, point, direction)
-AddPayLoadTime(120)
-end 
+
 local function CheckHivesForScan()
 local hives = {}
            for _, hiveent in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
@@ -48,6 +49,31 @@ local stopanddeploy = false
           end
         --Print("stopanddeploy is %s", stopanddeploy)
        return stopanddeploy
+end
+function MainRoomArc:GetDeathIconIndex()
+    return kDeathMessageIcon.ARC
+end
+function MainRoomArc:GetCanFireAtTargetActual(target, targetPoint)    
+
+    if not target.GetReceivesStructuralDamage or not target:GetReceivesStructuralDamage() then        
+        return false
+    end
+    
+    if target:isa("PanicAttack") then
+        return false
+    end
+    
+    if not target:GetIsSighted() and not GetIsTargetDetected(target) then
+        return false
+    end
+    
+    local distToTarget = (target:GetOrigin() - self:GetOrigin()):GetLengthXZ()
+    if (distToTarget > ARC.kFireRange) or (distToTarget < ARC.kMinFireRange) then
+        return false
+    end
+    
+    return true
+    
 end
 function ARC:InRadius()
 return  GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self) 
@@ -202,6 +228,9 @@ function MainRoomArc:Instruct()
    return true
 end
 if Server then
+function MainRoomArc:PreOnKill(attacker, doer, point, direction)
+--AddPayLoadTime(120) --NO WONDER TIMER WENT LONG LOL
+end 
 function MainRoomArc:UpdateMoveOrder(deltaTime)
 
     local currentOrder = self:GetCurrentOrder()
@@ -210,6 +239,10 @@ function MainRoomArc:UpdateMoveOrder(deltaTime)
     self:SetMode(ARC.kMode.Moving)  
     
     local moveSpeed = ( self:GetIsInCombat() or self:GetGameEffectMask(kGameEffect.OnInfestation) ) and 1.2 or 3
+   -- local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
+    --        if #marines >= 2 then
+    --        moveSpeed = moveSpeed * Clamp(#marines/4, 1.1, 4)
+   --         end
     local maxSpeedTable = { maxSpeed = moveSpeed }
     self:ModifyMaxSpeed(maxSpeedTable)
     

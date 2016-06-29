@@ -10,6 +10,11 @@ function Hive:UpdateManually()
    end
    return true
 end
+local function GetBioMassLevel()
+           local teamInfo = GetTeamInfoEntity(2)
+           local bioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
+           return math.round(bioMass / 4, 1, 3)
+end
 function Hive:UpdatePassive()
        if GetHasTech(self, kTechId.Xenocide) or not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
            
@@ -57,20 +62,23 @@ function Hive:UpdateResearch(deltaTime)
  if not self.timeLastUpdateCheck or self.timeLastUpdateCheck + 15 < Shared.GetTime() then 
    //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
     local researchNode = self:GetTeam():GetTechTree():GetTechNode(self.researchingId)
+       local defaultresearch = false
+       local projectedminutemarktounlock = 60
+       local gameRules = GetGamerules()
+       local currentroundlength = ( Shared.GetTime() - gameRules:GetGameStartTime() )
+       local researchDuration = 4
     if researchNode then
-        local gameRules = GetGamerules()
-        local projectedminutemarktounlock = 60
-        local currentroundlength = ( Shared.GetTime() - gameRules:GetGameStartTime() )
-        if researchNode:GetTechId() == kTechId.ResearchBioMassOne then
-           projectedminutemarktounlock = math.random(45, 75)
-        elseif researchNode:GetTechId() == kTechId.ResearchBioMassTwo then
-          projectedminutemarktounlock = math.random(75, 100)
-        elseif researchNode:GetTechId() == kTechId.BileBomb then
-           projectedminutemarktounlock = math.random(60,180)
+                    if researchNode:GetTechId() == kTechId.ResearchBioMassOne then
+                       elseif researchNode:GetTechId() == kTechId.ResearchBioMassTwo then
+                       researchDuration = 200 -- 10 mins == biomass 9 == onos eggs avail and stomp avail == scale to difficulty as per flavor of personality
+                       defaultresearch = true
+                    end--
+        if researchNode:GetTechId() == kTechId.BileBomb then
+           projectedminutemarktounlock = math.random(180,240)
       elseif researchNode:GetTechId() == kTechId.MetabolizeEnergy then
-        projectedminutemarktounlock = math.random(45, 180)
+        projectedminutemarktounlock = math.random(180, 240)
       elseif researchNode:GetTechId() == kTechId.Leap then
-         projectedminutemarktounlock = math.random(240, 280)
+         projectedminutemarktounlock = math.random(180, 240)
       elseif researchNode:GetTechId() == kTechId.Spores then
          projectedminutemarktounlock = math.random(280, 300)
       elseif researchNode:GetTechId() == kTechId.Umbra then
@@ -87,8 +95,10 @@ function Hive:UpdateResearch(deltaTime)
         projectedminutemarktounlock = math.random(420, 500)
           
         end --
-       
-        local progress = Clamp(currentroundlength / projectedminutemarktounlock, 0, 1)
+      end  --
+        local modified = Clamp(currentroundlength / projectedminutemarktounlock, 0, 1)
+        local default = self.researchProgress + deltaTime / researchDuration
+        local progress = not defaultresearch and modified or default
         //Print("%s", progress)
         
         if progress ~= self.researchProgress then
@@ -112,5 +122,4 @@ function Hive:UpdateResearch(deltaTime)
         
     end  --
             self.timeLastUpdateCheck = Shared.GetTime()
-    end
 end

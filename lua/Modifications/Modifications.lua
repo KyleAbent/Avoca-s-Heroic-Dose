@@ -62,7 +62,7 @@ function Whip:FilterTarget()
 end
 function Whip:GetCanFireAtTargetActual(target, targetPoint)    
 
-    if target:isa("AvocaArc") and target:GetInAttackMode() then
+    if target:isa("AvocaArc") and not target:GetInAttackMode() then
     return false
     end
     
@@ -113,7 +113,8 @@ SetCachedTechData(kTechId.Harvester, kTechDataRequiresInfestation, false)
 SetCachedTechData(kTechId.Crag, kTechDataRequiresInfestation, false)
 SetCachedTechData(kTechId.Whip, kTechDataRequiresInfestation, false)
 SetCachedTechData(kTechId.Egg, kTechDataRequiresInfestation, false)
-
+SetCachedTechData(kTechId.Shift, kTechDataRequiresInfestation, false)
+SetCachedTechData(kTechId.Shade, kTechDataRequiresInfestation, false)
 if Server then
 
 function CommandStructure:GetCanBeUsedConstructed(byPlayer)
@@ -294,12 +295,62 @@ local orig_PowerPoint_OnKill = PowerPoint.OnKill
          nearestExtractor:Kill()
        end
     end
+local function ToSpawnFormula(self,panicstospawn, where)
+         for i = 1, panicstospawn do
+                           local bitch = GetPayLoadArc()
+                           if bitch then
+                           local spawnpoint = FindFreeSpace(bitch:GetOrigin(), 4, 8)
+                              if spawnpoint then
+                              local panicattack = CreateEntity(PanicAttack.kMapName, spawnpoint, 2)
+                               panicattack:SetConstructionComplete()
+                               end
+                           end
+               end
+            
+end
+local function SendAnxietyAttack(self, where, who)
+        who = table.count(who)
+         for i = 1, who do
+                           local panicattack = who[i]
+                           local bitch = GetPayLoadArc()
+                           if bitch then
+                           local spawnpoint = FindFreeSpace(bitch:GetOrigin(), 4, 8)
+                              if spawnpoint then
+                                    panicattack:SetOrigin(spawnpoint)
+                               end
+                           end
+               end
+end
+local function PanicInitiate(self,where)
+local panicattacks = {}
 
+        for _, panicattack in ipairs(GetEntitiesWithinRange("PanicAttack", where, 9999)) do
+                if panicattack:GetIsAlive() then
+                       table.insert(panicattacks,panicattack) 
+               end
+       end
+       
+  local countofpanic = Clamp(table.count(panicwhips), 0, 8)
+  local maxpanic = 8
+  local panicstospawn = math.abs(maxpanic - countofpanic)
+        panicstospawn = Clamp(panicstospawn, 0, 4)
+
+            if panicstospawn >= 1 then ToSpawnFormula(self,panicstospawn, where) end
+            
+            if countofpanic >= 1 then
+                SendAnxietyAttack(self, where, panicattacks) -- not sure
+            end
+end
 
 local orig_Hive_OnTakeDamage = Hive.OnTakeDamage
 function Hive:OnTakeDamage(damage, attacker, doer, point)
 
-if attacker and attacker:isa("AvocaArc") then AddPayLoadTime(8) end
+   if doer and doer:isa("ARC") then 
+         Print("PanicAttack Initiated")
+         PanicInitiate(self,self:GetOrigin())
+         AddPayLoadTime(8) 
+    end
+    
 return orig_Hive_OnTakeDamage(self,damage, attacker, doer, point)
 end
 ----

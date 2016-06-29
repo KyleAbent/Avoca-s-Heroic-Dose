@@ -3,7 +3,9 @@ HiveCrag.kMapName = "hivecrag"
 
 --Nothin yet eh
 
-
+function HiveCrag:GetDeathIconIndex()
+    return kDeathMessageIcon.Crag
+end
 function HiveCrag:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

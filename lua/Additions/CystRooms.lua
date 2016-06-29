@@ -36,6 +36,7 @@ local powerpoints = {}--GetDisabledPowerPoints()
 local tospawn = {}
 table.insert(tospawn, AutoCyst.kMapName)
 table.insert(tospawn, Shade.kMapName)
+table.insert(tospawn, Shift.kMapName)
 
 local tospawn = table.random(tospawn)
 

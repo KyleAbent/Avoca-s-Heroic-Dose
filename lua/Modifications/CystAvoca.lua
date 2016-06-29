@@ -162,7 +162,7 @@ function MagnetizeStructures(who)
                 end
           end
           for index, whip in ipairs(GetEntitiesForTeam("Whip", 2)) do
-               if not whip:isa("PowerDrainer") and whip:GetIsBuilt() and who:GetDistance(whip) >= 16 and not (whip:GetHasOrder() or whip.moving) then 
+               if not whip:isa("PowerDrainer") and not whip:isa("PanicWhip") and whip:GetIsBuilt() and who:GetDistance(whip) >= 16 and not (whip:GetHasOrder() or whip.moving) then 
                 local success = whip:GiveOrder(kTechId.Move, who:GetId(), who:GetOrigin(), nil, true, true) 
                if success then break end
                 end

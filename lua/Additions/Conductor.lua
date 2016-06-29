@@ -340,18 +340,33 @@ function Conductor:SetMainRoom(where, which)
         ForAllMarinesSendWP(where, which)
         FindOrCreateKingCyst(where, which)
 end
+local function SuddenDeathConditionsCheck(self)
+          local arc = GetPayLoadArc()
+          
+          if arc and arc:GetInAttackMode() then return true end
+          
+          return false
+end
 function Conductor:PayloadTimer()
            local boolean = false
            local gamestarttime = GetGamerules():GetGameStartTime()
            local gameLength = Shared.GetTime() - gamestarttime
        if  gameLength >= self.payLoadTime then
-          GetGamerules():SetGameState(kGameState.Team2Won)
+             if not SuddenDeathConditionsCheck(self) then
+               GetGamerules():SetGameState(kGameState.Team2Won)
+             else
+               AddPayLoadTime(8)
+             end
+             
           -- for i = 1, 30 do
           -- Print("DERP DERP TIMER COUNT DOWN TO 0 DERP DERP") 
           -- end
            boolean = true
        end
        return not boolean
+end
+function Conductor:AddTime(seconds)
+  self.payLoadTime = self.payLoadTime + seconds
 end
 function Conductor:SendNotification(who, seconds)
 --replace with shine plugin avocagamerules

@@ -4,6 +4,9 @@ AvocaArc.kMapName = "avocaarc"
 local kNanoshieldMaterial = PrecacheAsset("cinematics/vfx_materials/nanoshield.material")
 local kPhaseSound = PrecacheAsset("sound/NS2.fev/marine/structures/phase_gate_teleport")
 
+local kMoveParam = "move_speed"
+local kMuzzleNode = "fxnode_arcmuzzle"
+
 
 local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
    local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
@@ -67,11 +70,10 @@ local function GiveUnDeploy(who)
      who:TriggerEffects("arc_stop_charge")
      who:TriggerEffects("arc_undeploying")
 end
-local function ShouldStop(who)
+local function PlayersNearby(who)
 
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 4)
-if #players >=1 then return false end
-return true
+return #players or 0 
 end
 function AvocaArc:SpecificRules()
 --How emberassing to have the 6.22 video show off broken lua but hey that what's given after only 6 hours
@@ -88,11 +90,11 @@ local attacking = self.deployMode == ARC.kDeployMode.Deployed
 local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self)  
 --Print("inradius is %s", inradius) 
 
-local shouldstop = ShouldStop(self)
+local shouldstop = PlayersNearby(self) == 0
 --Print("shouldstop is %s", shouldstop) 
 local shouldmove = not shouldstop and not moving and not inradius
 --Print("shouldmove is %s", shouldmove) 
-local shouldstop = moving and ShouldStop(self)
+local shouldstop = moving and PlayersNearby(self) == 0
 --Print("shouldstop is %s", shouldstop) 
 local shouldattack = inradius and not attacking 
 --Print("shouldattack is %s", shouldattack) 
@@ -137,7 +139,9 @@ function AvocaArc:GetUnitNameOverride(viewer)
     end
 return unitName
 end  
-
+function AvocaArc:GetDeathIconIndex()
+    return kDeathMessageIcon.ARC
+end
 function AvocaArc:GetCanFireAtTargetActual(target, targetPoint)    
 
     if not target.GetReceivesStructuralDamage or not target:GetReceivesStructuralDamage() then        
@@ -161,10 +165,12 @@ function AvocaArc:GetCanFireAtTargetActual(target, targetPoint)
     
 end
 function AvocaArc:ModifyDamageTaken(damageTable, attacker, doer, damageType)
-local damage = self:GetInAttackMode() and 0.7 or 0 
+local damage = self:GetInAttackMode() and 0.25 or 0 
         damageTable.damage = damageTable.damage * damage
 end
-
+function AvocaArc:GetDamageType()
+return kDamageType.StructuresOnly
+end
 if Client then
 
     function AvocaArc:OnUpdateRender()
@@ -230,6 +236,43 @@ function AvocaArc:Instruct()
 end
 
 if Server then
+function AvocaArc:PreOnKill(attacker, doer, point, direction)
+AddPayLoadTime(120) 
+end 
+function AvocaArc:UpdateMoveOrder(deltaTime)
+
+    local currentOrder = self:GetCurrentOrder()
+    ASSERT(currentOrder)
+    
+    self:SetMode(ARC.kMode.Moving)  
+    
+    local moveSpeed = ( self:GetIsInCombat() or self:GetGameEffectMask(kGameEffect.OnInfestation) ) and ARC.kCombatMoveSpeed or ARC.kMoveSpeed
+   -- local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
+    --        if #marines >= 2 then
+    --        moveSpeed = moveSpeed * Clamp(#marines/4, 1.1, 4)
+    --        end
+    local maxSpeedTable = { maxSpeed = moveSpeed }
+    self:ModifyMaxSpeed(maxSpeedTable)
+    
+    self:MoveToTarget(PhysicsMask.AIMovement, currentOrder:GetLocation(), maxSpeedTable.maxSpeed, deltaTime)
+    
+    self:AdjustPitchAndRoll()
+    
+    if self:IsTargetReached(currentOrder:GetLocation(), kAIMoveOrderCompleteDistance) then
+    
+        self:CompletedCurrentOrder()
+        self:SetPoseParam(kMoveParam, 0)
+        
+        -- If no more orders, we're done
+        if self:GetCurrentOrder() == nil then
+            self:SetMode(ARC.kMode.Stationary)
+        end
+        
+    else
+        self:SetPoseParam(kMoveParam, .5)
+    end
+    
+end
 local function GetDestinationGateEndPoint(self)
     -- Find next phase gate to teleport to
     local phaseGates = {}    

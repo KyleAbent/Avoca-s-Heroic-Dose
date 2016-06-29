@@ -21,6 +21,9 @@ function BaseSentry:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
+function BaseSentry:GetDeathIconIndex()
+    return kDeathMessageIcon.Sentry
+end
 function BaseSentry:GetMaxHealth()
     return kSentryHealth * 4
 end

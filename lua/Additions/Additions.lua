@@ -9,6 +9,7 @@ Script.Load("lua/Additions/HiveDefense.lua")
 Script.Load("lua/Additions/Vaporizer.lua") 
 Script.Load("lua/Additions/Convars.lua") 
 Script.Load("lua/Additions/CystRooms.lua") 
+Script.Load("lua/Additions/PanicAttack.lua") 
 
 
 function Location:MakeSureRoomIsntEmpty()
