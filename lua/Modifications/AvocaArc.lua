@@ -2,6 +2,7 @@
 class 'AvocaArc' (ARC)
 AvocaArc.kMapName = "avocaarc"
 local kNanoshieldMaterial = PrecacheAsset("cinematics/vfx_materials/nanoshield.material")
+local kPhaseSound = PrecacheAsset("sound/NS2.fev/marine/structures/phase_gate_teleport")
 
 
 local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
@@ -228,6 +229,63 @@ function AvocaArc:Instruct()
    return true
 end
 
+if Server then
+local function GetDestinationGateEndPoint(self)
+    -- Find next phase gate to teleport to
+    local phaseGates = {}    
+    for index, phaseGate in ipairs( GetEntitiesForTeam("PhaseGate", self:GetTeamNumber()) ) do
+        if GetIsUnitActive(phaseGate) then
+            table.insert(phaseGates, phaseGate)
+        end
+    end    
+    
+    if table.count(phaseGates) < 2 then
+        return nil
+    end
+    
+    -- Find our index and add 1
+    local index = table.find(phaseGates, self)
+    if (index ~= nil) then
+    
+        local nextIndex = ConditionalValue(index == table.count(phaseGates), 1, index + 1)
+        local entity = phaseGates[0]
+        return entity:GetOrigin()
+        
+    end
+end
+function AvocaArc:GetCanBeUsed(player, useSuccessTable)
+    if player:isa("Marine") then
+    useSuccessTable.useSuccess = true    
+    else
+    useSuccessTable.useSuccess = false
+    end
+end
+function AvocaArc:OnUse(player, elapsedTime, useSuccessTable)
 
+      if HasMixin(user, "PhaseGateUser") then
+        user:TriggerEffects("phase_gate_player_enter")        
+        user:TriggerEffects("teleport")
+        
+        StartSoundEffectAtOrigin(kPhaseSound, self:GetOrigin())
+        local origin = GetDestinationGateEndPoint(self)
+        local destinationCoords = Angles(0, self.targetYaw, 0):GetCoords()
+        
+        player:OnPhaseGateEntry(origin)
+        
+        TransformPlayerCoordsForPhaseGate(user, self:GetCoords(), destinationCoords)
+
+        player:SetOrigin(origin)
+        -- trigger exit effect at destination
+        player:TriggerEffects("phase_gate_player_exit")
+        
+        StartSoundEffectAtOrigin(kPhaseSound, origin)
+
+        return true
+
+      end
+    
+end
+
+end
 
 Shared.LinkClassToMap("AvocaArc", AvocaArc.kMapName, networkVars)

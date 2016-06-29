@@ -23,6 +23,9 @@ local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
    local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
    if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
 end
+function MainRoomArc:PreOnKill(attacker, doer, point, direction)
+AddPayLoadTime(120)
+end 
 local function CheckHivesForScan()
 local hives = {}
            for _, hiveent in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do

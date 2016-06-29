@@ -41,19 +41,7 @@ end
 
 --Thanks for the trick, modular exo
 
-if Client then
-function PlayerUI_GetPayloadTime()
 
-    local entityList = Shared.GetEntitiesWithClassname("Conductor")
-    if entityList:GetSize() > 0 then
-               local conductor = entityList:GetEntityAtIndex(0)
-               local length = conductor:GetPayloadLength()
-               --Print("length is %s", length)
-               return length
-    end
-    return 0
-end
-end
 
 local orig_Whip_OnInit = Whip.OnInitialized
 function Whip:OnInitialized()
@@ -81,6 +69,7 @@ function Whip:GetCanFireAtTargetActual(target, targetPoint)
     return true
     
 end
+
 local orig_Marine_OnCreate = Marine.OnCreate
 function Marine:OnCreate()
     orig_Marine_OnCreate(self)
@@ -310,26 +299,23 @@ local orig_PowerPoint_OnKill = PowerPoint.OnKill
 local orig_Hive_OnTakeDamage = Hive.OnTakeDamage
 function Hive:OnTakeDamage(damage, attacker, doer, point)
 
-if attacker and attacker:isa("AvocaArc") then AddPayLoadTime(4) end
+if attacker and attacker:isa("AvocaArc") then AddPayLoadTime(8) end
 return orig_Hive_OnTakeDamage(self,damage, attacker, doer, point)
 end
 ----
 local orig_Hive_OnKill = Hive.OnKill
 function Hive:OnKill(attacker, doer, point, direction)
-AddPayLoadTime(360)
+AddPayLoadTime(180)
  return orig_Hive_OnKill(self,attacker, doer, point, direction)
 end
 
-
-
---Dont know why the other arcs damage players and eggs :/
-function LiveMixin:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
-
-    if hitPoint ~= nil and ( attacker:isa("MainRoomArc") and not attacker:GetCanFireAtTarget(self, attacker:GetOrigin()) )then
-    
-        damageTable.damage = damageTable.damage * 0
-        
-    end
-
+function Whip:OnKill(attacker, doer, point, direction)
+ --if attacker and attacker:isa("ARC") then AddPayLoadTime(1) end
 end
+
+function PowerPoint:PreOnKill(attacker, doer, point, direction)
+local location = GetLocationForPoint(self:GetOrigin())
+SealAirLock(location.name)
+end 
+
 end--server

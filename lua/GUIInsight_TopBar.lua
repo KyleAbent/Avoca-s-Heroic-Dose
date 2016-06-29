@@ -286,6 +286,16 @@ function GUIInsight_TopBar:SendKeyEvent(key, down)
     return false
 
 end
+local function GetPayloadTime()
+    local entityList = Shared.GetEntitiesWithClassname("Conductor")
+    if entityList:GetSize() > 0 then
+               local conductor = entityList:GetEntityAtIndex(0)
+               local length = conductor:GetPayloadLength()
+               --Print("length is %s", length)
+               return length
+    end
+    return 600
+end
 function GUIInsight_TopBar:Update(deltaTime)
     
     PROFILE("GUIInsight_TopBar:Update")
@@ -308,10 +318,9 @@ function GUIInsight_TopBar:Update(deltaTime)
     local gameTimeText = string.format("%d:%02d", minutes, seconds)
     
     
-        local payloadTimetext = nil
-        
-        
-        local timerlength = PlayerUI_GetPayloadTime()
+
+        if startTime ~= 0 and GetPayloadTime() ~= 0 then 
+        local timerlength = GetPayloadTime()
         local NowToFront = timerlength - (Shared.GetTime() - PlayerUI_GetGameStartTime())
         local FrontLength =  math.ceil( Shared.GetTime() + NowToFront - Shared.GetTime() )
         frontTime = FrontLength
@@ -321,9 +330,11 @@ function GUIInsight_TopBar:Update(deltaTime)
     minutes = minutes - hours * 60
     seconds = seconds - minutes * 60 - hours * 3600
      payloadTimetext = string.format("payLoadtime: %d:%02d", minutes, seconds)
-
-
-           local timerlength = PlayerUI_GetPayloadTime()
+    else
+      payloadTimetext = string.format("payLoadtime: %s", GetPayloadTime())
+end
+       if GetPayloadTime() ~= 0 then 
+           local timerlength = GetPayloadTime()
            local NowToSiege = timerlength - (Shared.GetTime() - PlayerUI_GetGameStartTime())
            local SiegeLength =  math.ceil( Shared.GetTime() + NowToSiege - Shared.GetTime() )
            siegeTime = SiegeLength
@@ -333,7 +344,9 @@ function GUIInsight_TopBar:Update(deltaTime)
            minutes = minutes - hours * 60
            seconds = seconds - minutes * 60 - hours * 3600
           siegeTimeText = string.format("TBD: %d:%02d", minutes, seconds)
-
+     else
+       siegeTimeText = string.format("tbd: derp")
+        end
     gameTime:SetText(gameTimeText)
     payLoadtime:SetText(siegeTimeText)
     payLoadpercent:SetText(payloadTimetext)

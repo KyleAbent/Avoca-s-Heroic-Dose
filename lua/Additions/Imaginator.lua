@@ -56,6 +56,7 @@ local function AutoDrop(self,who)
   if which ~= 0 then Envision(who, which) end
 end
 function Imaginator:Automations() --Does not use tres *yet* ..??
+              self:CystRooms()
               self:AutoBuildConstructs()
               self:AutoBuildResTowers()
               return true
@@ -85,6 +86,10 @@ local function FindRandomPerson(airlock, powerpoint)
 
  return powerpoint:GetOrigin()
 end
+local function GetRange(who, where)
+    local ArcFormula = (where - who:GetOrigin()):GetLengthXZ()
+    return ArcFormula
+end
 function Imaginator:AutoBuildConstructs()
 
 Print("AutoBuildConstructs")
@@ -110,16 +115,19 @@ local tospawn = table.random(tospawn)
             if randomspawn then
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetMapName() == tospawn end)
                       if nearestof then
-                      local range = nearestof:GetDistance(powerpoint)
+                      local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
                       Print("range is %s", range)
                           local minrange = 12
-                          if tospawn == PhaseGate.kMapName then minrange = 42 end
+                          if tospawn == PhaseGate.kMapName then minrange = 72 end
                           if tospawn == Observatory.kMapName then minrange = 32 end
-                          if tospawn == RoboticsFactory.kMapName then minrange = 32 end
+                          if tospawn == RoboticsFactory.kMapName then minrange = 52 end
                           if tospawn == SentryAvoca.kMapName then minrange = GetSentryMinRangeReq(randomspawn) end
-                          if tospawn == PrototypeLab.kMapName then minrange = 48 end
+                          if tospawn == PrototypeLab.kMapName then minrange = 52 end
                           if range >=  minrange then
-                           CreateEntity(tospawn, randomspawn, 1)
+                           local entity = CreateEntity(tospawn, randomspawn, 1)
+                               if entity:isa("Cyst") then
+                                  entity:SetImmuneToRedeploymentTime(999)
+                               end
                           end
                      end
                end   

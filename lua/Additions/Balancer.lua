@@ -56,38 +56,38 @@ function Conductor:FirePhaseCannons(powerpoint)
              local contaminationroll = math.random(chance, 100)
               if chance >= contaminationroll then
                 CreateEntityForTeam(kTechId.Contamination, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance - 10, 1, 100)  
+                 chance = Clamp(chance - 4, 1, 100)  
               end
               
                 local mistroll = math.random(chance, 100)
               if chance >= mistroll then
                 CreateEntityForTeam(kTechId.NutrientMist, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance - 10, 1, 100)  
+                 chance = Clamp(chance -  4, 1, 100)  
               end
                 local rupturerull = math.random(chance, 100)
               if chance >= rupturerull then
                 CreateEntityForTeam(kTechId.Rupture, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance - 10, 1, 100)  
+                 chance = Clamp(chance -  4, 1, 100)  
               end
                 local bonewallroll1 = math.random(chance, 100)
               if chance >= bonewallroll1 then
                 CreateEntityForTeam(kTechId.BoneWall, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance - 10, 1, 100)  
+                 chance = Clamp(chance -  4, 1, 100)  
               end
                 local bonewallroll1 = math.random(chance, 100)
               if chance >= bonewallroll1 then
                 CreateEntityForTeam(kTechId.BoneWall, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance - 10, 1, 100)  
+                 chance = Clamp(chance -  4, 1, 100)  
               end
                 local bonewallroll1 = math.random(chance, 100)
               if chance >= bonewallroll1 then
                 CreateEntityForTeam(kTechId.BoneWall, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance - 10, 1, 100)  
+                 chance = Clamp(chance -  4, 1, 100)  
               end
                 local bonewallroll1 = math.random(chance, 100)
               if chance >= bonewallroll1 then
                 CreateEntityForTeam(kTechId.BoneWall, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance - 10, 1, 100)  
+                 chance = Clamp(chance - 4, 1, 100)  
               end
 end
 
@@ -162,6 +162,9 @@ function Conductor:HandoutMarineBuffs()
              end
              return true
 end
+
+
+
 
 
 

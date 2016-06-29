@@ -314,8 +314,13 @@ function Conductor:OnCreate()
    for i = 1,8  do
      Print("Conductor created")
    end
-   self:OnRoundStart()
+
+   if Server then
    self.payLoadTime = 600
+   end
+end
+function Conductor:GetIsMapEntity()
+return true
 end
 function Conductor:GetPayloadLength()
  return self.payLoadTime
@@ -357,6 +362,7 @@ function Conductor:Automations()
               self:CollectResources()
               self:MaintainHiveDefense()
               self:HandoutMarineBuffs()
+              self:CheckAndMaybeBuildMac()
               return true
 end
 function Conductor:CollectResources()

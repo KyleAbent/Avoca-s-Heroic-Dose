@@ -138,7 +138,7 @@ function CystAvoca:Synchronize()
                      local whips = GetEntitiesForTeamWithinRange("Whip", 2, self:GetOrigin(), 999999)
                      local crags = GetCragsCount()
                      self:SpawnWhipsAtKing(whips, crags, self, self:GetOrigin())
-                     local cysts, ratio, tableof = GetCystsInLocation(GetLocationForPoint(self:GetOrigin()))
+                     local cysts, tableof = GetCystsInLocation(GetLocationForPoint(self:GetOrigin()))
                      for i = 1, #tableof do
                         local autocyst = tableof[i]
                         if autocyst and autocyst:GetIsAlive() and autocyst:GetIsBuilt() then AttractWhipsCrags(autocyst) end
@@ -146,9 +146,9 @@ function CystAvoca:Synchronize()
                     return true
 end
 function AttractWhipsCrags(who)
-   local crags = #GetEntitiesWithinRange("Crag", who:GetOrigin(), 2) 
-   local whips = #GetEntitiesWithinRange("Whip", who:GetOrigin(), 2)
-    if not whips or crags then
+   local crags = #GetEntitiesWithinRange("Crag", who:GetOrigin(), 4) 
+   local whips = #GetEntitiesWithinRange("Whip", who:GetOrigin(), 4)
+    if not whips and not crags or (whips + crags <= 7) then
                  MagnetizeStructures(who)
     end
 end
@@ -156,7 +156,8 @@ function MagnetizeStructures(who)
 
           for index, crag in ipairs(GetEntitiesForTeam("Crag", 2)) do
                if not crag:isa("HiveCrag") and crag:GetIsBuilt() and who:GetDistance(crag) >= 16 and not (crag:GetHasOrder() or crag.moving) then 
-                 local success = crag:GiveOrder(kTechId.Move, who:GetId(), who:GetOrigin(), nil, true, true) 
+                 local where = FindFreeSpace(who:GetOrigin(), .5, 8)
+                 local success = crag:GiveOrder(kTechId.Move, who:GetId(), where, nil, true, true) 
                  if success then break end
                 end
           end

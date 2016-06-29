@@ -1,5 +1,5 @@
-local kOpenSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_open")
-local kCloseSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_close")
+--arcs/macs spawning without robo
+if Server then
 
 local function GetMacsAmount()
     local macavoca = 0
@@ -22,6 +22,48 @@ local function GetMacsAmount()
          total = macavoca + basemac + playermac + bigmac
     return  macavoca, basemac, playermac, bigmac, total
 end
+local function MacQualifications(self)
+    local macavoca,basemac, playermac,bigmac, total = GetMacsAmount()
+ local boolean = false
+     if total <= 7 then
+            boolean = true
+      end
+      
+      return boolean
+        
+end
+local function GetMacMapName()
+   local macavoca,basemac, playermac,bigmac, total = GetMacsAmount()
+   if macavoca <= 2 then
+        return MacAvoca.kMapName
+   elseif basemac<= 2 then
+       return BaseMac.kMapName
+   elseif playermac <=2 then
+       return PlayerMac.kMapName
+   elseif bigmac == 0 then
+        return  BigMac.kMapName
+   end
+
+end
+function Conductor:CheckAndMaybeBuildMac()
+  local chair = nil
+            for _, mainent in ientitylist(Shared.GetEntitiesWithClassname("CommandStructure")) do
+                    if mainent:GetTeamNumber() == 1 then chair = mainent break end
+             end
+             
+           if MacQualifications(self) then
+           local mac = CreateEntity(GetMacMapName(), FindFreeSpace(chair:GetOrigin()) )
+           end
+           
+           return true
+end
+
+end
+
+
+local kOpenSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_open")
+local kCloseSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_close")
+
 local function GetArcsAmount()
     local arcs = 0
         for index, ARC in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
@@ -43,22 +85,6 @@ local function ArcQualifications(self)
       
       return boolean
 end
-local function MacQualifications(self)
-    local macavoca,basemac, playermac,bigmac, total = GetMacsAmount()
- local boolean = false
-     if total <= 7 and
-      --  self:GetTeam():GetTeamResources() >= kMACCost and 
-       --   ( kMaxSupply - GetSupplyUsedByTeam(1) >= LookupTechData(kTechId.MAC, kTechDataSupply, 0)) and 
-            self.deployed and 
-            GetIsUnitActive(self) and 
-           self:GetResearchProgress() == 0  and
-          not self.open then
-            boolean = true
-      end
-      
-      return boolean
-        
-end
 local function HasPayLoad(where)
 
         for _, avocaarc in ipairs(GetEntitiesWithinRange("AvocaArc", where, 999)) do
@@ -75,19 +101,6 @@ function RoboticsFactory:ChangeTo(who,mapname)
                      end, 4) 
                      end
 end
-function RoboticsFactory:ChangeMacsAccordinglyHere(entity)
-   local macavoca,basemac, playermac,bigmac, total = GetMacsAmount()
-   if macavoca <= 2 then
-   self:ChangeTo(entity, MacAvoca.kMapName)
-   elseif basemac<= 2 then
-   self:ChangeTo(entity, BaseMac.kMapName)
-   elseif playermac <=2 then
-   self:ChangeTo(entity, PlayerMac.kMapName)
-   elseif bigmac == 0 then
-   self:ChangeTo(entity, BigMac.kMapName)
-   end
-
-end
 function RoboticsFactory:OnTag(tagName)
     
     PROFILE("RoboticsFactory:OnTag")
@@ -98,15 +111,11 @@ function RoboticsFactory:OnTag(tagName)
           
            if Server then
                 local entity = self.builtEntity
-                if entity:isa("ARC") then
                    if not HasPayLoad(entity:GetOrigin()) then
                         self:ChangeTo(entity, AvocaArc.kMapName)
                    else
                         self:ChangeTo(entity, MainRoomArc.kMapName)
                    end
-               elseif entity:isa("MAC") then
-                    self:ChangeMacsAccordinglyHere(entity)
-               end
                  self.builtEntity = nil
 end
           
@@ -124,10 +133,7 @@ end
 if Server then
   function RoboticsFactory:OnUpdate()
    if self.timeOfLastMacCheck == nil or Shared.GetTime() > self.timeOfLastMacCheck + 8 then
-           if MacQualifications(self) then
-           self:OverrideCreateManufactureEntity(kTechId.MAC)
-           --self:GetTeam():SetTeamResources(self:GetTeam():GetTeamResources() - kMACCost )
-           elseif ArcQualifications(self) then
+           if ArcQualifications(self) then
            self:OverrideCreateManufactureEntity(kTechId.ARC)
            end
            

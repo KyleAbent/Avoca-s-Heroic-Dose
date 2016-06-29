@@ -21,22 +21,20 @@ self.Enabled = true
 return true
 end
 
+function Plugin:MapPostLoad()
+      Server.CreateEntity(Conductor.kMapName)
+
+end
 function Plugin:SetGameState( Gamerules, State, OldState )
-       if State == kGameState.Countdown then
+           if State == kGameState.Countdown then
+       self:SimpleTimer( 8, function() 
           for _, conductor in ientitylist(Shared.GetEntitiesWithClassname("Conductor")) do
-             DestroyEntity(conductor)
+             conductor:OnRoundStart()
+             break
           end
-      CreateEntity(Conductor.kMapName)
-        end
-        
-           if State == kGameState.Team1Won or State == kGameState.Team2Won or State == kGameState.Draw then
-          
-          for _, conductor in ientitylist(Shared.GetEntitiesWithClassname("Conductor")) do
-             DestroyEntity(conductor)
+       end)   
           end
 end
-
-end  
 function Plugin:OnSendNotification(seconds)
     local who = nil
     local entityList = Shared.GetEntitiesWithClassname("Conductor")

@@ -1,23 +1,9 @@
 function AddPayLoadTime(seconds)
     local entityList = Shared.GetEntitiesWithClassname("Conductor")
     if entityList:GetSize() > 0 then
-                local gameLength = Shared.GetTime() - GetGamerules():GetGameStartTime()
-                 local conductor = entityList:GetEntityAtIndex(0)
-                 local currenttimeleft = math.abs(conductor.payLoadTime - gameLength )
-                 local amount = seconds
-             
-            if amount >= 60 then    
-                 if currenttimeleft + conductor.payLoadTime + seconds >= 1500 then
-                     local overflow = 0
-                    overflow = seconds + currenttimeleft
-                    overflow = overflow - (1500)
-                    amount = amount - overflow
-                 end
-                   amount = math.round(amount,0)
-            end
-            
-                conductor:SendNotification(amount)
-                conductor.payLoadTime = conductor.payLoadTime + amount
+                 local conductor = entityList:GetEntityAtIndex(0) 
+                conductor:SendNotification(seconds)
+                conductor.payLoadTime = conductor.payLoadTime + seconds
     end    
 end
 function GetIsPointInMarineBase(where)    
@@ -98,4 +84,30 @@ function GetIsPointWithinHiveRadius(point)
    if #hive >= 1 then return true end
 
    return false
+end
+
+if Server then
+
+    function GetCystsInLocation(location, powerpoint)
+        if not powerpoint then powerpoint = GetPowerPointForLocation(location.name) end
+      /*
+          local entities = location:GetEntitiesInTrigger()
+           for i = 1, #entities do
+              local entity = entities[i]
+              if entity:isa("AutoCyst") then Print("AutoCyst found in room") end
+           end
+      */
+         local tableof = {}
+            local entities = GetEntitiesForTeamWithinRange("AutoCyst", 2, powerpoint:GetOrigin(), 24)
+                local cysts = 0
+            for i = 1, #entities do
+            local entity = entities[i]
+                if GetLocationForPoint(entity:GetOrigin()) == location then 
+                  cysts = cysts + 1
+                  table.insert(tableof, entity)
+                end
+            end
+            return cysts, tableof
+end
+
 end
