@@ -119,6 +119,7 @@ function Plugin:GetCreditData(Client)
    end
 return User, ID
 end
+/*
  function Plugin:ClientConnect(Client)
      --SO I can seed and AFK  without being randomized onteam while afk :P
      if Client:GetUserId() == 22542592 then
@@ -131,6 +132,7 @@ end
  
  
  end
+ */
  function Plugin:ClientConfirmConnect(Client)
  
  if Client:GetIsVirtual() then return end

@@ -73,6 +73,19 @@ end
 local function PlayersNearby(who)
 
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 4)
+
+    if #players >= 1 then
+         for i = 1, #players do
+            local player = players[i]
+            if ( player:GetIsAlive() and  player.GetIsNanoShielded and not player:GetIsNanoShielded()) then player:ActivateNanoShield() end
+           if ( player:GetHealth() == player:GetMaxHealth() ) then
+           local addarmoramount = 3 * player:GetArmorLevel()
+           player:AddHealth(addarmoramount, false, not true, nil, nil, true)
+           else
+           player:AddHealth(Armory.kHealAmount, false, false, nil, nil, true)   
+           end
+         end
+    end
 return #players or 0 
 end
 function AvocaArc:SpecificRules()
@@ -166,7 +179,9 @@ function AvocaArc:GetCanFireAtTargetActual(target, targetPoint)
 end
 function AvocaArc:ModifyDamageTaken(damageTable, attacker, doer, damageType)
 local damage = self:GetInAttackMode() and 0.25 or 0 
+        if doer:isa("PanicAttack") then damage = damage * 4 end
         damageTable.damage = damageTable.damage * damage
+
 end
 function AvocaArc:GetDamageType()
 return kDamageType.StructuresOnly
@@ -237,7 +252,7 @@ end
 
 if Server then
 function AvocaArc:PreOnKill(attacker, doer, point, direction)
-AddPayLoadTime(120) 
+AddPayLoadTime(90) 
 end 
 function AvocaArc:UpdateMoveOrder(deltaTime)
 
@@ -329,6 +344,87 @@ function AvocaArc:OnUse(player, elapsedTime, useSuccessTable)
     
 end
 
+local function PerformAttack(self)
+
+    if self.targetPosition then
+    
+        self:TriggerEffects("arc_firing")    
+        -- Play big hit sound at origin
+        
+        -- don't pass triggering entity so the sound / cinematic will always be relevant for everyone
+        GetEffectManager():TriggerEffects("arc_hit_primary", {effecthostcoords = Coords.GetTranslation(self.targetPosition)})
+        
+        local hitEntities = GetEntitiesWithMixinWithinRange("Live", self.targetPosition, ARC.kSplashRadius)
+
+        -- Do damage to every target in range
+        RadiusDamage(hitEntities, self.targetPosition, ARC.kSplashRadius, 1350, self, true)
+
+        -- Play hit effect on each
+        for index, target in ipairs(hitEntities) do
+        
+            if HasMixin(target, "Effects") then
+                target:TriggerEffects("arc_hit_secondary")
+            end 
+           
+        end
+        
+    end
+    
+    -- reset target position and acquire new target
+    self.targetPosition = nil
+    self.targetedEntity = Entity.invalidId
+    
 end
+
+--all this just to modify damage -.-
+
+function AvocaArc:OnTag(tagName)
+
+    PROFILE("ARC:OnTag")
+    
+    if tagName == "fire_start" then
+        PerformAttack(self)
+    elseif tagName == "target_start" then
+        self:TriggerEffects("arc_charge")
+    elseif tagName == "attack_end" then
+        self:SetMode(ARC.kMode.Targeting)
+    elseif tagName == "deploy_start" then
+        self:TriggerEffects("arc_deploying")
+    elseif tagName == "undeploy_start" then
+        self:TriggerEffects("arc_stop_charge")
+    elseif tagName == "deploy_end" then
+    
+        -- Clear orders when deployed so new ARC attack order will be used
+        self.deployMode = ARC.kDeployMode.Deployed
+        self:ClearOrders()
+        -- notify the target selector that we have moved.
+        self.targetSelector:AttackerMoved()
+        
+        self:AdjustMaxHealth(kARCDeployedHealth)
+        
+        local currentArmor = self:GetArmor()
+        if currentArmor ~= 0 then
+            self.undeployedArmor = currentArmor
+        end
+        
+        self:SetMaxArmor(kARCDeployedArmor)
+        self:SetArmor(self.deployedArmor)
+        
+    elseif tagName == "undeploy_end" then
+    
+        self.deployMode = ARC.kDeployMode.Undeployed
+        
+        self:AdjustMaxHealth(kARCHealth)
+        self.deployedArmor = self:GetArmor()
+        self:SetMaxArmor(kARCArmor)
+        self:SetArmor(self.undeployedArmor)
+
+    end
+    
+end
+
+end
+
+
 
 Shared.LinkClassToMap("AvocaArc", AvocaArc.kMapName, networkVars)

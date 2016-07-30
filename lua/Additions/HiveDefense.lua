@@ -1,4 +1,5 @@
-    local function GetBuiltStructureCount(className, teamNum, locationId)
+   --Kyle 'Avoca' Abent
+ local function GetBuiltStructureCount(className, teamNum, locationId)
         local count = 0
         for _, structure in ipairs(GetEntitiesForTeam(className, teamNum)) do
             if structure:GetIsBuilt() and structure:GetIsAlive() then
@@ -96,6 +97,9 @@ local function DamagePowerPoint(hive)
       end
     return false
 end
+local function GetCanSpawnAlienEntity(trescount)
+    return GetGamerules().team2:GetTeamResources() >= trescount
+end
 function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades)
         -- local tres = kStructureDropCost
          DamagePowerPoint(hive)
@@ -126,20 +130,22 @@ function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades)
          
          
                    if #shifts <= math.random(1,3) then
-                   --   if self:GetCanSpawnAlienEntity(tres, 0) then  
-                   --   self.team2:SetTeamResources(self.team2:GetTeamResources()  - tres)  
+                      local tres = 0 --kShiftCost
+                      if GetCanSpawnAlienEntity(tres) then  
                       local shift = CreateEntity(Shift.kMapName, FindFreeSpace(origin), 2) 
+                      shift:GetTeam():SetTeamResources(shift:GetTeam():GetTeamResources() - tres)
                       shift:SetConstructionComplete()
-                  --    end
+                      end
                     end
 
                     if crags <= math.random(1,3) then
                       if not spawned then
-                    --  if self:GetCanSpawnAlienEntity(tres, 0) then  
-                   --   self.team2:SetTeamResources(self.team2:GetTeamResources()  - tres)  
+                       local tres = 0 --kCragCost
+                      if GetCanSpawnAlienEntity(tres) then  
                       local crag = CreateEntity(Crag.kMapName, FindFreeSpace(origin ), 2) 
+                      crag:GetTeam():SetTeamResources(crag:GetTeam():GetTeamResources() - tres)
                       crag:SetConstructionComplete()
-                    --  end
+                      end
                       end
                     end
       
@@ -154,12 +160,13 @@ function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades)
                     end
                     
                     if #shades <= math.random(1,3) then
+                       local tres = 0 --kShadeCost
                        if not spawned then 
-                    --  if self:GetCanSpawnAlienEntity(tres, 0) then  
-                     -- self.team2:SetTeamResources(self.team2:GetTeamResources()  - tres)  
+                      if GetCanSpawnAlienEntity(tres) then  
                        local shade = CreateEntity(Shade.kMapName, FindFreeSpace(origin), 2) 
+                      shade:GetTeam():SetTeamResources(shade:GetTeam():GetTeamResources() - tres)
                       shade:SetConstructionComplete()
-                     --  end
+                       end
                        end
                     end
 

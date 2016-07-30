@@ -25,70 +25,17 @@ end
  
  end
  */
-function Conductor:InitiateBalancer()
---So basically help the aliens out if marines defend too well and the game gets boring
---By enabling this automatic script to base automatic entities spawning based on chance.
---The chance is based on how well or not the marines and aliens played, in theory.
-          --Print("Phase Cannons Deploying!")
-           local built, unbuilt, random = CountNodes()
-           local chance = (built/unbuilt) / (built+unbuilt)
-           chance = Clamp(chance * 100, 1, 100)
-           local roll = math.random(1,100)
-              if chance >= roll then
-                  self:FirePhaseCannons(random)
-              end            
-                        return true
-end
-function Conductor:FirePhaseCannons(powerpoint)
-             local built, unbuilt, random = CountNodes()
-        --    SendTeamMessage(self, kTeamMessageTypes.PhaseCannonLocation, powerpoint:GetLocationId())
-              local chance = (built/unbuilt) / (built+unbuilt)  
-               chance = Clamp(chance * 100, 1, 100)             
-               
-               for i = 1, math.random(1, 4) do
+function Conductor:FirePhaseCannons(powerpoint, force)
+               local powerdrains = 4 --not force and 4 or 2
+               powerdrains = self:GetCanVape() and powerdrains * 2 or powerdrains
+               for i = 1, math.random(1, powerdrains) do
                  local origin = GetRandomBuildPosition( kTechId.Whip, powerpoint:GetOrigin(), 8 )
                  local braindrain = CreateEntity(PowerDrainer.kMapName, origin, 2)
                   braindrain:SetConstructionComplete()
                   braindrain:ActivateSelfDestruct()
                   braindrain:SetMature()
                end
-                
-             local contaminationroll = math.random(chance, 100)
-              if chance >= contaminationroll then
-                CreateEntityForTeam(kTechId.Contamination, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance - 4, 1, 100)  
-              end
-              
-                local mistroll = math.random(chance, 100)
-              if chance >= mistroll then
-                CreateEntityForTeam(kTechId.NutrientMist, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance -  4, 1, 100)  
-              end
-                local rupturerull = math.random(chance, 100)
-              if chance >= rupturerull then
-                CreateEntityForTeam(kTechId.Rupture, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance -  4, 1, 100)  
-              end
-                local bonewallroll1 = math.random(chance, 100)
-              if chance >= bonewallroll1 then
-                CreateEntityForTeam(kTechId.BoneWall, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance -  4, 1, 100)  
-              end
-                local bonewallroll1 = math.random(chance, 100)
-              if chance >= bonewallroll1 then
-                CreateEntityForTeam(kTechId.BoneWall, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance -  4, 1, 100)  
-              end
-                local bonewallroll1 = math.random(chance, 100)
-              if chance >= bonewallroll1 then
-                CreateEntityForTeam(kTechId.BoneWall, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance -  4, 1, 100)  
-              end
-                local bonewallroll1 = math.random(chance, 100)
-              if chance >= bonewallroll1 then
-                CreateEntityForTeam(kTechId.BoneWall, FindFreeSpace(powerpoint:GetOrigin(), 2), 2, nil)
-                 chance = Clamp(chance - 4, 1, 100)  
-              end
+    
 end
 
 

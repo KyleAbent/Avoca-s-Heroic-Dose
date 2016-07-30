@@ -93,7 +93,7 @@ function BaseSentry:FireBullets()
         
     end
 
-
+/*
  function BaseSentry:OnAdjustModelCoords(modelCoords)
          local coords = modelCoords
     	local scale = 1.8
@@ -103,7 +103,7 @@ function BaseSentry:FireBullets()
    
     return coords
 end
-
+*/
 if Server then
 
  function BaseSentry:OnUpdate(deltaTime)

@@ -2,8 +2,17 @@
 class 'SentryAvoca' (Sentry) --Because I dont want to spawn it other than when conductor is active and that file is already full. 
 SentryAvoca.kMapName = "sentryavoca"
 
-
-
+function SentryAvoca:OnCreate()
+ Sentry.OnCreate(self)
+ self:AdjustMaxHealth(self:GetMaxHealth())
+ self:AdjustMaxArmor(self:GetMaxArmor())
+end
+function SentryAvoca:GetMaxHealth()
+    return kSentryHealth * 2
+end
+function SentryAvoca:GetMaxArmor()
+    return kSentryArmor * 2
+end
 function SentryAvoca:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

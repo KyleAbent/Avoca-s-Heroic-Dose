@@ -12,7 +12,7 @@ Script.Load("lua/Modifications/MainRoomArc.lua")
 Script.Load("lua/Modifications/HiveCrag.lua")
 Script.Load("lua/Modifications/SentryAvoca.lua")
 Script.Load("lua/Modifications/BaseSentry.lua")
-
+Script.Load("lua/Modifications/AvocaChair.lua")
 
 --Macs
 Script.Load("lua/Modifications/Macs/MacAvoca.lua")
@@ -30,13 +30,16 @@ Script.Load("lua/Modifications/AutoMacsArcs.lua")
 
 
 if Server then
-Script.Load("lua/Modifications/ArmoryArmor.lua")
 Script.Load("lua/Modifications/LightSwitch.lua")
+Script.Load("lua/Modifications/ArmoryArmor.lua")
+
 
 
 
 
 end
+
+
 
 
 --Thanks for the trick, modular exo
@@ -91,9 +94,39 @@ function Alien:OnCreate()
     end
 end
 
+function Hive:GetBioMassLevel()
+    return self.bioMassLevel
+end
 
+function Hive:OnConstructionComplete()
+--biomass 0
+    -- Play special tech point animation at same time so it appears that we bash through it.
+    local attachedTechPoint = self:GetAttached()
+    if attachedTechPoint then
+        attachedTechPoint:SetIsSmashed(true)
+    else
+        Print("Hive not attached to tech point")
+    end
+    
+    local team = self:GetTeam()
+    
+    if team then
+        team:OnHiveConstructed(self)
+    end
+    
+    if self.hiveType == 1 then
+        self:OnResearchComplete(kTechId.UpgradeToCragHive)
+    elseif self.hiveType == 2 then
+        self:OnResearchComplete(kTechId.UpgradeToShadeHive)
+    elseif self.hiveType == 3 then
+        self:OnResearchComplete(kTechId.UpgradeToShiftHive)
+    end
 
-
+    local cysts = GetEntitiesForTeamWithinRange( "Cyst", self:GetTeamNumber(), self:GetOrigin(), self:GetCystParentRange())
+    for _, cyst in ipairs(cysts) do
+        cyst:ChangeParent(self)
+    end
+end
 function GhostStructureMixin:__initmixin()
 
     -- init the entity in ghost structure mode
@@ -188,12 +221,7 @@ end
 
 local function GetDestinationGate(self)
     local phaseGates = {} 
-    
-    for index, payload  in ipairs( GetEntitiesForTeam("AvocaArc", self:GetTeamNumber()) ) do
-        if GetIsUnitActive(payload) then
-            table.insert(phaseGates, payload)
-        end
-    end    
+   
     
   -- Find next phase gate to teleport to
    
@@ -201,7 +229,13 @@ local function GetDestinationGate(self)
         if GetIsUnitActive(phaseGate) then
             table.insert(phaseGates, phaseGate)
         end
-    end    
+    end  
+
+    for index, payload  in ipairs( GetEntitiesForTeam("AvocaArc", self:GetTeamNumber()) ) do
+        if GetIsUnitActive(payload) then
+            table.insert(phaseGates, payload)
+        end
+    end      
     
     if table.count(phaseGates) < 2 then
         return nil
@@ -287,18 +321,36 @@ function GameInfo:SetStartTime(startTime)
      end
 end
 */
+local function LocationsMatch(who,whom)
+   
+  local whoname = GetLocationForPoint(who:GetOrigin())
+  local whomname = GetLocationForPoint(whom:GetOrigin())
+  return whoname == whomname
+end
+local orig_PowerPoint_OnConstructionComplete = PowerPoint.OnConstructionComplete
+    function PowerPoint:OnConstructionComplete()
+        orig_PowerPoint_OnConstructionComplete(self)
+       local nearestHarvester = GetNearest(self:GetOrigin(), "Harvester", 2, function(ent) return LocationsMatch(self,ent)  end)
+       if nearestHarvester then
+         nearestHarvester:Kill()
+       end
+end
 local orig_PowerPoint_OnKill = PowerPoint.OnKill
     function PowerPoint:OnKill(attacker, doer, point, direction)
     orig_PowerPoint_OnKill(self)
-       local nearestExtractor = GetNearest(self:GetOrigin(), "Extractor", 1, function(ent) return GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(self:GetOrigin())  end)
+       local nearestExtractor = GetNearest(self:GetOrigin(), "Extractor", 1, function(ent) return LocationsMatch(self,ent)  end)
        if nearestExtractor then
          nearestExtractor:Kill()
        end
+        local location = GetLocationForPoint(self:GetOrigin())
+        location = location and location.name 
+        SealAirLock(location, self:GetOrigin())
+       
     end
 local function ToSpawnFormula(self,panicstospawn, where)
          for i = 1, panicstospawn do
                            local bitch = GetPayLoadArc()
-                           if bitch then
+                           if bitch and GetIsPointWithinHiveRadius(bitch:GetOrigin()) then
                            local spawnpoint = FindFreeSpace(bitch:GetOrigin(), 4, 8)
                               if spawnpoint then
                               local panicattack = CreateEntity(PanicAttack.kMapName, spawnpoint, 2)
@@ -309,11 +361,10 @@ local function ToSpawnFormula(self,panicstospawn, where)
             
 end
 local function SendAnxietyAttack(self, where, who)
-        who = table.count(who)
-         for i = 1, who do
+         for i = 1, #who do
                            local panicattack = who[i]
                            local bitch = GetPayLoadArc()
-                           if bitch then
+                           if bitch and GetIsPointWithinHiveRadius(bitch:GetOrigin()) then
                            local spawnpoint = FindFreeSpace(bitch:GetOrigin(), 4, 8)
                               if spawnpoint then
                                     panicattack:SetOrigin(spawnpoint)
@@ -330,16 +381,17 @@ local panicattacks = {}
                end
        end
        
-  local countofpanic = Clamp(table.count(panicwhips), 0, 8)
-  local maxpanic = 8
+  local countofpanic = Clamp(table.count(panicattacks), 0, 8)
+  local maxpanic = 4
   local panicstospawn = math.abs(maxpanic - countofpanic)
-        panicstospawn = Clamp(panicstospawn, 0, 4)
+        panicstospawn = Clamp(panicstospawn, 1, 2)
 
             if panicstospawn >= 1 then ToSpawnFormula(self,panicstospawn, where) end
-            
+            /*
             if countofpanic >= 1 then
                 SendAnxietyAttack(self, where, panicattacks) -- not sure
             end
+            */
 end
 
 local orig_Hive_OnTakeDamage = Hive.OnTakeDamage
@@ -348,25 +400,190 @@ function Hive:OnTakeDamage(damage, attacker, doer, point)
    if doer and doer:isa("ARC") then 
          Print("PanicAttack Initiated")
          PanicInitiate(self,self:GetOrigin())
-         AddPayLoadTime(8) 
+        if self:GetIsBuilt() then  AddPayLoadTime(8)  end
     end
     
 return orig_Hive_OnTakeDamage(self,damage, attacker, doer, point)
 end
 ----
+local function GetTechPoint(where)
+    for _, techpoint in ipairs(GetEntitiesWithinRange("TechPoint", where, 8)) do
+         if techpoint then return techpoint end
+    end
+end
+local function GetIsVaporizing(where)
+    for _, vape in ipairs(GetEntitiesWithinRange("Vaporizer", where, 8)) do
+         if vape then return true end
+    end
+end
+local function BuildAlienHive(who)
+     who:AddTimedCallback(function() 
+     local hive = who:SpawnCommandStructure(2)
+     end, 8)
+end
+local function SmokeWeedEveryDay(who)
+     --messy
+                 for _, conductor in ientitylist(Shared.GetEntitiesWithClassname("Conductor")) do
+                    if conductor and conductor:GetCanVape() then 
+                         local vaporizer = CreateEntity(Vaporizer.kMapName, who:GetOrigin(), 1)  
+                    end
+             end
+end    
+local function BuildMarineChair(who)
+     who:AddTimedCallback(function() 
+     local avocachair = CreateEntity(AvocaChair.kMapName, who:GetOrigin(), 1)
+     avocachair:SetConstructionComplete()
+     SmokeWeedEveryDay(avocachair)
+     end, 8)
+end
+function CommandStation:OnKill(attacker, doer, point, direction)
+local child = GetTechPoint(self:GetOrigin())
+BuildAlienHive(child)
+end
+function SentryBattery:GetUnitNameOverride(viewer)
+    local unitName = GetDisplayName(self)   
+    unitName = string.format(Locale.ResolveString("BackupPower") )
+return unitName
+end  
 local orig_Hive_OnKill = Hive.OnKill
 function Hive:OnKill(attacker, doer, point, direction)
-AddPayLoadTime(180)
+if self:GetIsBuilt() then AddPayLoadTime(180) end
+local child = GetTechPoint(self:GetOrigin())
+BuildMarineChair(child)
  return orig_Hive_OnKill(self,attacker, doer, point, direction)
 end
-
 function Whip:OnKill(attacker, doer, point, direction)
  --if attacker and attacker:isa("ARC") then AddPayLoadTime(1) end
 end
 
-function PowerPoint:PreOnKill(attacker, doer, point, direction)
-local location = GetLocationForPoint(self:GetOrigin())
-SealAirLock(location.name)
-end 
+
+
+function CommandStation:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil and GetIsVaporizing(self:GetOrigin()) then
+    
+        damageTable.damage = 0 --I already know whips and hydras are still gonna try to attack. Gotta filter that elsewhere.
+        
+    end
+
+end
+/*
+function InfantryPortal:GetRequiresPower()
+return true --why have this off if this is pretty much only way marines can lose with bots
+end
+function ArmsLab:GetRequiresPower()
+return false
+end
+*/
+function InfantryPortal:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil then
+    
+        damageTable.damage = 0 --I already know whips and hydras are still gonna try to attack. Gotta filter that elsewhere.
+        
+    end
+
+end
+function ArmsLab:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil then
+    
+        damageTable.damage = 0 --I already know whips and hydras are still gonna try to attack. Gotta filter that elsewhere.
+        
+    end
+
+end
+-- Find team start with team 0 or for specified team. Remove it from the list so other teams don't start there. Return nil if there are none.
+function NS2Gamerules:ChooseTechPoint(techPoints, teamNumber)
+
+    local validTechPoints = { }
+    local totalTechPointWeight = 0
+    
+    -- Build list of valid starts (marked as "neutral" or for this team in map)
+    for _, currentTechPoint in pairs(techPoints) do
+    
+        -- Always include tech points with team 0 and never include team 3 into random selection process
+       -- local teamNum = currentTechPoint:GetTeamNumberAllowed()
+       -- if (teamNum == 0 or teamNum == teamNumber) and teamNum ~= 3 then
+        
+            table.insert(validTechPoints, currentTechPoint)
+            totalTechPointWeight = totalTechPointWeight + currentTechPoint:GetChooseWeight()
+            
+      --  end
+        
+    end
+    
+    local chosenTechPointWeight = self.techPointRandomizer:random(0, totalTechPointWeight)
+    local chosenTechPoint = nil
+    local currentWeight = 0
+    for _, currentTechPoint in pairs(validTechPoints) do
+    
+        currentWeight = currentWeight + currentTechPoint:GetChooseWeight()
+        if chosenTechPointWeight - currentWeight <= 0 then
+        
+            chosenTechPoint = currentTechPoint
+            break
+            
+        end
+        
+    end
+    
+    -- Remove it from the list so it isn't chosen by other team
+    if chosenTechPoint ~= nil then
+        table.removevalue(techPoints, chosenTechPoint)
+    else
+        assert(false, "ChooseTechPoint couldn't find a tech point for team " .. teamNumber)
+    end
+    
+    return chosenTechPoint
+    
+end
+function Exo:PerformEjectOnPree()
+    
+        if self:GetIsAlive() then
+       
+            local reuseWeapons = self.storedWeaponsIds ~= nil
+        
+            local marine = self:Replace(self.prevPlayerMapName or Marine.kMapName, self:GetTeamNumber(), false, self:GetOrigin() + Vector(0, 0.2, 0))
+            local health = Clamp(self.prevPlayerHealth or kMarineHealth-30, 1, 70)
+            marine:SetHealth(health)
+            marine:SetMaxArmor(self.prevPlayerMaxArmor or kMarineArmor)
+            marine:SetArmor(self.prevPlayerArmor or kMarineArmor)
+            
+            --exosuit:SetOwner(marine)
+            
+            marine.onGround = false
+            local initialVelocity = self:GetViewCoords().zAxis
+            initialVelocity:Scale(4)
+            initialVelocity.y = 9
+            marine:SetVelocity(initialVelocity)
+            
+            if reuseWeapons then
+         
+                for _, weaponId in ipairs(self.storedWeaponsIds) do
+                
+                    local weapon = Shared.GetEntity(weaponId)
+                    if weapon then
+                        marine:AddWeapon(weapon)
+                    end
+                    
+                end
+            
+            end
+            
+            marine:SetHUDSlotActive(1)
+            
+            if marine:isa("JetpackMarine") then
+                marine:SetFuel(0)
+            end
+        
+        end
+    
+        return false
+    
+end
+function Exo:PreOnKill(attacker, doer, point, direction)
+          self:PerformEjectOnPree()
+end
 
 end--server

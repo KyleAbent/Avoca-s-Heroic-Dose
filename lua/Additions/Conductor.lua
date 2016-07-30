@@ -1,4 +1,6 @@
 -- Kyle 'Avoca' Abent
+--http://twitch.tv/kyleabent
+--https://github.com/KyleAbent/
 
 
 class 'Conductor' (Entity)
@@ -9,10 +11,11 @@ Conductor.kMapName = "conductor"
 local networkVars = 
 
 {
-   payLoadTime = "float"
+   payLoadTime = "float",
+   phaseCannonTime = "float"
 }
 
-
+/*
 local function AddPlayerResources(harvesters, extractors)
   --Settling with this cheap stuff for now to just see how it works without spending too much time on it
    for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do     
@@ -24,12 +27,7 @@ local function AddPlayerResources(harvesters, extractors)
          end
     end
 end
-local function AddTeamResources(harvesters, extractors)
-               local tresamount = kTeamResourcePerTick 
-               GetGamerules():GetTeam1():AddTeamResources(tresamount  * extractors)
-               GetGamerules():GetTeam2():AddTeamResources(tresamount  * harvesters)
-end
-    
+*/   
               
 local function CoordinateWithPowerNode(locationname)
                  local powernode = GetPowerPointForLocation(locationname)
@@ -84,7 +82,7 @@ local function FindAppropriateOrder(mac,where)
                 end
             
                 // Look for entities to heal with weld.
-                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", 1, where, 12)
+                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", 1, where, 999)
                 for w = 1, #weldables do
                 
                     local weldable = weldables[w]
@@ -103,7 +101,7 @@ local function FindAppropriateOrder(mac,where)
                 end
             
                 // Look for entities to heal with weld.
-                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", 1, where, 24)
+                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", 1, where, 999)
                 for w = 1, #weldables do
                 
                     local weldable = weldables[w]
@@ -215,7 +213,7 @@ local function FindMarineDefense(where)
         end
         return nil
 end
-
+/*
 local function SendTheMarineOrdersHere(who, where, which) 
  local offense = nil 
  local defense = nil 
@@ -239,19 +237,19 @@ local function SendTheMarineOrdersHere(who, where, which)
            end
 
 end
-   
+ */
 local function DefendPayLoad(player, where, which)
          local payload = GetNearest(where, "ARC", 1)
          if payload then
          local range = 0
                range = player:GetDistance(payload)
-               Print("player to payload distance is %s", range)
+               --Print("player to payload distance is %s", range)
                if range <= 32 and ( payload.deployMode ~= ARC.kDeployMode.Deployed  and not payload:InRadius() ) then
                player:GiveOrder(kTechId.Defend, payload:GetId(), payload:GetOrigin(), nil, true, true)
                return
                end
         end
-        SendTheMarineOrdersHere(player,where, which)
+        --SendTheMarineOrdersHere(player,where, which)
 end
  local function ForAllMarinesSendWP(where, which)
           for _, player in ipairs(GetEntitiesWithinRange("Marine", where, 999)) do
@@ -259,6 +257,18 @@ end
                DefendPayLoad(player, where, which)
            end
          end
+end
+local function UnMaturizeKing(who)
+    if Server then
+    
+        who.matureFraction = 0
+        who.finalMatureFraction = 0
+        who.starvationMatureFraction = 0
+        who.timeMaturityLastUpdate = 0
+        who.isMature = false
+        who.updateMaturity = true
+    
+    end
 end
 local function FindOrCreateKingCyst(where, which)
  local king = false
@@ -277,7 +287,11 @@ local function FindOrCreateKingCyst(where, which)
           end
           
           if hasking and king then
-             king:SetOrigin(toplace) 
+              if king:GetIsMature() then
+               king:KillWhipAvoca()
+               king:SetOrigin(toplace) 
+               UnMaturizeKing(king)
+               end
           else
               local KingCyst = CreateEntity(CystAvoca.kMapName, where, 2)
               KingCyst:SetConstructionComplete()
@@ -308,6 +322,7 @@ function Conductor:OnRoundStart()
               self:AddTimedCallback(Conductor.PickMainRoom, 16)
               self:AddTimedCallback(Conductor.Automations, 8)
               self:AddTimedCallback(Conductor.PayloadTimer, 1)
+              self:AddTimedCallback(Conductor.PCTimer, 1)
             end
 end
 function Conductor:OnCreate() 
@@ -317,6 +332,7 @@ function Conductor:OnCreate()
 
    if Server then
    self.payLoadTime = 600
+   self.phaseCannonTime = 120
    end
 end
 function Conductor:GetIsMapEntity()
@@ -324,6 +340,9 @@ return true
 end
 function Conductor:GetPayloadLength()
  return self.payLoadTime
+end
+function Conductor:GetTimeLeftTillPC()
+ return self.phaseCannonTime
 end
 function Conductor:PickMainRoom()
        --Print("Picking main room")
@@ -336,7 +355,7 @@ end
 function Conductor:SetMainRoom(where, which)
        if Server then MoveMacs(where) MoveArcs(where) end
         CoordinateWithPowerNode(which.name)
-        CreateAlienMarker(where)
+        if not self:GetCanVape() then CreateAlienMarker(where) end
         ForAllMarinesSendWP(where, which)
         FindOrCreateKingCyst(where, which)
 end
@@ -347,22 +366,57 @@ local function SuddenDeathConditionsCheck(self)
           
           return false
 end
-function Conductor:PayloadTimer()
-           local boolean = false
+local function RanOutOfWeed()
+            for _, vaporizer in ientitylist(Shared.GetEntitiesWithClassname("Vaporizer")) do
+                    if vaporizer then DestroyEntity(vaporizer) end
+             end
+end
+function Conductor:GetCanVape()
            local gamestarttime = GetGamerules():GetGameStartTime()
            local gameLength = Shared.GetTime() - gamestarttime
-       if  gameLength >= self.payLoadTime then
+           return  gameLength >= self.payLoadTime
+end
+function Conductor:GetCanFire()
+           local gamestarttime = GetGamerules():GetGameStartTime()
+           local gameLength = Shared.GetTime() - gamestarttime
+           return  gameLength >= self.phaseCannonTime
+end
+function Conductor:ResetPC()
+self.phaseCannonTime = self.phaseCannonTime + 120 + 5
+self:AddTimedCallback(Conductor.PCTimer, 1)
+return false
+end
+local function FirePCAllBuiltRooms(self)
+                 for index, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
+                   if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
+                     self:FirePhaseCannons(powerpoint, force)
+                    end
+                end
+                
+end
+function Conductor:PayloadTimer()
+
+   local boolean = false
+       if  self:GetCanVape() then
+                  boolean = true
              if not SuddenDeathConditionsCheck(self) then
-               GetGamerules():SetGameState(kGameState.Team2Won)
+               --GetGamerules():SetGameState(kGameState.Team2Won)
+                RanOutOfWeed()
              else
                AddPayLoadTime(8)
              end
-             
-          -- for i = 1, 30 do
-          -- Print("DERP DERP TIMER COUNT DOWN TO 0 DERP DERP") 
-          -- end
-           boolean = true
        end
+       return not boolean
+       
+end
+function Conductor:PCTimer()
+   local boolean = false
+    if self:GetCanFire() then
+         boolean = true
+         FirePCAllBuiltRooms(self) -- Ddos!
+         self:AddTimedCallback(Conductor.ResetPC, 4)
+       end
+       
        return not boolean
 end
 function Conductor:AddTime(seconds)
@@ -373,20 +427,24 @@ function Conductor:SendNotification(who, seconds)
 end
 function Conductor:Automations()
 
-              self:InitiateBalancer()
               self:CollectResources()
               self:MaintainHiveDefense()
               self:HandoutMarineBuffs()
               self:CheckAndMaybeBuildMac()
               return true
 end
+if Server then 
 function Conductor:CollectResources()
    local harvesters = Clamp(SimpleCClass(string.format("Harvester"), true) or 0, 1, 14)
    local extractors =  Clamp(SimpleCClass(string.format("Extractor"), true) or 0, 1, 14)
-   AddPlayerResources(harvesters, extractors)
-   AddTeamResources(harvesters, extractors)
-end
+   
+   if harvesters <=1 then   GetGamerules():GetTeam2():AddTeamResources(math.random(4,8)) end
+   if extractors <=1 then    GetGamerules():GetTeam1():AddTeamResources(math.random(4,8))  end
+   
+   --AddPlayerResources(harvesters, extractors)
 
+end
+end
 
 function Conductor:GetLocationWithMostMixedPlayers()
 -- works good 2.15

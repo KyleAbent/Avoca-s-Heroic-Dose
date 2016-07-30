@@ -296,6 +296,16 @@ local function GetPayloadTime()
     end
     return 600
 end
+local function GetPCTime()
+    local entityList = Shared.GetEntitiesWithClassname("Conductor")
+    if entityList:GetSize() > 0 then
+               local conductor = entityList:GetEntityAtIndex(0)
+               local length = conductor:GetTimeLeftTillPC()
+               --Print("length is %s", length)
+               return length
+    end
+    return 600
+end
 function GUIInsight_TopBar:Update(deltaTime)
     
     PROFILE("GUIInsight_TopBar:Update")
@@ -329,12 +339,12 @@ function GUIInsight_TopBar:Update(deltaTime)
     local hours = math.floor(minutes / 60)
     minutes = minutes - hours * 60
     seconds = seconds - minutes * 60 - hours * 3600
-     payloadTimetext = string.format("payLoadtime: %d:%02d", minutes, seconds)
+     payloadTimetext = string.format("ChairDefense: %d:%02d", minutes, seconds)
     else
-      payloadTimetext = string.format("payLoadtime: %s", GetPayloadTime())
+      payloadTimetext = string.format("Chair(s) Vulnerable!", GetPayloadTime())
 end
-       if GetPayloadTime() ~= 0 then 
-           local timerlength = GetPayloadTime()
+       if startTime ~= 0 and GetPCTime() ~= 0 then 
+           local timerlength = GetPCTime()
            local NowToSiege = timerlength - (Shared.GetTime() - PlayerUI_GetGameStartTime())
            local SiegeLength =  math.ceil( Shared.GetTime() + NowToSiege - Shared.GetTime() )
            siegeTime = SiegeLength
@@ -343,9 +353,9 @@ end
            local hours = math.floor(minutes / 60)
            minutes = minutes - hours * 60
            seconds = seconds - minutes * 60 - hours * 3600
-          siegeTimeText = string.format("TBD: %d:%02d", minutes, seconds)
+          siegeTimeText = string.format("PowerDrainers: %d:%02d", minutes, seconds)
      else
-       siegeTimeText = string.format("tbd: derp")
+       siegeTimeText = string.format("SHOTS FIRED")
         end
     gameTime:SetText(gameTimeText)
     payLoadtime:SetText(siegeTimeText)

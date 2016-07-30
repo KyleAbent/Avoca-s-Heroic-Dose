@@ -34,11 +34,11 @@ local function MacQualifications(self)
 end
 local function GetMacMapName()
    local macavoca,basemac, playermac,bigmac, total = GetMacsAmount()
-   if macavoca <= 2 then
+   if macavoca <= 3 then
         return MacAvoca.kMapName
-   elseif basemac<= 2 then
+   elseif basemac<= 3 then
        return BaseMac.kMapName
-   elseif playermac <=2 then
+   elseif playermac <=5 then
        return PlayerMac.kMapName
    elseif bigmac == 0 then
         return  BigMac.kMapName
@@ -81,7 +81,7 @@ end
 local function ArcQualifications(self)
  local boolean = false
      if (GetArcsAmount() <= 7 or not HasPayLoad(self:GetOrigin()) )  and
-       -- self:GetTeam():GetTeamResources() >= kARCCost and 
+        self:GetTeam():GetTeamResources() >= kARCCost and 
       --    ( kMaxSupply - GetSupplyUsedByTeam(1) >= LookupTechData(kTechId.ARC, kTechDataSupply, 0)) and 
             self.deployed and 
             GetIsUnitActive(self) and 
@@ -133,8 +133,9 @@ end
 if Server then
   function RoboticsFactory:OnUpdate()
    if self.timeOfLastMacCheck == nil or Shared.GetTime() > self.timeOfLastMacCheck + 8 then
-           if ArcQualifications(self) then
+           if self:GetTechId() == kTechId.ARCRoboticsFactory  and ArcQualifications(self) then
            self:OverrideCreateManufactureEntity(kTechId.ARC)
+           self:GetTeam():SetTeamResources(self:GetTeam():GetTeamResources() - cost)
            end
            
     self.timeOfLastMacCheck = Shared.GetTime()  

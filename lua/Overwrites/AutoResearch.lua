@@ -2,8 +2,29 @@
 --But messy but whatevs. Maybe easier to pull the techids from TechButtons and tier them that way.
 kMarineResearchDelay = 5
 
-
-
+local function TresCheck(cost)
+    return GetGamerules().team1:GetTeamResources() >= cost
+end
+local function DeductTres(cost)
+          local marineteam = GetGamerules().team1
+          marineteam:SetTeamResources(marineteam:GetTeamResources() - cost)
+end
+function RoboticsFactory:OnConstructionComplete()
+self:AddTimedCallback(RoboticsFactory.UpdateManually, 4)
+ self.deployed = true
+end
+function RoboticsFactory:UpdateManually()
+   if Server then  
+     self:UpdatePassive()
+   end
+   return true
+end
+function ArmsLab:UpdateManually()
+   if Server then  
+     self:UpdatePassive()
+   end
+   return true
+end
 function ArmsLab:OnConstructionComplete()
 self:AddTimedCallback(ArmsLab.UpdateManually, kMarineResearchDelay)
 end
@@ -32,10 +53,34 @@ function Armory:UpdateManually()
    return true
 end
 
-
+function RoboticsFactory:UpdatePassive()
+   //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
+       if self:GetTechId() == kTechId.ARCRoboticsFactory  then
+           return false
+     end
+   if not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
+    
+    local techid = nil
+    
+    if self:GetTechId() ~= kTechId.ARCRoboticsFactory then
+    techid = kTechId.UpgradeRoboticsFactory
+    else
+       return  
+    end
+    
+    local cost = 1 --LookupTechData(techid, kTechDataCostKey, 0)
+    if TresCheck(cost) then
+    DeductTres(cost)
+   local techNode = self:GetTeam():GetTechTree():GetTechNode( techid ) 
+   self:SetResearching(techNode, self)
+   else return true 
+   end
+   
+end
 function PrototypeLab:UpdatePassive()
    //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
-       if GetHasTech(self, kTechId.ExosuitTech) or not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
+    if GetHasTech(self, kTechId.ExosuitTech)  then return false end 
+      if not GetHasTech(self, kTechId.AdvancedWeaponry) and not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
     
     local techid = nil
     
@@ -47,9 +92,13 @@ function PrototypeLab:UpdatePassive()
        return  
     end
     
+    local cost = 1 --LookupTechData(techid, kTechDataCostKey, 0)
+    if TresCheck(cost) then
+    DeductTres(cost)
    local techNode = self:GetTeam():GetTechTree():GetTechNode( techid ) 
    self:SetResearching(techNode, self)
-   
+      else return true 
+   end
    
 end
 function PrototypeLab:UpdateResearch(deltaTime)
@@ -94,6 +143,7 @@ function PrototypeLab:UpdateResearch(deltaTime)
 end
 function ArmsLab:UpdatePassive()
    //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
+     if GetHasTech(self, kTechId.Armor3) then return false end
        if not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return false end
     local techid = nil  
     
@@ -118,10 +168,13 @@ function ArmsLab:UpdatePassive()
     else
        return  false
     end
-    
+    local cost = 1 --LookupTechData(techid, kTechDataCostKey, 0)
+    if TresCheck(cost) then
+    DeductTres(cost)
    local techNode = self:GetTeam():GetTechTree():GetTechNode( techid ) 
                  self:SetResearching(techNode, self)
-   
+      else return true         
+   end
 end
 
 function ArmsLab:UpdateResearch(deltaTime)
@@ -181,7 +234,8 @@ function ArmsLab:UpdateResearch(deltaTime)
 function Armory:UpdatePassive()
    //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
     local researchNode = self:GetTeam():GetTechTree():GetTechNode(self.researchingId)
-    if (self:isa("AdvancedArmory") and GetHasTech(self, kTechId.HeavyMachineGunTech) ) or not  GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
+    if (self:isa("AdvancedArmory") and GetHasTech(self, kTechId.HeavyMachineGunTech) ) then return false end
+    if not  GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
 
     
     local techid = nil
@@ -199,9 +253,13 @@ function Armory:UpdatePassive()
     else
        return  
     end
-    
+    local cost = 1 --LookupTechData(techid, kTechDataCostKey, 0)
+    if TresCheck(cost) then
+    DeductTres(cost)
    local techNode = self:GetTeam():GetTechTree():GetTechNode( techid ) 
     self:SetResearching(techNode, self)
+       else return true 
+    end
 end
 function Armory:UpdateResearch(deltaTime)
  if not self.timeLastUpdateCheck or self.timeLastUpdateCheck + 15 < Shared.GetTime() then 

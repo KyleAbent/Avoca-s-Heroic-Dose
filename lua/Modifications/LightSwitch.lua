@@ -1,9 +1,15 @@
-   local function BreachAirLock(where, which)
-  local airlock = CreateEntity(AirLock.kMapName, where)
-  airlock.scale = which.scale
-  airlock.name = which.name
-  airlock:SetBox(airlock.scale)  -- Rather than trigger init?
- -- Print("Airlock @ %s", which.name)
+local function BreachAirLock(where, which)
+
+          for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
+           if location.name == which.name then 
+              local airlock = CreateEntity(AirLock.kMapName, location:GetOrigin())
+              airlock.scale = location.scale
+              airlock.name = which.name
+              airlock:SetBox(airlock.scale) 
+           end
+      end
+      
+
 end
 function SealAirLock(nameofwhich)
 

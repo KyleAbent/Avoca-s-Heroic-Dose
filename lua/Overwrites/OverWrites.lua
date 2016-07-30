@@ -43,6 +43,26 @@ end
 --Control Point based marine construction based on player amount inside?
 
 if Server then
+
+--Whips do less damage with less health (slap atleast)
+
+function Whip:SlapTarget(target)
+    self:FaceTarget(target)
+    -- where we hit
+    local targetPoint = target:GetEngagementPoint()
+    local attackOrigin = self:GetEyePos()
+    local hitDirection = targetPoint - attackOrigin
+    hitDirection:Normalize()
+    -- fudge a bit - put the point of attack 0.5m short of the target
+    local hitPosition = targetPoint - hitDirection * 0.5
+    local damage = Whip.kDamage 
+    local damage = not self:isa("PowerDrainer") and Clamp(damage * self:GetHealthScalar(), 1, damage) or Whip.kDamage * 0.3
+    self:DoDamage(damage, target, hitPosition, hitDirection, nil, true)
+    self:TriggerEffects("whip_attack")
+
+end
+
+
 local function GetIsPowered(where)
 --By memory, didnt have to look this one up. Wrote it word for word too :P
   local location = GetLocationForPoint(where)

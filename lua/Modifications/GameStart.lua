@@ -19,6 +19,22 @@ local function AlreadySpawned(self, origin)
         if ents and #ents >= 4 then return true else return false end
         
 end
+/*
+if Server then
+local function SiegeThisBitchUp(where, teamnum)
+
+        
+    if teamnum == 2 then
+               for i = 1, 4  do
+                      local resNodeSpawned = CreateEntity(ResourcePoint.kMapName, FindFreeSpace(where,8))
+               end
+   else
+   
+   end
+
+end
+end
+*/
 function Conductor:SpawnBaseEntities()
 //messy and mir-air. But whatever. Requires GetGroundPosition
 local techPointOrigin = nil
@@ -29,9 +45,9 @@ local techPointOrigin = nil
 
     CreateEntity(InfantryPortal.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     CreateEntity(InfantryPortal.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    CreateEntity(Armory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    --CreateEntity(Armory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     CreateEntity(ArmsLab.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    CreateEntity(RoboticsFactory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    --CreateEntity(RoboticsFactory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
 
     CreateEntity(MacAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     CreateEntity(MacAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
@@ -44,9 +60,9 @@ local techPointOrigin = nil
     
     CreateEntity(BigMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
 
-    CreateEntity(PrototypeLab.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    CreateEntity(PhaseGate.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    CreateEntity(Observatory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    --CreateEntity(PrototypeLab.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    --CreateEntity(PhaseGate.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    --CreateEntity(Observatory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     for i = 1, 4 do
    CreateEntity(BaseSentry.kMapName, FindFreeSpace(techPointOrigin,4), 1)
    end
@@ -111,6 +127,7 @@ local tech = nil
                           if tech:GetAttached() == nil then
                            local hive = tech:SpawnCommandStructure(2)
                           hive:SetConstructionComplete()
+                          --SiegeThisBitchUp(hive:GetOrigin(), 2)
                           local location = GetLocationForPoint(tech:GetOrigin())
                           location = location and location.name or nil
                           local powerpoint = GetPowerPointForLocation(location)

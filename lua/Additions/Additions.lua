@@ -8,9 +8,8 @@ Script.Load("lua/Additions/Balancer.lua")
 Script.Load("lua/Additions/HiveDefense.lua") 
 Script.Load("lua/Additions/Vaporizer.lua") 
 Script.Load("lua/Additions/Convars.lua") 
-Script.Load("lua/Additions/CystRooms.lua") 
 Script.Load("lua/Additions/PanicAttack.lua") 
-
+Script.Load("lua/Additions/WhipAvoca.lua") 
 
 function Location:MakeSureRoomIsntEmpty()
           --So that the room lights being changed are actually observed, otherwise useless :)
@@ -69,4 +68,45 @@ function Location:MakeSureRoomIsntEmpty()
 
 end
     
+    
+    
+    
+    if Server then
+    local function FreeOfRange(who)
+   local crags = #GetEntitiesWithinRange("Crag", who:GetOrigin(), 8) 
+   local whips = #GetEntitiesWithinRange("Whip", who:GetOrigin(), 8)
+    if not whips and not crags or (whips + crags <= 3) then return true end
+    return false
+    end
+    local function MoveElseWhereFree(who)
+        local eligableparent = nil 
+        local nearestcyst = GearNearest(who:GetOrigin(), "Cyst", 2, function(ent) return ent:GetIsBuilt() and FreeOfRange(ent) end)
+               if nearestcyst then
+                 local where = FindFreeSpace(nearestcyst:GetOrigin(), .5, 8)
+                 who:GiveOrder(kTechId.Move, nearestcyst:GetId(), where, nil, true, true) 
+                end
+          
+    end
+     function Crag:OnOrderComplete(currentOrder)
+        if currentOrder == kTechId.Move then
+        local crags = #GetEntitiesWithinRange("Crag", who:GetOrigin(), 4) 
+        local whips = #GetEntitiesWithinRange("Whip", who:GetOrigin(), 4)
+        if whips or crags and (whips + crags >= 4) then
+                 MoveElseWhereFree(self)
+           end
+        end
+     end
+     
+     function Whip:OnOrderComplete(currentOrder)
+        if currentOrder == kTechId.Move then
+        local crags = #GetEntitiesWithinRange("Crag", who:GetOrigin(), 8) 
+        local whips = #GetEntitiesWithinRange("Whip", who:GetOrigin(), 8)
+        if whips or crags and (whips + crags >= 4) then
+                 MoveElseWhereFree(self)
+         end
+        end
+     
+     end
+    
+    end
     

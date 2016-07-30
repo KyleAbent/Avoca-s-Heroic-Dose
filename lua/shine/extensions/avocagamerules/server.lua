@@ -53,12 +53,22 @@ function Plugin:OnGetCommander()
     return nil
 end
 function Plugin:ClientConnect(client)
+     --if client:GetUserId() == 22542592 then
+     
+
+     local team = math.random(1,2)
+     self:SimpleTimer( 4, function() 
+     if client then Shared.ConsoleCommand(string.format("sh_setteam %s %s", client:GetUserId(), team )) end
+      end)
+
+   --  end
     if not client:GetIsVirtual() and not GetGamerules():GetGameStarted() then
     
-           for i = 1, 11 do
-           Shared.ConsoleCommand("addbot")
-           end
+          -- for i = 1, 7 do
+          -- Shared.ConsoleCommand("addbot")
+          -- end
            
+          GetGamerules():SetMaxBots(12, false)
            Shared.ConsoleCommand("sh_randomrr")
           GetGamerules():SetGameState(kGameState.Countdown)
           GetGamerules().countdownTime = 4

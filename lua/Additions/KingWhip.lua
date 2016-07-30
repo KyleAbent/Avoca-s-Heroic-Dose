@@ -15,7 +15,7 @@ function PanicAttack:GetMaxHealth()
     return kHydraHealth * 4
 end
 function PanicAttack:GetMaxArmor()
-    return kHydraArmor * 4
+    return kHydrayArmor * 4
 end
 function PanicAttack:OnInitialized()
   Hydra.OnInitialized(self)

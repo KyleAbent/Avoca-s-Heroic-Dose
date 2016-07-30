@@ -1,3 +1,10 @@
+local function TresCheck(cost)
+    return GetGamerules().team1:GetTeamResources() >= cost
+end
+local function DeductTres(cost)
+          local alienteam = GetGamerules().team2
+          alienteam:SetTeamResources(alienteam:GetTeamResources() - cost)
+end
 function Conductor:AutoBioMass()
           for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
              hive:AddTimedCallback(Hive.UpdateManually, 15)
@@ -23,11 +30,8 @@ function Hive:UpdatePassive()
            
     local techid = nil
     
-    if self.bioMassLevel <= 1 then
-    techid = kTechId.ResearchBioMassOne
-    elseif self.bioMassLevel <= 2 then
-    techid =kTechId.ResearchBioMassTwo    --Prolly easier to just read techtree and their requirements no?
-      elseif teambioMass >= 2 and not GetHasTech(self, kTechId.Charge) then
+
+      if teambioMass >= 2 and not GetHasTech(self, kTechId.Charge) then
     techid = kTechId.Charge
       elseif teambioMass >= 3 and not GetHasTech(self, kTechId.BileBomb) then
     techid = kTechId.BileBomb
@@ -49,12 +53,21 @@ function Hive:UpdatePassive()
     techid = kTechId.Stomp
       elseif teambioMass >= 9 and not GetHasTech(self, kTechId.Xenocide) then 
     techid = kTechId.Xenocide
-    else
-       return  false
     end
     
+        if techid == nil and self.bioMassLevel <= 1 then
+    techid = kTechId.ResearchBioMassOne
+    elseif techid == nil and self.bioMassLevel <= 2 then
+    techid =kTechId.ResearchBioMassTwo    --Prolly easier to just read techtree and their requirements no?
+    end
+    
+    if techid == nil then return true end
+    local cost = LookupTechData(techid, kTechDataCostKey, 0)
+    if TresCheck(cost) then
+    DeductTres(cost)
    local techNode = self:GetTeam():GetTechTree():GetTechNode( techid ) 
    self:SetResearching(techNode, self)
+   end
    
    
 end
@@ -70,7 +83,7 @@ function Hive:UpdateResearch(deltaTime)
     if researchNode then
                     if researchNode:GetTechId() == kTechId.ResearchBioMassOne then
                        elseif researchNode:GetTechId() == kTechId.ResearchBioMassTwo then
-                       researchDuration = 200 -- 10 mins == biomass 9 == onos eggs avail and stomp avail == scale to difficulty as per flavor of personality
+                       researchDuration = 300
                        defaultresearch = true
                     end--
         if researchNode:GetTechId() == kTechId.BileBomb then
