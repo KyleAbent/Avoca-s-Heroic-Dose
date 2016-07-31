@@ -25,6 +25,13 @@ function Plugin:MapPostLoad()
       Server.CreateEntity(Conductor.kMapName)
 
 end
+function Plugin:CommLoginPlayer( Building, Player  )
+
+      Player:Eject()
+      
+      
+end
+
 function Plugin:SetGameState( Gamerules, State, OldState )
            if State == kGameState.Countdown then
        self:SimpleTimer( 8, function() 

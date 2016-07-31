@@ -10,6 +10,7 @@ Script.Load("lua/Additions/Vaporizer.lua")
 Script.Load("lua/Additions/Convars.lua") 
 Script.Load("lua/Additions/PanicAttack.lua") 
 Script.Load("lua/Additions/WhipAvoca.lua") 
+Script.Load("lua/Additions/FireGrenade.lua") 
 
 function Location:MakeSureRoomIsntEmpty()
           --So that the room lights being changed are actually observed, otherwise useless :)
@@ -90,18 +91,17 @@ end
      function Crag:OnOrderComplete(currentOrder)
         if currentOrder == kTechId.Move then
         local crags = #GetEntitiesWithinRange("Crag", who:GetOrigin(), 4) 
-        local whips = #GetEntitiesWithinRange("Whip", who:GetOrigin(), 4)
-        if whips or crags and (whips + crags >= 4) then
+        if crags and  #crags >= 4 then
                  MoveElseWhereFree(self)
            end
         end
      end
      
      function Whip:OnOrderComplete(currentOrder)
+        if self:isa("WhipAvoca") then return end
         if currentOrder == kTechId.Move then
-        local crags = #GetEntitiesWithinRange("Crag", who:GetOrigin(), 8) 
         local whips = #GetEntitiesWithinRange("Whip", who:GetOrigin(), 8)
-        if whips or crags and (whips + crags >= 4) then
+        if whips  and #whips  >= 4 then
                  MoveElseWhereFree(self)
          end
         end

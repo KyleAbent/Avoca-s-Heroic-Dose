@@ -73,65 +73,6 @@ local function GetIsWeldedByOtherMAC(self, target)
     return false
     
 end
-local function FindAppropriateOrder(mac,where)
-  if mac:isa("BigMac") then 
-            local constructable =  GetNearestMixin(where, "Construct", 1, function(ent) return not ent:GetIsBuilt() and ent:GetCanConstruct(mac) and mac:CheckTarget(ent:GetOrigin())  end)
-               if constructable then
-                    mac:GiveOrder(kTechId.Construct, constructable:GetId(), constructable:GetOrigin())
-                    return
-                end
-            
-                // Look for entities to heal with weld.
-                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", 1, where, 999)
-                for w = 1, #weldables do
-                
-                    local weldable = weldables[w]
-                    // There are cases where the weldable's weld percentage is very close to
-                    // 100% but not exactly 100%. This second check prevents the MAC from being so pedantic.
-                    if weldable:GetCanBeWelded(mac) and weldable:GetWeldPercentage() < 1 and not GetIsWeldedByOtherMAC(mac, weldable) then
-                    mac:GiveOrder(kTechId.Construct, weldable:GetId(), weldable:GetOrigin())
-                    return
-                    end
-                 end
-   elseif mac:isa("MacAvoca") then --powerpoints and extractors only
-            local constructable =  GetNearestMixin(where, "Construct", 1, function(ent) return  ( ent:isa("Extractor") or ent:isa("PowerPoint") ) and not ent:GetIsBuilt() and ent:GetCanConstruct(mac) and mac:CheckTarget(ent:GetOrigin())  end)
-               if constructable then
-                    mac:GiveOrder(kTechId.Construct, constructable:GetId(), constructable:GetOrigin())
-                    return
-                end
-            
-                // Look for entities to heal with weld.
-                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", 1, where, 999)
-                for w = 1, #weldables do
-                
-                    local weldable = weldables[w]
-                    // There are cases where the weldable's weld percentage is very close to
-                    // 100% but not exactly 100%. This second check prevents the MAC from being so pedantic.
-                    if ( weldable:isa("Extractor") or weldable:isa("PowerPoint") ) and  weldable:GetCanBeWelded(mac) and weldable:GetWeldPercentage() < 1 and not GetIsWeldedByOtherMAC(mac, weldable) then
-                    mac:GiveOrder(kTechId.Construct, weldable:GetId(), weldable:GetOrigin())
-                    return
-                    end
-                 end
-         elseif mac:isa("PlayerMac") then
-             local nearestplayer = GetNearestMixin(where, "Weldable", 1, function(ent) return ent:isa("Player") and ent:GetCanBeWelded(mac) and ent:GetWeldPercentage() < 1  end)
-                 if nearestplayer then
-                        mac:GiveOrder(kTechId.AutoWeld, nearestplayer:GetId(), nearestplayer:GetOrigin())
-                 end
-       elseif mac:isa("BaseMac") then
-             local nearestinBase = GetNearestMixin(where, "Weldable", 1, function(ent) return not ent:isa("Player") and GetIsPointInMarineBase(ent:GetOrigin()) and ent:GetCanBeWelded(mac) and ent:GetWeldPercentage() < 1  end)
-                 if nearestinBase then
-                        mac:GiveOrder(kTechId.AutoWeld, nearestinBase:GetId(), nearestinBase:GetOrigin())
-                 end
-       end
-        
-end
-local function MoveMacs(where)
-        for _, mac in ipairs(GetEntitiesWithinRange("MAC", where, 999)) do
-           if mac:GetIsAlive() and not mac:GetHasOrder() and not MatchOrigins(mac, where) then
-           FindAppropriateOrder(mac, where)
-           end
-       end
-end
 
 local function EntityIsaPowerPoint(nearestenemy)
  return nearestenemy:isa("PowerPoint") and nearestenemy:GetIsBuilt() and not nearestenemy:GetIsDisabled()
@@ -258,18 +199,6 @@ end
            end
          end
 end
-local function UnMaturizeKing(who)
-    if Server then
-    
-        who.matureFraction = 0
-        who.finalMatureFraction = 0
-        who.starvationMatureFraction = 0
-        who.timeMaturityLastUpdate = 0
-        who.isMature = false
-        who.updateMaturity = true
-    
-    end
-end
 local function FindOrCreateKingCyst(where, which)
  local king = false
  local temphack =  GetNearest(where, "Player", nil, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() end) 
@@ -287,10 +216,9 @@ local function FindOrCreateKingCyst(where, which)
           end
           
           if hasking and king then
-              if king:GetIsMature() then
-               king:KillWhipAvoca()
-               king:SetOrigin(toplace) 
-               UnMaturizeKing(king)
+              if king:GetIsMature() and not king.moving then
+               king:GiveOrder(kTechId.Move, nil, toplace, nil, true, true) 
+               king:MoveWhipAvoca(toplace)
                end
           else
               local KingCyst = CreateEntity(CystAvoca.kMapName, where, 2)
@@ -299,10 +227,10 @@ local function FindOrCreateKingCyst(where, which)
               king = KingCyst
           end
      else
-       Print("No spot found for king cyst!")
+--       Print("No spot found for king cyst!")
      end
        
-       if king then Print("King Cyst located in %s", which.name) end
+      -- if king then Print("King Cyst located in %s", which.name) end
 
 end
 
@@ -326,10 +254,6 @@ function Conductor:OnRoundStart()
             end
 end
 function Conductor:OnCreate() 
-   for i = 1,8  do
-     Print("Conductor created")
-   end
-
    if Server then
    self.payLoadTime = 600
    self.phaseCannonTime = 120
@@ -353,7 +277,6 @@ function Conductor:PickMainRoom()
        return true
 end
 function Conductor:SetMainRoom(where, which)
-       if Server then MoveMacs(where) MoveArcs(where) end
         CoordinateWithPowerNode(which.name)
         if not self:GetCanVape() then CreateAlienMarker(where) end
         ForAllMarinesSendWP(where, which)

@@ -3,6 +3,14 @@ PlayerMac.kMapName = "playermac"
 
 local networkVars = {}
 
+function PlayerMac:OnCreate()
+ MAC.OnCreate(self)
+ self:AdjustMaxHealth(kMACHealth * 1.25)
+ self:AdjustMaxArmor(kMACArmor * 1.25)
+end
+
+local kNanoshieldMaterial = PrecacheAsset("cinematics/vfx_materials/nanoshield.material")
+
 local function GetAutomaticOrder(self)
 
     local target = nil
@@ -16,27 +24,30 @@ local function GetAutomaticOrder(self)
             primaryTarget = Shared.GetEntity(currentOrder:GetParam())
         end
 
-        if primaryTarget and (HasMixin(primaryTarget, "Weldable") and primaryTarget:GetWeldPercentage() < 1) and primaryTarget:isa("Player")  then
+        if primaryTarget and (HasMixin(primaryTarget, "Weldable") and primaryTarget:GetWeldPercentage() < 1) and primaryTarget:GetCanBeWelded(self) and primaryTarget:isa("Player")  then
             
             target = primaryTarget
             orderType = kTechId.FollowAndWeld
                     
         else
-            
-            if not target then
-             local nearestplayer = GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  end)
-                 if nearestplayer then
-                        target = nearestplayer
+             local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", 1, self:GetOrigin(), 9999)
+                for w = 1, #weldables do
+                
+                    local weldable = weldables[w]
+                    if weldable:isa("Player") and weldable:GetCanBeWelded(self) and weldable:GetWeldPercentage() < 1  then
+                    
+                        target = weldable
                         orderType = kTechId.FollowAndWeld
-                 end
-            end
-        
-        end
+                        break
 
+                    end
+                    
+                end
+        end
         self.timeOfLastFindSomethingTime = Shared.GetTime()
 
-    end
-    
+
+      end
     return target, orderType
 
 end
@@ -166,4 +177,38 @@ function PlayerMac:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
+
+
+if Client then
+
+    function PlayerMac:OnUpdateRender()
+          local showMaterial = not GetAreEnemies(self, Client.GetLocalPlayer())
+    
+        local model = self:GetRenderModel()
+        if model then
+
+            model:SetMaterialParameter("glowIntensity", 4)
+
+            if showMaterial then
+                
+                if not self.hallucinationMaterial then
+                    self.hallucinationMaterial = AddMaterial(model, kNanoshieldMaterial)
+                end
+                
+                self:SetOpacity(0, "hallucination")
+            
+            else
+            
+                if self.hallucinationMaterial then
+                    RemoveMaterial(model, self.hallucinationMaterial)
+                    self.hallucinationMaterial = nil
+                end//
+                
+                self:SetOpacity(1, "hallucination")
+            
+            end //showma
+            
+        end//omodel
+end //up render
+end -- client
 Shared.LinkClassToMap("PlayerMac", PlayerMac.kMapName, networkVars)

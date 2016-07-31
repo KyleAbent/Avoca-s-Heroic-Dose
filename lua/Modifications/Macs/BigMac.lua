@@ -29,37 +29,19 @@ local function GetAutomaticOrder(self)
         else
 
             -- If there's a friendly entity nearby that needs constructing, constuct it.
-            local constructables = GetEntitiesWithMixinForTeamWithinRange("Construct", self:GetTeamNumber(), self:GetOrigin(), MAC.kOrderScanRadius)
-            for c = 1, #constructables do
             
-                local constructable = constructables[c]
-                if constructable:GetCanConstruct(self) then
-                
+            local constructable =  GetNearestMixin(self:GetOrigin(), "Construct", 1, function(ent) return not GetIsPointInMarineBase(ent:GetOrigin()) and not ent:GetIsBuilt() and ent:GetCanConstruct(self) and self:CheckTarget(ent:GetOrigin())  end)
+               if constructable then
                     target = constructable
                     orderType = kTechId.Construct
-                    break
-                    
                 end
-                
-            end
-            
+
             if not target then
             
-                -- Look for entities to heal with weld.
-                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", self:GetTeamNumber(), self:GetOrigin(), MAC.kOrderScanRadius)
-                for w = 1, #weldables do
-                
-                    local weldable = weldables[w]
-                    -- There are cases where the weldable's weld percentage is very close to
-                    -- 100% but not exactly 100%. This second check prevents the MAC from being so pedantic.
-                    if weldable:GetCanBeWelded(self) and weldable:GetWeldPercentage() < 1 and not weldable:isa("MAC") then
-                    
-                        target = weldable
-                        orderType = kTechId.AutoWeld
-                        break
-
-                    end
-                    
+            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return not GetIsPointInMarineBase(ent:GetOrigin()) and not ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  end)
+               if weldable then
+                    target = constructable
+                    orderType = kTechId.AutoWeld
                 end
             
             end

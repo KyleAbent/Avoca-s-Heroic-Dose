@@ -3,6 +3,12 @@ MacAvoca.kMapName = "macavoca"
 
 local networkVars = {}
 
+function MacAvoca:OnCreate()
+ MAC.OnCreate(self)
+ self:AdjustMaxHealth(kMACHealth * 2)
+ self:AdjustMaxArmor(kMACArmor * 2)
+end
+
 local function GetAutomaticOrder(self)
 
     local target = nil
@@ -14,57 +20,24 @@ local function GetAutomaticOrder(self)
         local primaryTarget = nil
         if currentOrder and currentOrder:GetType() == kTechId.FollowAndWeld then
             primaryTarget = Shared.GetEntity(currentOrder:GetParam())
-        end
+        end --
 
-        if primaryTarget and (HasMixin(primaryTarget, "Weldable") and primaryTarget:GetWeldPercentage() < 1) and not primaryTarget:isa("MAC") then
+        if primaryTarget and (HasMixin(primaryTarget, "Weldable") and primaryTarget:GetCanBeWelded(self) and primaryTarget:GetWeldPercentage() < 1) and not primaryTarget:isa("MAC") then
             
             target = primaryTarget
             orderType = kTechId.AutoWeld
                     
-        else
-
-            -- If there's a friendly entity nearby that needs constructing, constuct it.
-            local constructables = GetEntitiesWithMixinForTeamWithinRange("Construct", self:GetTeamNumber(), self:GetOrigin(), MAC.kOrderScanRadius)
-            for c = 1, #constructables do
+      else
             
-                local constructable = constructables[c]
-                if constructable:GetCanConstruct(self) then
-                
-                    target = constructable
-                    orderType = kTechId.Construct
-                    break
-                    
-                end
-                
-            end
-            
-            if not target then
-            
-                -- Look for entities to heal with weld.
-                local weldables = GetEntitiesWithMixinForTeamWithinRange("Weldable", self:GetTeamNumber(), self:GetOrigin(), MAC.kOrderScanRadius)
-                for w = 1, #weldables do
-                
-                    local weldable = weldables[w]
-                    -- There are cases where the weldable's weld percentage is very close to
-                    -- 100% but not exactly 100%. This second check prevents the MAC from being so pedantic.
-                    if weldable:GetCanBeWelded(self) and weldable:GetWeldPercentage() < 1 and not weldable:isa("MAC") then
-                    
-                        target = weldable
-                        orderType = kTechId.AutoWeld
-                        break
-
-                    end
-                    
+            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return ent:isa("ARC") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  end)
+               if weldable then
+                    target = weldable
+                    orderType = kTechId.FollowAndWeld
                 end
             
             end
-        
-        end
-
         self.timeOfLastFindSomethingTime = Shared.GetTime()
-
-    end
-    
+        end
     return target, orderType
 
 end

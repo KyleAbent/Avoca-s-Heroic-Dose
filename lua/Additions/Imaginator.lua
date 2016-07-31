@@ -17,6 +17,7 @@ function Imaginator:OnCreate()
               --self:AddTimedCallback(Imaginator.PickMainRoom, 16)
               self:AddTimedCallback(Imaginator.Automations, 8)
               self:AddTimedCallback(Imaginator.Imaginations, 4)
+              self:AddTimedCallback(Imaginator.CystTimer, 1)
             end
 end
 local function GetDisabledPowerPoints()
@@ -79,6 +80,9 @@ end
 function Imaginator:Imaginations() --Tres spending WIP
               self:MarineConstructs()
               self:AlienConstructs(false)
+              return true
+end
+function Imaginator:CystTimer()
               self:AlienConstructs(true)
               return true
 end
@@ -175,6 +179,32 @@ function Imaginator:MarineConstructs()
 
 return true
 end
+function Imaginator:TriggerNotification(locationId, techId)
+
+    local message = BuildCommanderNotificationMessage(locationId, techId)
+    
+    -- send the message only to Marines (that implies that they are alive and have a hud to display the notification
+    
+    for index, marine in ipairs(GetEntitiesForTeam("Player", 1)) do
+        Server.SendNetworkMessage(marine, "CommanderNotification", message, true) 
+    end
+
+end
+local function GetTechId(mapname)
+      local thehardway = GetEntitiesWithMixinForTeam("Construct", 1) 
+      
+      for i = 1, #thehardway do
+        local ent = thehardway[i]
+         if ent:GetMapName() == mapname then return ent:GetTechId() end
+      end
+      return nil
+end
+local function BuildNotificationMessage(where, self, mapname)
+        local techId = GetTechId(mapname)
+        local location = GetLocationForPoint(where)
+        local locationName = location and location:GetName() or ""
+        self:TriggerNotification(Shared.GetStringIndex(locationName), techId)
+end
 function Imaginator:ActualFormulaMarine()
 
 --Print("AutoBuildConstructs")
@@ -193,7 +223,7 @@ local success = false
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetMapName() == tospawn end)
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
-                      Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
+                      --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
                           local minrange = 12
                           if tospawn == Armory.kMapName then minrange = 12 end
                           if tospawn == PhaseGate.kMapName then minrange = 42 end
@@ -206,6 +236,7 @@ local success = false
                           if range >=  minrange  then
                            local entity = CreateEntity(tospawn, randomspawn, 1)
                                entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
+                               BuildNotificationMessage(randomspawn, self, tospawn)
                                success = true
                           end --
                      else -- it tonly takes 1!
@@ -225,7 +256,7 @@ local function GetAlienSpawnList(cystonly)
 local tospawn = {}
 
       if cystonly then 
-      table.insert(tospawn, AutoCyst.kMapName)
+      return AutoCyst.kMapName
       end
       
           if TresCheck(kShiftCost) then
@@ -265,7 +296,7 @@ local success = false
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 2, function(ent) return ent:GetMapName() == tospawn end)
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
-                      Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
+                      --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
                           local minrange = 12
                           if tospawn == Cyst.kMapName then minrange = kCystRedeployRange end
                           if tospawn == Shade.kMapName then minrange = 17 end

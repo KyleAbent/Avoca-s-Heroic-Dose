@@ -52,7 +52,7 @@ function Conductor:CheckAndMaybeBuildMac()
              end
              
            if MacQualifications(self) then
-           local mac = CreateEntity(GetMacMapName(), FindFreeSpace(chair:GetOrigin()) )
+           local mac = CreateEntity(GetMacMapName(), FindFreeSpace(chair:GetOrigin()), 1 )
            end
            
            return true

@@ -3,6 +3,12 @@ BaseMac.kMapName = "basemac"
 
 local networkVars = {}
 
+function BaseMac:OnCreate()
+ MAC.OnCreate(self)
+ self:AdjustMaxHealth(kMACHealth * 0.5)
+ self:AdjustMaxArmor(kMACArmor * 0.5)
+end
+
 local function GetAutomaticOrder(self)
 
     local target = nil
@@ -22,16 +28,30 @@ local function GetAutomaticOrder(self)
             orderType = kTechId.AutoWeld
                     
         else
-              local nearestinBase = GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return not ent:isa("Player") and GetIsPointInMarineBase(ent:GetOrigin()) and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  end)
-                 if nearestinBase then
-                 target = constructable
-                 orderType = kTechId.AutoWeld
-             end  
+        
+            -- If there's a friendly entity nearby that needs constructing, constuct it.
+            
+            local constructable =  GetNearestMixin(self:GetOrigin(), "Construct", 1, function(ent) return GetIsPointInMarineBase(ent:GetOrigin()) and not ent:GetIsBuilt() and ent:GetCanConstruct(self) and self:CheckTarget(ent:GetOrigin())  end)
+               if constructable then
+                    target = constructable
+                    orderType = kTechId.Construct
+                end
+
+            if not target then
+            
+            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return GetIsPointInMarineBase(ent:GetOrigin()) and not ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  end)
+               if weldable then
+                    target = weldable
+                    orderType = kTechId.AutoWeld
+                end
+            
+            end
         
         end
 
-        self.timeOfLastFindSomethingTime = Shared.GetTime()
 
+        self.timeOfLastFindSomethingTime = Shared.GetTime()
+    
     end
     
     return target, orderType

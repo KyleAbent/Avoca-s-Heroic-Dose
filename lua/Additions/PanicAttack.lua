@@ -12,10 +12,10 @@ function PanicAttack:GetSendDeathMessageOverride()
 return false
 end
 function PanicAttack:GetMaxHealth()
-    return kHydraHealth * 4
+    return kMatureHydraHealth * 2
 end
 function PanicAttack:GetMaxArmor()
-    return kHydraArmor * 4
+    return kMatureHydraArmor * 2
 end
 function PanicAttack:OnInitialized()
   Hydra.OnInitialized(self)

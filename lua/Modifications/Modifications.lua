@@ -1,5 +1,3 @@
-Spectator.kKillCamEnabled = false
-kPlayerResPerInterval = 0.5
 Script.Load("lua/Modifications/ModelSize.lua")
 Script.Load("lua/Modifications/Remixes.lua")
 Script.Load("lua/Modifications/Criticisms.lua")
@@ -65,7 +63,7 @@ function Whip:FilterTarget()
 end
 function Whip:GetCanFireAtTargetActual(target, targetPoint)    
 
-    if target:isa("AvocaArc") and not target:GetInAttackMode() then
+    if target:isa("AvocaArc") and not target:GetInAttackMode() or target:isa("AvocaChair") then
     return false
     end
     
@@ -224,18 +222,20 @@ local function GetDestinationGate(self)
    
     
   -- Find next phase gate to teleport to
-   
+  
+    for index, payload  in ipairs( GetEntitiesForTeam("AvocaArc", self:GetTeamNumber()) ) do
+        if GetIsUnitActive(payload) then
+            table.insert(phaseGates, payload)
+        end
+    end      
+    
     for index, phaseGate in ipairs( GetEntitiesForTeam("PhaseGate", self:GetTeamNumber()) ) do
         if GetIsUnitActive(phaseGate) then
             table.insert(phaseGates, phaseGate)
         end
     end  
 
-    for index, payload  in ipairs( GetEntitiesForTeam("AvocaArc", self:GetTeamNumber()) ) do
-        if GetIsUnitActive(payload) then
-            table.insert(phaseGates, payload)
-        end
-    end      
+
     
     if table.count(phaseGates) < 2 then
         return nil

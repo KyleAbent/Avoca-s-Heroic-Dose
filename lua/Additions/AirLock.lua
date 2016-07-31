@@ -83,11 +83,11 @@ local lottery = {}
 end
 function AirLock:BaseDefense() 
   if Server then  
-                  Print("BaseDefense triggered")
+  --                Print("BaseDefense triggered")
           local spawnpoint = GetRandom(self, self.name)
             if spawnpoint ~= nil then 
-                  Print("SpawnDefense triggered")
-              CreateEntity(ClusterGrenade.kMapName, spawnpoint, 1) --oh fuck i had this set as team 2 LOL 
+                 -- Print("SpawnDefense triggered")
+              CreateEntity(FireFlameCloud.kMapName, spawnpoint, 1) --oh fuck i had this set as team 2 LOL 
            end
    end
      return not self:GetIsDestroyed()

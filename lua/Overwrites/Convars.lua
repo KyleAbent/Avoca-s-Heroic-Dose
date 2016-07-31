@@ -11,3 +11,6 @@ kShiftCost = 10
 kShadeCost = 10
 kCragCost = 10
 kWhipCost = 10
+
+kPlayerResPerInterval = 0.5
+Spectator.kKillCamEnabled = false

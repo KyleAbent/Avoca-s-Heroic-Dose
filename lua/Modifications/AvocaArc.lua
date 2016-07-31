@@ -78,8 +78,9 @@ local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 4)
          for i = 1, #players do
             local player = players[i]
             if ( player:GetIsAlive() and  player.GetIsNanoShielded and not player:GetIsNanoShielded()) then player:ActivateNanoShield() end
-           if ( player:GetHealth() == player:GetMaxHealth() ) then
+           if player:isa("Marine") and( player:GetHealth() == player:GetMaxHealth() ) then
            local addarmoramount = 3 * player:GetArmorLevel()
+           addarmoramount = who:GetInAttackMode() and addarmoramount * 1.5 or addarmoramount
            player:AddHealth(addarmoramount, false, not true, nil, nil, true)
            else
            player:AddHealth(Armory.kHealAmount, false, false, nil, nil, true)   

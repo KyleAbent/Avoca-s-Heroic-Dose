@@ -21,7 +21,7 @@ end
 
 function ConstructMixin:GetCanConstruct(constructor)
 
-return self:isa("PowerPoint") or constructor:isa("MAC")
+return self:isa("PowerPoint") or ( constructor and constructor:isa("MAC") )
     
 end
 /*

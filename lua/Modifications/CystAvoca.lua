@@ -1,8 +1,22 @@
 class 'CystAvoca' (Cyst)
 CystAvoca.kMapName = "cystavoca"
 
+
+Script.Load("lua/OrdersMixin.lua")
+Script.Load("lua/PathingMixin.lua")
+Script.Load("lua/AlienStructureMoveMixin.lua")
+
+
+local networkVars = {}
+AddMixinNetworkVars(OrdersMixin, networkVars)
+AddMixinNetworkVars(AlienStructureMoveMixin, networkVars)
+
+
 function CystAvoca:OnCreate()
   Cyst.OnCreate(self)
+    InitMixin(self, PathingMixin)
+    InitMixin(self, OrdersMixin, { kMoveOrderCompleteDistance = kAIMoveOrderCompleteDistance })
+    InitMixin(self, AlienStructureMoveMixin, { kAlienStructureMoveSound = Whip.kWalkingSound })
   self:AddTimedCallback(CystAvoca.Heal, 8)
 end
 function CystAvoca:GetCystParentRange()
@@ -18,7 +32,9 @@ function CystAvoca:GetCystParentRange()
 return 999
 end
 
-
+function CystAvoca:GetMaxSpeed()
+    return 3
+end
 if Server then
 
 
@@ -33,7 +49,7 @@ if Server then
 end
 function CystAvoca:OnConstructionComplete()
     self:AddTimedCallback(CystAvoca.EnergizeInRange, 4)
-    self:AddTimedCallback(CystAvoca.Synchronize, 8)
+    self:AddTimedCallback(CystAvoca.Synchronize, 4)
 end
 function CystAvoca:EnergizeInRange()
     if self:GetIsBuilt() and not self:GetIsOnFire() and self:GetMaturityFraction() == 1 then
@@ -62,10 +78,20 @@ function CystAvoca:KillWhipAvoca()
                      if #whips == 0 then return end
                      
                      for i = 1, #whips do
-                     local whip = whip[i]
+                     local whip = whips[i]
                       whip:ActivateSelfDestruct()
                      end
 end       
+function CystAvoca:MoveWhipAvoca(where)
+                     local whips = GetEntitiesForTeamWithinRange("WhipAvoca", 2, self:GetOrigin(), 999999)
+                     
+                     if #whips == 0 then return end
+                     
+                     for i = 1, #whips do
+                     local whip = whips[i]
+                        whip:GiveOrder(kTechId.Move, nil, FindFreeSpace(where, .5,8), nil, true, true) 
+                     end
+end  
 function CystAvoca:PreOnKill(attacker, doer, point, direction)
        self:KillWhipAvoca()
 end
@@ -76,24 +102,21 @@ function CystAvoca:SpawnWhipsAtKing(whips, crags, cyst, origin)
      --   if self:GetCanSpawnAlienEntity(tres, nil, cyst:GetIsInCombat()) then
          local maxwhips = 8
          local currentwhips = Clamp(#whips, 0, maxwhips)
-         Print("Currentwhips is %s", currentwhips)
+  --       Print("Currentwhips is %s", currentwhips)
          local whipstospawn = math.abs(maxwhips - currentwhips)
-         Print("whipstospawn is %s", whipstospawn)
+        -- Print("whipstospawn is %s", whipstospawn)
           whipstospawn = Clamp(whipstospawn, 0, 4)
-         Print("whipstospawn is %s", whipstospawn)
+        -- Print("whipstospawn is %s", whipstospawn)
          
          if whipstospawn >= 1 then
          
          for i = 1, whipstospawn do
-                 local tres = kWhipCost / 2
-                 if GetCanSpawnAlienEntity(tres) then  
-                     local autoconstructspawnchance = math.random(1,2)
+                -- local tres = kWhipCost / 2
+               --  if GetCanSpawnAlienEntity(tres) then  
                      local whip = CreateEntity(WhipAvoca.kMapName, FindFreeSpace(origin), 2) 
-                      if autoconstructspawnchance == 1 then
                         whip:SetConstructionComplete()
-                      end
-                      whip:GetTeam():SetTeamResources(whip:GetTeam():GetTeamResources() - tres)
-                       end
+                     -- whip:GetTeam():SetTeamResources(whip:GetTeam():GetTeamResources() - tres)
+                      -- end
                      --end, 4)
 
          end
@@ -158,8 +181,25 @@ local crags = 0
           return crags
 
 end
+/*
+function CystAvoca:OnMaturityComplete()
+
+end
+
+function CystAvoca:OnOrderComplete(currentOrder)
+  self:Synchronize()
+end
+*/
+function Cyst:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if doer ~= nil and doer:isa("ARC") then
+        damageTable.damage = 0
+    end
+
+end
 function CystAvoca:Synchronize()
-    if not self:GetIsMature() then return true end
+    if not self:GetIsMature() or self.moving then return true end
+       Print("Calling to sync")
                      MoveEggs(self)
                      local whips = GetEntitiesForTeamWithinRange("WhipAvoca", 2, self:GetOrigin(), 999999)
                      local crags = GetCragsCount()
@@ -167,14 +207,13 @@ function CystAvoca:Synchronize()
                      local cysts, tableof = GetCystsInLocation(GetLocationForPoint(self:GetOrigin()))
                      for i = 1, #tableof do
                         local autocyst = tableof[i]
-                        if autocyst and autocyst:GetIsAlive() and autocyst:GetIsBuilt() then AttractWhipsCrags(autocyst) end
+                        if autocyst and autocyst:GetIsAlive() and autocyst:GetIsBuilt() then AttractCrags(autocyst) end
                      end
                     return true
 end
-function AttractWhipsCrags(who)
+function AttractCrags(who)
    local crags = #GetEntitiesWithinRange("Crag", who:GetOrigin(), 8) 
-   local whips = #GetEntitiesWithinRange("WhipAvoca", who:GetOrigin(), 8)
-    if not whips and not crags or (whips + crags <= 3) then
+    if not crags or  crags <= 3 then
                  MagnetizeStructures(who)
     end
 end
@@ -186,17 +225,10 @@ function MagnetizeStructures(who)
                  local success = crag:GiveOrder(kTechId.Move, who:GetId(), where, nil, true, true) 
                  if success then break end
                 end
-          end
-          for index, whip in ipairs(GetEntitiesForTeam("WhipAvoca", 2)) do
-               if not whip:isa("PowerDrainer") and whip:GetIsBuilt() and who:GetDistance(whip) >= 8 and not  whip.moving then 
-                local success = whip:GiveOrder(kTechId.Move, who:GetId(), who:GetOrigin(), nil, true, true) 
-               if success then break end
-                end
-                
+          end          
 
 end
-                
-end       
+                    
 function CystAvoca:GetMatureMaxHealth()
     return (math.max(kMatureCystHealth * self.healthScalar or 0, kMinMatureCystHealth)) * 8
 end 
@@ -209,7 +241,7 @@ function CystAvoca:GetInfestationRadius()
 end
 
 function CystAvoca:GetMaturityRate()
-  return 60 * 1.3
+  return 8
 end
 
 function CystAvoca:OnAdjustModelCoords(modelCoords)
