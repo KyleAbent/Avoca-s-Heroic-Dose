@@ -27,7 +27,7 @@ function Plugin:MapPostLoad()
 end
 function Plugin:CommLoginPlayer( Building, Player  )
 
-      Player:Eject()
+     return
       
       
 end

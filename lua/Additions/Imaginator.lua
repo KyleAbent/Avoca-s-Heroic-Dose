@@ -103,8 +103,13 @@ local function GetRange(who, where)
     local ArcFormula = (where - who:GetOrigin()):GetLengthXZ()
     return ArcFormula
 end
-local function TresCheck(cost)
+local function TresCheck(team, cost)
+    if team == 1 then
     return GetGamerules().team1:GetTeamResources() >= cost
+    elseif team == 2 then
+    return GetGamerules().team2:GetTeamResources() >= cost
+    end
+
 end
 local function GetSentryMinRangeReq(where)
 local count = 0
@@ -134,15 +139,15 @@ local function GetMarineSpawnList()
 
 local tospawn = {}
 
-     if TresCheck(kPhaseGateCost) then
+     if TresCheck(1,kPhaseGateCost) then
      table.insert(tospawn, PhaseGate.kMapName)
        end
        
-    if TresCheck(kArmoryCost) then
+    if TresCheck(1,kArmoryCost) then
     table.insert(tospawn, Armory.kMapName)
     end
     
-      if TresCheck(kObservatoryCost) then
+      if TresCheck(1,kObservatoryCost) then
        table.insert(tospawn, Observatory.kMapName)
       end
       
@@ -150,16 +155,16 @@ local tospawn = {}
      table.insert(tospawn, Scan.kMapName)
      end
        
-      if TresCheck(kRoboticsFactoryCost) then
+      if TresCheck(1,kRoboticsFactoryCost) then
       table.insert(tospawn, RoboticsFactory.kMapName)
       end
       
 
-    if TresCheck(8) then
+    if TresCheck(1,8) then
     table.insert(tospawn, SentryAvoca.kMapName)
     end
     
-     if TresCheck(kPrototypeLabCost) then
+     if TresCheck(1,kPrototypeLabCost) then
      table.insert(tospawn, PrototypeLab.kMapName)
      end
      
@@ -199,23 +204,34 @@ local function GetTechId(mapname)
       end
       return nil
 end
+local function GetActiveAirLock()
+  local airlocks = {}
+  for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
+        if location:GetIsAirLock(true) then table.insert(airlocks,location) end
+    end
+    return table.random(airlocks) 
+end
+local function GetScanMinRangeReq(where)
+
+            local obs = #GetEntitiesForTeamWithinRange("Observatory", 1, where, kScanRadius)
+            
+            for i = 1, obs do
+             if GetIsUnitActive(obs) then return 999 end
+            end
+            
+            return kScanRadius  
+                
+end
 local function BuildNotificationMessage(where, self, mapname)
-        local techId = GetTechId(mapname)
-        local location = GetLocationForPoint(where)
-        local locationName = location and location:GetName() or ""
-        self:TriggerNotification(Shared.GetStringIndex(locationName), techId)
 end
 function Imaginator:ActualFormulaMarine()
 
 --Print("AutoBuildConstructs")
 local randomspawn = nil
 local tospawn = GetMarineSpawnList()
-local airlocks = EntityListToTable(Shared.GetEntitiesWithClassname("AirLock"))
-local airlock = nil
+local airlock = GetActiveAirLock()
 local success = false
-      if airlocks then
-      airlock = table.random(airlocks)
-            if airlock then
+            if airlock and tospawn then
                 local powerpoint = GetPowerPointForLocation(airlock.name)
              if powerpoint then
                 local randomspawn = FindFreeSpace(FindRandomPerson(airlock, powerpoint))
@@ -231,7 +247,7 @@ local success = false
                           if tospawn == RoboticsFactory.kMapName then minrange = 52  end
                           if tospawn == SentryAvoca.kMapName then minrange = GetSentryMinRangeReq(randomspawn) end
                           if tospawn == PrototypeLab.kMapName then minrange = 52  end
-                          if tospawn == Scan.kMapName then minrange = kScanRadius cost = 3 end
+                          if tospawn == Scan.kMapName then minrange = GetScanMinRangeReq(randomspawn)  cost = 3 end
                           if tospawn == SentryBattery.kMapName then minrange = 16 end
                           if range >=  minrange  then
                            local entity = CreateEntity(tospawn, randomspawn, 1)
@@ -244,13 +260,17 @@ local success = false
                         success = true
                      end
                end   
-            end 
             end
   end
     
   return success
   
 end
+/*
+local function HasThreeUpgFor()
+GetGamerules().team2
+end
+*/
 local function GetAlienSpawnList(cystonly)
 
 local tospawn = {}
@@ -259,13 +279,13 @@ local tospawn = {}
       return AutoCyst.kMapName
       end
       
-          if TresCheck(kShiftCost) then
+          if TresCheck(2,kShiftCost) then
       table.insert(tospawn, Shade.kMapName)
           end
-          if TresCheck(kShadeCost) then
+          if TresCheck(2,kShadeCost) then
       table.insert(tospawn, Shift.kMapName)
           end
-          if TresCheck(kWhipCost) then
+          if TresCheck(2,kWhipCost) then
       table.insert(tospawn, Whip.kMapName)
       end
       
@@ -288,7 +308,7 @@ local randomspawn = nil
 local powerPoints = GetDisabledPowerPoints()
 local tospawn = GetAlienSpawnList(cystonly)
 local success = false
-     if powerPoints then
+     if powerPoints and tospawn then
                 local powerpoint = table.random(powerPoints)
              if powerpoint and powerpoint:GetIsDisabled() then
                 local randomspawn = FindFreeSpace(FindRandomPerson(GetLocationForPoint(powerpoint:GetOrigin()), powerpoint))

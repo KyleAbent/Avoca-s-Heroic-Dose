@@ -17,16 +17,9 @@ function CystAvoca:OnCreate()
     InitMixin(self, PathingMixin)
     InitMixin(self, OrdersMixin, { kMoveOrderCompleteDistance = kAIMoveOrderCompleteDistance })
     InitMixin(self, AlienStructureMoveMixin, { kAlienStructureMoveSound = Whip.kWalkingSound })
-  self:AddTimedCallback(CystAvoca.Heal, 8)
 end
 function CystAvoca:GetCystParentRange()
 return 999
-end
-function CystAvoca:Heal()
-   if self:GetHealth() == self:GetMatureMaxHealth() then return true end
-   local gain = math.min(self:GetMatureMaxHealth() - self:GetHealth()) / math.random(2,4)
-   self:AddHealth(gain, false, false, false)
-   return self:GetIsAlive() and not self:GetIsDestroyed()
 end
 function CystAvoca:GetCystParentRange()
 return 999
@@ -114,7 +107,17 @@ function CystAvoca:SpawnWhipsAtKing(whips, crags, cyst, origin)
                 -- local tres = kWhipCost / 2
                --  if GetCanSpawnAlienEntity(tres) then  
                      local whip = CreateEntity(WhipAvoca.kMapName, FindFreeSpace(origin), 2) 
+                     local random = math.random(1,4)
+                     
+                     if random == 4 then
                         whip:SetConstructionComplete()
+                     end
+                     
+                     local randomagain = whip:GetIsBuilt() and math.random(1,4)
+                     if randomagain == 4 then
+                        whip:SetMature()
+                      end
+                      
                      -- whip:GetTeam():SetTeamResources(whip:GetTeam():GetTeamResources() - tres)
                       -- end
                      --end, 4)
@@ -152,11 +155,26 @@ function CystAvoca:SpawnWhipsAtKing(whips, crags, cyst, origin)
          --   end     
             
 end
-local function ChanceMist(where)
-    local chance = math.random(1,100)
+local function SlowMarinesNearMist(where)
+ local marines = GetEntitiesForTeamWithinRange("Player", 1, where, 10)
+ 
+   if #marines == 0 then return end
+   
+    for i = 1, #marines do
+     local ent = marines[i]
+     if ent:GetIsAlive() and ent.SetWebbed then ent:SetWebbed(8) end
+    end
     
-      if chance <= 30 then
-      if Server then CreateEntity(NutrientMist.kMapName, FindFreeSpace(where), 2) end
+end
+
+local function ChanceMist(where)
+    local chance = math.random(1,4)
+    
+      if chance == 4 then
+      if Server then 
+        CreateEntity(NutrientMist.kMapName, FindFreeSpace(where), 2)
+         SlowMarinesNearMist(where)
+         end
       end
 end
 local function MoveEggs(self)
@@ -193,7 +211,14 @@ end
 function Cyst:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
     if doer ~= nil and doer:isa("ARC") then
-        damageTable.damage = 0
+        damageTable.damage = 10
+    end
+
+end
+function CystAvoca:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if doer ~= nil and doer:isa("ARC") then
+        damageTable.damage = 100
     end
 
 end
@@ -204,7 +229,9 @@ function CystAvoca:Synchronize()
                      local whips = GetEntitiesForTeamWithinRange("WhipAvoca", 2, self:GetOrigin(), 999999)
                      local crags = GetCragsCount()
                      self:SpawnWhipsAtKing(whips, crags, self, self:GetOrigin())
-                     local cysts, tableof = GetCystsInLocation(GetLocationForPoint(self:GetOrigin()))
+                     local location = GetLocationForPoint(self:GetOrigin()) or GetNearest(self:GetOrigin(), "Location") or nil
+                     if location == nil then return true end
+                     local cysts, tableof = GetCystsInLocation(location)
                      for i = 1, #tableof do
                         local autocyst = tableof[i]
                         if autocyst and autocyst:GetIsAlive() and autocyst:GetIsBuilt() then AttractCrags(autocyst) end

@@ -28,7 +28,8 @@ local function GetDefenseEntsInRange(who)
  local crags = GetCragsCount(who:GetOrigin())
  local hivecrags = GetEntitiesWithinRange("HiveCrag", who:GetOrigin(), 24)
  local shades = GetEntitiesForTeamWithinRange("Shade", 2, who:GetOrigin(), 24)
-return shifts, crags, hivecrags, shades
+ local drifters = GetEntitiesForTeamWithinRange("DrifterAvoca", 2, who:GetOrigin(), 9999)
+return shifts, crags, hivecrags, shades, drifters
 end
 local function UpdateTypeOfHive(who)
 local hasshade = false
@@ -85,67 +86,68 @@ function Conductor:MaintainHiveDefense()
           
                   return true
 end
-local function DamagePowerPoint(hive)
-  local where = hive:GetOrigin()
-  local location = GetLocationForPoint(where)
-  local locationName = location and location.name or ""
-  local powerpoint = GetPowerPointForLocation(locationName)
-      if powerpoint then
-         if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then 
-            powerpoint:DeductHealth(powerpoint:GetMaxHealth() * 0.10)
-         end
-      end
-    return false
-end
 local function GetCanSpawnAlienEntity(trescount)
     return GetGamerules().team2:GetTeamResources() >= trescount
 end
-function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades)
-        -- local tres = kStructureDropCost
-         DamagePowerPoint(hive)
-         local spawned = false
-         local origin = hive:GetOrigin()
-         local veils = Clamp(GetBuiltStructureCount("Veil", 2), 0, 3)
+local function SpawnUpgChamber(origin)
+        local spawned = false
+         local veils = Clamp(GetBuiltStructureCount("Veil", 2), 0, 3) 
          local spurs = Clamp(GetBuiltStructureCount("Spur", 2), 0, 3)
          local shells = Clamp(GetBuiltStructureCount("Shell", 2), 0, 3)
-         local spawnedupg = false
-            
+         local spawnedupg = false 
+         local workaround = nil
+            --messy archaic primitive spawn formula because it simply works - built from ground up - improved over time etc
           if veils <= 2 then
           local veil = CreateEntity(Veil.kMapName, FindFreeSpace(origin), 2) 
           veil:SetConstructionComplete()
+          workaround = veil
           spawnedupg = true
           end
           
-           if spurs <=  2 and not spawnedupg then
+           if spurs <=  2 and not spawnedupg  then
           local spur = CreateEntity(Spur.kMapName, FindFreeSpace(origin), 2) 
           spur:SetConstructionComplete()
+          workaround = spur
           spawnedupg = true
            end
            
-          if shells <= 2 and not spawnedupg then
+          if shells <= 2  and not spawnedupg then
           local shell = CreateEntity(Shell.kMapName, FindFreeSpace(origin), 2) 
           shell:SetConstructionComplete()
+          workaround = shell
           spawnedupg = true
           end
-         
+          
+         if spawnedupg == true then
+           workaround:GetTeam():SetTeamResources(workaround:GetTeam():GetTeamResources() - 0) 
+            end
+            
+end
+function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades, drifters)
+        -- local tres = kStructureDropCost
+         if not hive:GetIsAlive() then return end
+         local origin = hive:GetOrigin()
+        local canafford = GetCanSpawnAlienEntity(0)
+        if canafford then SpawnUpgChamber(origin) end    
+
          
                    if #shifts <= math.random(1,3) then
                       local tres = 0 --kShiftCost
-                      if GetCanSpawnAlienEntity(tres) then  
+                     -- if GetCanSpawnAlienEntity(tres) then  
                       local shift = CreateEntity(Shift.kMapName, FindFreeSpace(origin), 2) 
-                      shift:GetTeam():SetTeamResources(shift:GetTeam():GetTeamResources() - tres)
+                      --shift:GetTeam():SetTeamResources(shift:GetTeam():GetTeamResources() - tres)
                       shift:SetConstructionComplete()
-                      end
+                     -- end
                     end
 
                     if crags <= math.random(1,3) then
                       if not spawned then
                        local tres = 0 --kCragCost
-                      if GetCanSpawnAlienEntity(tres) then  
+                     -- if GetCanSpawnAlienEntity(tres) then  
                       local crag = CreateEntity(Crag.kMapName, FindFreeSpace(origin ), 2) 
-                      crag:GetTeam():SetTeamResources(crag:GetTeam():GetTeamResources() - tres)
+                    --  crag:GetTeam():SetTeamResources(crag:GetTeam():GetTeamResources() - tres)
                       crag:SetConstructionComplete()
-                      end
+                     -- end
                       end
                     end
       
@@ -162,14 +164,23 @@ function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades)
                     if #shades <= math.random(1,3) then
                        local tres = 0 --kShadeCost
                        if not spawned then 
-                      if GetCanSpawnAlienEntity(tres) then  
+                    --  if GetCanSpawnAlienEntity(tres) then  
                        local shade = CreateEntity(Shade.kMapName, FindFreeSpace(origin), 2) 
-                      shade:GetTeam():SetTeamResources(shade:GetTeam():GetTeamResources() - tres)
+                    --  shade:GetTeam():SetTeamResources(shade:GetTeam():GetTeamResources() - tres)
                       shade:SetConstructionComplete()
-                       end
+                      -- end
                        end
                     end
 
+                    if #drifters <= 2 then
+                       local tres = 0 --kShadeCost
+                       if not spawned then 
+                     -- if GetCanSpawnAlienEntity(tres) then  
+                       local drifter = CreateEntity(DrifterAvoca.kMapName, FindFreeSpace(origin), 2) 
+                     -- drifter:GetTeam():SetTeamResources(drifter:GetTeam():GetTeamResources() - tres)
+                       --end
+                       end
+                    end
         
 
 

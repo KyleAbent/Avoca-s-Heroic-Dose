@@ -3,19 +3,15 @@ Script.Load("lua/Modifications/Remixes.lua")
 Script.Load("lua/Modifications/Criticisms.lua")
 Script.Load("lua/Modifications/AvocaRules.lua")
 Script.Load("lua/Modifications/CystAvoca.lua")
-Script.Load("lua/Modifications/PowerPointAvoca.lua")
-Script.Load("lua/Modifications/AutoBioMass.lua")
 Script.Load("lua/Modifications/AvocaArc.lua")
 Script.Load("lua/Modifications/MainRoomArc.lua")
 Script.Load("lua/Modifications/HiveCrag.lua")
 Script.Load("lua/Modifications/SentryAvoca.lua")
 Script.Load("lua/Modifications/BaseSentry.lua")
-Script.Load("lua/Modifications/AvocaChair.lua")
+Script.Load("lua/Modifications/BigArc.lua")
 
 --Macs
-Script.Load("lua/Modifications/Macs/MacAvoca.lua")
 Script.Load("lua/Modifications/Macs/BaseMac.lua")
-Script.Load("lua/Modifications/Macs/PlayerMac.lua")
 Script.Load("lua/Modifications/Macs/BigMac.lua")
 --
 
@@ -24,11 +20,13 @@ Script.Load("lua/Modifications/GameStart.lua")
 Script.Load("lua/Modifications/AutoMacsArcs.lua")
 
 
+Script.Load("lua/Modifications/DrifterAvoca.lua")
+Script.Load("lua/Modifications/WhipAvoca.lua") 
 
+Script.Load("lua/Modifications/PhaseAvoca.lua") 
 
 
 if Server then
-Script.Load("lua/Modifications/LightSwitch.lua")
 Script.Load("lua/Modifications/ArmoryArmor.lua")
 
 
@@ -63,7 +61,7 @@ function Whip:FilterTarget()
 end
 function Whip:GetCanFireAtTargetActual(target, targetPoint)    
 
-    if target:isa("AvocaArc") and not target:GetInAttackMode() or target:isa("AvocaChair") then
+    if target:isa("AvocaArc") and not target:GetInAttackMode() then
     return false
     end
     
@@ -217,84 +215,6 @@ end
     end
 */
 
-local function GetDestinationGate(self)
-    local phaseGates = {} 
-   
-    
-  -- Find next phase gate to teleport to
-  
-    for index, payload  in ipairs( GetEntitiesForTeam("AvocaArc", self:GetTeamNumber()) ) do
-        if GetIsUnitActive(payload) then
-            table.insert(phaseGates, payload)
-        end
-    end      
-    
-    for index, phaseGate in ipairs( GetEntitiesForTeam("PhaseGate", self:GetTeamNumber()) ) do
-        if GetIsUnitActive(phaseGate) then
-            table.insert(phaseGates, phaseGate)
-        end
-    end  
-
-
-    
-    if table.count(phaseGates) < 2 then
-        return nil
-    end
-    
-    -- Find our index and add 1
-    local index = table.find(phaseGates, self)
-    if (index ~= nil) then
-    
-        local nextIndex = ConditionalValue(index == table.count(phaseGates), 1, index + 1)
-        ASSERT(nextIndex >= 1)
-        ASSERT(nextIndex <= table.count(phaseGates))
-        return phaseGates[nextIndex]
-        
-    end
-    
-    return nil
-    
-
-    
-end
-
---So that we can teleport to the payload without having to run to it all the time :P
-local function ComputeDestinationLocationId(self, destGate)
-
-    local destLocationId = Entity.invalidId
-    if destGate then
-    
-        local location = GetLocationForPoint(destGate:GetOrigin())
-        if location then
-            destLocationId = location:GetId()
-        end
-        
-    end
-    
-    return destLocationId
-    
-end
-    function PhaseGate:Update()
-
-        self.phase = (self.timeOfLastPhase ~= nil) and (Shared.GetTime() < (self.timeOfLastPhase + 0.3))
-
-        local destinationPhaseGate = GetDestinationGate(self)
-        if destinationPhaseGate ~= nil and GetIsUnitActive(self) and self.deployed and (destinationPhaseGate.deployed or destinationPhaseGate:isa("ARC") ) then        
-        
-            self.destinationEndpoint = destinationPhaseGate:GetOrigin()
-            self.linked = true
-            self.targetYaw = destinationPhaseGate:GetAngles().yaw
-            self.destLocationId = ComputeDestinationLocationId(self, destinationPhaseGate)
-            
-        else
-            self.linked = false
-            self.targetYaw = 0
-            self.destLocationId = Entity.invalidId
-        end
-
-        return true
-        
-    end
 
 
 
@@ -325,7 +245,7 @@ local function LocationsMatch(who,whom)
    
   local whoname = GetLocationForPoint(who:GetOrigin())
   local whomname = GetLocationForPoint(whom:GetOrigin())
-  return whoname == whomname
+  return true --whoname == whomname
 end
 local orig_PowerPoint_OnConstructionComplete = PowerPoint.OnConstructionComplete
     function PowerPoint:OnConstructionComplete()
@@ -344,7 +264,7 @@ local orig_PowerPoint_OnKill = PowerPoint.OnKill
        end
         local location = GetLocationForPoint(self:GetOrigin())
         location = location and location.name 
-        SealAirLock(location, self:GetOrigin())
+       if Client then location:HideDank() end
        
     end
 local function ToSpawnFormula(self,panicstospawn, where)
@@ -355,16 +275,21 @@ local function ToSpawnFormula(self,panicstospawn, where)
                               if spawnpoint then
                               local panicattack = CreateEntity(PanicAttack.kMapName, spawnpoint, 2)
                                panicattack:SetConstructionComplete()
+                               panicattack:SetMature()
                                end
                            end
                end
             
 end
+local function GetRange(who, where)
+    local ArcFormula = (where - who:GetOrigin()):GetLengthXZ()
+    return ArcFormula
+end
 local function SendAnxietyAttack(self, where, who)
          for i = 1, #who do
                            local panicattack = who[i]
                            local bitch = GetPayLoadArc()
-                           if bitch and GetIsPointWithinHiveRadius(bitch:GetOrigin()) then
+                           if bitch and GetIsPointWithinHiveRadius(bitch:GetOrigin()) and GetRange(panicattack,bitch:GetOrigin()) >= 16 then                  
                            local spawnpoint = FindFreeSpace(bitch:GetOrigin(), 4, 8)
                               if spawnpoint then
                                     panicattack:SetOrigin(spawnpoint)
@@ -387,11 +312,11 @@ local panicattacks = {}
         panicstospawn = Clamp(panicstospawn, 1, 2)
 
             if panicstospawn >= 1 then ToSpawnFormula(self,panicstospawn, where) end
-            /*
+            
             if countofpanic >= 1 then
                 SendAnxietyAttack(self, where, panicattacks) -- not sure
             end
-            */
+            
 end
 
 local orig_Hive_OnTakeDamage = Hive.OnTakeDamage
@@ -406,50 +331,42 @@ function Hive:OnTakeDamage(damage, attacker, doer, point)
 return orig_Hive_OnTakeDamage(self,damage, attacker, doer, point)
 end
 ----
-local function GetTechPoint(where)
-    for _, techpoint in ipairs(GetEntitiesWithinRange("TechPoint", where, 8)) do
-         if techpoint then return techpoint end
-    end
-end
-local function GetIsVaporizing(where)
-    for _, vape in ipairs(GetEntitiesWithinRange("Vaporizer", where, 8)) do
-         if vape then return true end
-    end
-end
-local function BuildAlienHive(who)
+
+local kAuxPowerBackupSound = PrecacheAsset("sound/NS2.fev/marine/power_node/backup")
+
+local function BuildRoomPower(who)
+
+     local nearestPower = GetNearest(who:GetOrigin(), "PowerPoint", 1, function(ent) return LocationsMatch(who,ent)  end)
+       if nearestPower and nearestPower:GetIsDisabled() then
+            local cheaptrick = CreateEntity(PowerPoint.kMapName, nearestPower:GetOrigin(), 1)
+            cheaptrick:SetConstructionComplete()
+                DestroyEntity(nearestPower) 
+       end
+       
+       
      who:AddTimedCallback(function() 
-     local hive = who:SpawnCommandStructure(2)
+     local bigarc = CreateEntity(BigArc.kMapName, who:GetOrigin(), 1)
+     bigarc:GiveDeploy()
      end, 8)
+     
 end
-local function SmokeWeedEveryDay(who)
-     --messy
-                 for _, conductor in ientitylist(Shared.GetEntitiesWithClassname("Conductor")) do
-                    if conductor and conductor:GetCanVape() then 
-                         local vaporizer = CreateEntity(Vaporizer.kMapName, who:GetOrigin(), 1)  
-                    end
-             end
-end    
-local function BuildMarineChair(who)
-     who:AddTimedCallback(function() 
-     local avocachair = CreateEntity(AvocaChair.kMapName, who:GetOrigin(), 1)
-     avocachair:SetConstructionComplete()
-     SmokeWeedEveryDay(avocachair)
-     end, 8)
-end
-function CommandStation:OnKill(attacker, doer, point, direction)
-local child = GetTechPoint(self:GetOrigin())
-BuildAlienHive(child)
-end
+
 function SentryBattery:GetUnitNameOverride(viewer)
     local unitName = GetDisplayName(self)   
     unitName = string.format(Locale.ResolveString("BackupPower") )
 return unitName
 end  
+local function GetTechPoint(where)
+    for _, techpoint in ipairs(GetEntitiesWithinRange("TechPoint", where, 8)) do
+         if techpoint then return techpoint end
+    end
+end
 local orig_Hive_OnKill = Hive.OnKill
 function Hive:OnKill(attacker, doer, point, direction)
 if self:GetIsBuilt() then AddPayLoadTime(180) end
 local child = GetTechPoint(self:GetOrigin())
-BuildMarineChair(child)
+BuildRoomPower(child)
+child:SetIsVisible(false)
  return orig_Hive_OnKill(self,attacker, doer, point, direction)
 end
 function Whip:OnKill(attacker, doer, point, direction)
@@ -458,15 +375,6 @@ end
 
 
 
-function CommandStation:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
-
-    if hitPoint ~= nil and GetIsVaporizing(self:GetOrigin()) then
-    
-        damageTable.damage = 0 --I already know whips and hydras are still gonna try to attack. Gotta filter that elsewhere.
-        
-    end
-
-end
 /*
 function InfantryPortal:GetRequiresPower()
 return true --why have this off if this is pretty much only way marines can lose with bots
@@ -585,5 +493,117 @@ end
 function Exo:PreOnKill(attacker, doer, point, direction)
           self:PerformEjectOnPree()
 end
+local function GetDestinationGate(self)
+    local phaseGates = {} 
+  -- Find next phase gate to teleport to
+  
+  if self:isa("PhaseAvoca") then  
+  
+    for index, payload  in ipairs( GetEntitiesForTeam("AvocaArc", self:GetTeamNumber()) ) do
+        if GetIsUnitActive(payload) then
+            return payload
+        end
+    end 
+    
+   end
+   
+    for index, phaseGate in ipairs( GetEntitiesForTeam("PhaseGate", self:GetTeamNumber()) ) do
+        if GetIsUnitActive(phaseGate) and not phaseGate:isa("PhaseAvoca") then
+            table.insert(phaseGates, phaseGate)
+        end
+    end    
+    
+    
+     
+    if table.count(phaseGates) < 2 then
+        return nil
+    end
+    -- Find our index and add 1
+    local index = table.find(phaseGates, self)
+    if (index ~= nil) then
+    
+        local nextIndex = ConditionalValue(index == table.count(phaseGates), 1, index + 1)
+        ASSERT(nextIndex >= 1)
+        ASSERT(nextIndex <= table.count(phaseGates))
+        return phaseGates[nextIndex]
+        
+    end
+    
+    return nil 
+end
 
+--So that we can teleport to the payload without having to run to it all the time :P
+local function ComputeDestinationLocationId(self, destGate)
+
+    local destLocationId = Entity.invalidId
+    if destGate then
+    
+        local location = GetLocationForPoint(destGate:GetOrigin())
+        if location then
+            destLocationId = location:GetId()
+        end
+        
+    end
+    
+    return destLocationId
+    
+end
+    function PhaseGate:Update()
+
+        self.phase = (self.timeOfLastPhase ~= nil) and (Shared.GetTime() < (self.timeOfLastPhase + 0.3))
+
+        local destinationPhaseGate = GetDestinationGate(self)
+        if destinationPhaseGate ~= nil and GetIsUnitActive(self) and self.deployed and (destinationPhaseGate.deployed or destinationPhaseGate:isa("ARC") ) then        
+        
+            self.destinationEndpoint = destinationPhaseGate:GetOrigin()
+            self.linked = true
+            self.targetYaw = destinationPhaseGate:GetAngles().yaw
+            self.destLocationId = ComputeDestinationLocationId(self, destinationPhaseGate)
+            
+        else
+            self.linked = false
+            self.targetYaw = 0
+            self.destLocationId = Entity.invalidId
+        end
+
+        return true
+        
+    end
+function InfantryPortal:OhNoYouDidnt()
+
+     for _, powerconsumer in ipairs(GetEntitiesWithMixinForTeamWithinRange("PowerConsumer", 1, self:GetOrigin(), 24)) do
+          if powerconsumer ~= self and (powerconsumer:GetRequiresPower() and not powerconsumer:GetIsPowered()) then
+          powerconsumer:SetPowerSurgeDuration(16)
+          powerconsumer:TriggerEffects("arc_hit_secondary")
+          end
+     end
+     
+     self:TriggerEffects("arc_hit_primary")
+     
+ return not self:GetIsPowered()
+ 
+end
+
+    local orig_InfantryPortal_OnPowerOff = InfantryPortal.OnPowerOff
+function InfantryPortal:OnPowerOff()
+ orig_InfantryPortal_OnPowerOff(self)
+   self:AddTimedCallback(InfantryPortal.OhNoYouDidnt, 8)
+end
+    
+    
 end--server
+
+
+
+if Client then
+/*
+local orig_ActionFinder_OnProcessMove = MarineActionFinderMixin.OnProcessMove
+    function MarineActionFinderMixin:OnProcessMove(input )
+    orig_ActionFinder_OnProcessMove(self)
+    end
+ */
+function MarineActionFinderMixin:OnProcessMove(input)
+    return
+end
+
+end

@@ -47,21 +47,16 @@ local techPointOrigin = nil
     CreateEntity(InfantryPortal.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     --CreateEntity(Armory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     CreateEntity(ArmsLab.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    --CreateEntity(RoboticsFactory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-
-    CreateEntity(MacAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    CreateEntity(MacAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(RoboticsFactory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     
     CreateEntity(BaseMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     CreateEntity(BaseMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    
-    CreateEntity(PlayerMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    CreateEntity(PlayerMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     
     CreateEntity(BigMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
 
     --CreateEntity(PrototypeLab.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    --CreateEntity(PhaseGate.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+    CreateEntity(PhaseGate.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     --CreateEntity(Observatory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     for i = 1, 4 do
    CreateEntity(BaseSentry.kMapName, FindFreeSpace(techPointOrigin,4), 1)
@@ -109,12 +104,6 @@ local function TrySomethingElse(self)
              end
         */
 
-              local ccs = GetEntitiesForTeam("CommandStation", 1)
-              for i = 1, #ccs do
-                local chair = ccs[i]
-                local vaporizer = CreateEntity(Vaporizer.kMapName, chair:GetOrigin(), 1)
-              end 
-
    
 
 --self:SpawnBaseEntities(self, cc)    
@@ -127,11 +116,6 @@ local tech = nil
                           if tech:GetAttached() == nil then
                            local hive = tech:SpawnCommandStructure(2)
                           hive:SetConstructionComplete()
-                          --SiegeThisBitchUp(hive:GetOrigin(), 2)
-                          local location = GetLocationForPoint(tech:GetOrigin())
-                          location = location and location.name or nil
-                          local powerpoint = GetPowerPointForLocation(location)
-                          if powerpoint and not powerpoint:GetIsDisabled() then powerpoint:Kill() end
                           end
                     end
          

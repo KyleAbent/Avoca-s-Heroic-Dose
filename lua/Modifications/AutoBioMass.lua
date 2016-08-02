@@ -1,15 +1,4 @@
-local function TresCheck(cost)
-    return GetGamerules().team1:GetTeamResources() >= cost
-end
-local function DeductTres(cost)
-          local alienteam = GetGamerules().team2
-          alienteam:SetTeamResources(alienteam:GetTeamResources() - cost)
-end
-function Conductor:AutoBioMass()
-          for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
-             hive:AddTimedCallback(Hive.UpdateManually, 15)
-          end
-end
+
 
 function Hive:UpdateManually()
    if Server then  
@@ -70,69 +59,4 @@ function Hive:UpdatePassive()
    end
    
    
-end
-function Hive:UpdateResearch(deltaTime)
- if not self.timeLastUpdateCheck or self.timeLastUpdateCheck + 15 < Shared.GetTime() then 
-   //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
-    local researchNode = self:GetTeam():GetTechTree():GetTechNode(self.researchingId)
-       local defaultresearch = false
-       local projectedminutemarktounlock = 60
-       local gameRules = GetGamerules()
-       local currentroundlength = ( Shared.GetTime() - gameRules:GetGameStartTime() )
-       local researchDuration = 4
-    if researchNode then
-                    if researchNode:GetTechId() == kTechId.ResearchBioMassOne then
-                       elseif researchNode:GetTechId() == kTechId.ResearchBioMassTwo then
-                       researchDuration = 300
-                       defaultresearch = true
-                    end--
-        if researchNode:GetTechId() == kTechId.BileBomb then
-           projectedminutemarktounlock = math.random(180,240)
-      elseif researchNode:GetTechId() == kTechId.MetabolizeEnergy then
-        projectedminutemarktounlock = math.random(180, 240)
-      elseif researchNode:GetTechId() == kTechId.Leap then
-         projectedminutemarktounlock = math.random(180, 240)
-      elseif researchNode:GetTechId() == kTechId.Spores then
-         projectedminutemarktounlock = math.random(280, 300)
-      elseif researchNode:GetTechId() == kTechId.Umbra then
-         projectedminutemarktounlock = math.random(320, 360)
-      elseif researchNode:GetTechId() == kTechId.MetabolizeHealth then
-         projectedminutemarktounlock = math.random(320, 360)
-      elseif researchNode:GetTechId() == kTechId.BoneShield then 
-         projectedminutemarktounlock = math.random(360, 420)
-      elseif researchNode:GetTechId() == kTechId.Stab then 
-        projectedminutemarktounlock = math.random(360, 420)
-      elseif researchNode:GetTechId() == kTechId.Stomp then 
-        projectedminutemarktounlock = math.random(420, 480)
-      elseif researchNode:GetTechId() == kTechId.Xenocide then 
-        projectedminutemarktounlock = math.random(420, 500)
-          
-        end --
-      end  --
-        local modified = Clamp(currentroundlength / projectedminutemarktounlock, 0, 1)
-        local default = self.researchProgress + deltaTime / researchDuration
-        local progress = not defaultresearch and modified or default
-        //Print("%s", progress)
-        
-        if progress ~= self.researchProgress then
-        
-            self.researchProgress = progress
-            researchNode:SetResearchProgress(self.researchProgress)
-            
-            local techTree = self:GetTeam():GetTechTree()
-            techTree:SetTechNodeChanged(researchNode, string.format("researchProgress = %.2f", self.researchProgress))
-            
-            // Update research progress
-            if self.researchProgress == 1 then
-                // Mark this tech node as researched
-                researchNode:SetResearched(true)
-                
-                techTree:QueueOnResearchComplete(self.researchingId, self)
-                
-            end --
-        
-        end --
-        
-    end  --
-            self.timeLastUpdateCheck = Shared.GetTime()
 end

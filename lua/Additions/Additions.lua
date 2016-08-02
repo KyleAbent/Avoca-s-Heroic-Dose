@@ -6,10 +6,8 @@ Script.Load("lua/Additions/AutoCyst.lua")
 Script.Load("lua/Additions/Functions.lua")      
 Script.Load("lua/Additions/Balancer.lua")   
 Script.Load("lua/Additions/HiveDefense.lua") 
-Script.Load("lua/Additions/Vaporizer.lua") 
 Script.Load("lua/Additions/Convars.lua") 
 Script.Load("lua/Additions/PanicAttack.lua") 
-Script.Load("lua/Additions/WhipAvoca.lua") 
 Script.Load("lua/Additions/FireGrenade.lua") 
 
 function Location:MakeSureRoomIsntEmpty()
@@ -50,25 +48,6 @@ function Location:MakeSureRoomIsntEmpty()
     return EntityListToTable(Shared.GetEntitiesWithClassname("AirLock"))
    end
 
-    function GetIsPointInAirLock(point)  --Maybe a 'workaround' for other entities than players
-                                                      --to use this airlock entity rather than relying onupdate, maybe.. who knows.
-
-    local ents = GetAirLocks()
-    
-    for index, airlock in ipairs(ents) do
-    
-        if airlock and airlock:GetIsPointInside(point) then
-        
-            return airlock
-            
-        end    
-        
-    end
-    
-    return nil
-
-end
-    
     
     
     

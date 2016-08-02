@@ -4,18 +4,10 @@ PanicAttack.kMapName = "panicattack"
 
 function PanicAttack:OnCreate()
  Hydra.OnCreate(self)
- self:AdjustMaxHealth(self:GetMaxHealth())
- self:AdjustMaxArmor(self:GetMaxArmor())
 end
 
 function PanicAttack:GetSendDeathMessageOverride()
 return false
-end
-function PanicAttack:GetMaxHealth()
-    return kMatureHydraHealth * 2
-end
-function PanicAttack:GetMaxArmor()
-    return kMatureHydraArmor * 2
 end
 function PanicAttack:OnInitialized()
   Hydra.OnInitialized(self)
@@ -48,13 +40,6 @@ function PanicAttack:OnAdjustModelCoords(modelCoords)
         coords.yAxis = coords.yAxis * 2
         coords.zAxis = coords.zAxis * 2
     return coords
-end
-function PanicAttack:ActivateSelfDestruct()
-              self:AddTimedCallback(PanicAttack.Killme, 16)
-end
-function PanicAttack:Killme()
-    self:DeductHealth(90)
-     return true
 end
 function PanicAttack:FilterTarget()
 

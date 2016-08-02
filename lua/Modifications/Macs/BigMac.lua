@@ -7,7 +7,10 @@ function BigMac:OnCreate()
  MAC.OnCreate(self)
  self:AdjustMaxHealth(kMACHealth * 4)
  self:AdjustMaxArmor(kMACArmor * 4)
+ self:SetPhysicsGroup(PhysicsGroup.PlayerControllersGroup)
 end
+
+
 local function GetAutomaticOrder(self)
 
     local target = nil
@@ -38,7 +41,7 @@ local function GetAutomaticOrder(self)
 
             if not target then
             
-            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return not GetIsPointInMarineBase(ent:GetOrigin()) and not ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  end)
+            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return not GetIsPointInMarineBase(ent:GetOrigin()) and not ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  and self:CheckTarget(ent:GetOrigin())   end)
                if weldable then
                     target = constructable
                     orderType = kTechId.AutoWeld
@@ -350,4 +353,5 @@ function BigMac:ProcessWeldOrder(deltaTime, orderTarget, orderLocation, autoWeld
     return orderStatus
     
 end
+
 Shared.LinkClassToMap("BigMac", BigMac.kMapName, networkVars)

@@ -72,7 +72,7 @@ local function GiveUnDeploy(who)
 end
 local function PlayersNearby(who)
 
-local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 4)
+local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 5.5)
 
     if #players >= 1 then
          for i = 1, #players do
@@ -180,7 +180,10 @@ function AvocaArc:GetCanFireAtTargetActual(target, targetPoint)
 end
 function AvocaArc:ModifyDamageTaken(damageTable, attacker, doer, damageType)
 local damage = self:GetInAttackMode() and 0.25 or 0 
-        if doer:isa("PanicAttack") then damage = damage * 4 end
+        if doer and doer:isa("PanicAttack") then 
+         damage = damage * 8
+          damage = damage * Clamp(doer:GetHealthScalar(), 0.25, 1)
+         end
         damageTable.damage = damageTable.damage * damage
 
 end
@@ -220,11 +223,11 @@ if Client then
 end //up render
 end -- client
 function AvocaArc:BeginTimer()
-           self:AddTimedCallback(AvocaArc.Instruct, 4)
+           self:AddTimedCallback(AvocaArc.Instruct, 2.5)
 end
 function AvocaArc:OnAdjustModelCoords(coords)
     
-    	local scale = 1.5 
+    	local scale = 1.37 
         coords.xAxis = coords.xAxis * scale
         coords.yAxis = coords.yAxis * scale
         coords.zAxis = coords.zAxis * scale
@@ -253,7 +256,7 @@ end
 
 if Server then
 function AvocaArc:PreOnKill(attacker, doer, point, direction)
-AddPayLoadTime(90) 
+AddPayLoadTime(60) 
 end 
 function AvocaArc:UpdateMoveOrder(deltaTime)
 
@@ -261,8 +264,9 @@ function AvocaArc:UpdateMoveOrder(deltaTime)
     ASSERT(currentOrder)
     
     self:SetMode(ARC.kMode.Moving)  
-    
-    local moveSpeed = ( self:GetIsInCombat() or self:GetGameEffectMask(kGameEffect.OnInfestation) ) and ARC.kCombatMoveSpeed or ARC.kMoveSpeed
+    local slowspeed = ARC.kCombatMoveSpeed
+    local normalspeed = ARC.kMoveSpeed * 1.25
+    local moveSpeed = ( self:GetIsInCombat() or self:GetGameEffectMask(kGameEffect.OnInfestation) ) and slowspeed or normalspeed
    -- local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
     --        if #marines >= 2 then
     --        moveSpeed = moveSpeed * Clamp(#marines/4, 1.1, 4)
@@ -358,7 +362,7 @@ local function PerformAttack(self)
         local hitEntities = GetEntitiesWithMixinWithinRange("Live", self.targetPosition, ARC.kSplashRadius)
 
         -- Do damage to every target in range
-        RadiusDamage(hitEntities, self.targetPosition, ARC.kSplashRadius, 1350, self, true)
+        RadiusDamage(hitEntities, self.targetPosition, ARC.kSplashRadius, 980, self, true)
 
         -- Play hit effect on each
         for index, target in ipairs(hitEntities) do
@@ -401,7 +405,7 @@ function AvocaArc:OnTag(tagName)
         -- notify the target selector that we have moved.
         self.targetSelector:AttackerMoved()
         
-        self:AdjustMaxHealth(kARCDeployedHealth)
+        self:AdjustMaxHealth(kARCDeployedHealth * 2.5)
         
         local currentArmor = self:GetArmor()
         if currentArmor ~= 0 then
@@ -415,9 +419,9 @@ function AvocaArc:OnTag(tagName)
     
         self.deployMode = ARC.kDeployMode.Undeployed
         
-        self:AdjustMaxHealth(kARCHealth)
+        self:AdjustMaxHealth(kARCHealth * 2.5)
         self.deployedArmor = self:GetArmor()
-        self:SetMaxArmor(kARCArmor)
+        self:SetMaxArmor(kARCArmor * 2.5)
         self:SetArmor(self.undeployedArmor)
 
     end

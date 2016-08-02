@@ -14,3 +14,11 @@ kWhipCost = 10
 
 kPlayerResPerInterval = 0.5
 Spectator.kKillCamEnabled = false
+
+kSpikeMinDamage = 4 -- Temp nerf for bots without overcomplicating thigns
+
+kDrifterSelfOrderRange = 999 --mapwide eh
+
+kWelderPowerRepairRate = 880
+kBuilderPowerRepairRate = 880
+kWelderSentryRepairRate = 150 * 4

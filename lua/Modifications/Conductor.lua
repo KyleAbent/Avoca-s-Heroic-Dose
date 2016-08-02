@@ -154,17 +154,48 @@ local function FindMarineDefense(where)
         end
         return nil
 end
-local function DefendPayLoad(player, where)
-         local payload = GetNearest(where, "ARC", 1, function(ent) return not ent:isa("BigArc") end)
+/*
+local function SendTheMarineOrdersHere(who, where, which) 
+ local offense = nil 
+ local defense = nil 
+ local move = nil  
+
+           offense = FindMarineOffense(where)
+                if offense ~= nil then
+                who:GiveOrder(kTechId.Attack, offense:GetId(), offense:GetOrigin(), nil, true, true)
+                return
+                end
+           defense = FindMarineDefense(where) 
+              if defense ~= nil then
+              who:GiveOrder(kTechId.Defend, defense:GetId(), defense:GetOrigin(), nil, true, true)
+              return
+              end
+              
+           move =  FindMarineMove(where, which)
+           if move ~= nil  then
+                who:GiveOrder(kTechId.Move, nil, move, nil, true, true)
+                return
+           end
+
+end
+ */
+local function DefendPayLoad(player, where, which)
+         local payload = GetNearest(where, "ARC", 1)
          if payload then
+         local range = 0
+               range = player:GetDistance(payload)
+               --Print("player to payload distance is %s", range)
+               if range <= 32 and ( payload.deployMode ~= ARC.kDeployMode.Deployed  and not payload:InRadius() ) then
                player:GiveOrder(kTechId.Defend, payload:GetId(), payload:GetOrigin(), nil, true, true)
                return
+               end
         end
+        --SendTheMarineOrdersHere(player,where, which)
 end
- local function ForAllMarinesDefendArc(where)
+ local function ForAllMarinesSendWP(where, which)
           for _, player in ipairs(GetEntitiesWithinRange("Marine", where, 999)) do
            if player:GetIsAlive() and not player:isa("Commander") then
-               DefendPayLoad(player, player:GetOrigin())
+               DefendPayLoad(player, where, which)
            end
          end
 end
@@ -186,7 +217,13 @@ local function FindOrCreateKingCyst(where, which)
           
           if hasking and king then
               if king:GetIsMature() and not king.moving then
-               king:GiveOrder(kTechId.Move, nil, toplace, nil, true, true) 
+              
+               if king:CheckTarget(toplace) then --prevent stuckage?
+                 king:GiveOrder(kTechId.Move, nil, toplace, nil, true, true) 
+                 else
+                   king:SetOrigin(toplace)
+                   end
+                   
                king:MoveWhipAvoca(toplace)
                end
           else
@@ -210,46 +247,9 @@ local function BuildAllNodes(self)
           end
 
 end
-local function PlaceExtraRes(self)
-  local locations = {}
-          for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
-               local locationName = location and location:GetName() or ""
-               table.insertunique(locations,locationName)  
-          end
-   
-          for _, resnode in ientitylist(Shared.GetEntitiesWithClassname("ResourcePoint")) do
-               local location = GetLocationForPoint(resnode:GetOrigin())
-               local locationName = location and location:GetName() or ""
-               if table.find(locations, locationName) then table.removevalue(locations,locationName) end
-          end   
-
-   if #locations == 0 then return end 
-
-            for i = 1, #locations do
-                local location = locations[i]
-                local powerpoint = GetPowerPointForLocation(location)
-                if powerpoint then
-                   local ResourcePoint = CreateEntity(ResourcePoint.kPointMapName, FindFreeSpace(powerpoint:GetOrigin(), 4, 16))
-                end
-            end    
-          
-
-end
-
-local function SetupBaseDefense(self)
-
-          for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
-                if GetIsPointInMarineBase(location:GetOrigin()) then
-                 location:InitiateDefense()
-               end
-          end
-
-end
 function Conductor:OnRoundStart() 
            if Server then
               BuildAllNodes(self)
-              PlaceExtraRes(self)
-              SetupBaseDefense(self)
               self:SpawnInitialStructures()
               self:AutoBioMass()
               local CreateImagination = CreateEntity(Imaginator.kMapName)
@@ -283,10 +283,9 @@ function Conductor:PickMainRoom()
        return true
 end
 function Conductor:SetMainRoom(where, which)
-        if Server then MoveArcs(where) end 
         CoordinateWithPowerNode(which.name)
-        CreateAlienMarker(where) 
-        ForAllMarinesDefendArc(where)
+        if not self:GetCanVape() then CreateAlienMarker(where) end
+        ForAllMarinesSendWP(where, which)
         FindOrCreateKingCyst(where, which)
 end
 local function SuddenDeathConditionsCheck(self)
@@ -295,6 +294,11 @@ local function SuddenDeathConditionsCheck(self)
           if arc and arc:GetInAttackMode() then return true end
           
           return false
+end
+local function RanOutOfWeed()
+            for _, vaporizer in ientitylist(Shared.GetEntitiesWithClassname("Vaporizer")) do
+                    if vaporizer then DestroyEntity(vaporizer) end
+             end
 end
 function Conductor:GetCanVape()
            local gamestarttime = GetGamerules():GetGameStartTime()
@@ -326,6 +330,7 @@ function Conductor:PayloadTimer()
                   boolean = true
              if not SuddenDeathConditionsCheck(self) then
                --GetGamerules():SetGameState(kGameState.Team2Won)
+                RanOutOfWeed()
              else
                AddPayLoadTime(8)
              end

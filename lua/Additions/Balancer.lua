@@ -86,11 +86,11 @@ local function PackRulesHere(who, origin, techId, self)
 end
 local function PackQualificationsHere(who, self)
        local weapon = who:GetActiveWeapon()
-       local medpacks = GetEntitiesForTeamWithinRange("MedPack", 0, who:GetOrigin(), 8)
-       local ammopacks = GetEntitiesForTeamWithinRange("AmmoPack", 0, who:GetOrigin(), 8)
+       local medpacks = GetEntitiesForTeamWithinRange("MedPack", 1, who:GetOrigin(), 8)
+       local ammopacks = GetEntitiesForTeamWithinRange("AmmoPack", 1, who:GetOrigin(), 8)
             if who:GetHealth() <= 90 and #medpacks <= 4 then 
              PackRulesHere(who, who:GetOrigin(), kTechId.MedPack, self)
-             elseif  weapon and weapon.GetAmmoFraction and weapon:GetAmmoFraction() <= .9 and #ammopacks <= 4  then                     
+             elseif  weapon and weapon.GetAmmoFraction and weapon:GetAmmoFraction() <= .65 and #ammopacks <= 4  then                     
              PackRulesHere(who, who:GetOrigin(), kTechId.AmmoPack, self)
              elseif who:GetIsInCombat() then
                 local random = math.random(1,2)

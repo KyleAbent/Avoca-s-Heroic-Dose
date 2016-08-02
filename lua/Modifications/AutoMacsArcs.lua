@@ -2,28 +2,22 @@
 if Server then
 
 local function GetMacsAmount()
-    local macavoca = 0
     local basemac = 0
-    local playermac = 0
     local bigmac = 0
     local total = 0
         for index, mac in ientitylist(Shared.GetEntitiesWithClassname("MAC")) do
              if mac:isa("BaseMac") then
              basemac = basemac + 1
-             elseif mac:isa("PlayerMac") then
-             playermac = playermac + 1
              elseif mac:isa("BigMac") then
              basemac = basemac + 1
-             elseif mac:isa("MacAvoca") then
-             macavoca = macavoca + 1
              end
              
          end
-         total = macavoca + basemac + playermac + bigmac
-    return  macavoca, basemac, playermac, bigmac, total
+         total = basemac + bigmac
+    return  basemac, bigmac, total
 end
 local function MacQualifications(self)
-    local macavoca,basemac, playermac,bigmac, total = GetMacsAmount()
+    local basemac,bigmac, total = GetMacsAmount()
  local boolean = false
      if total <= 7 then
             boolean = true
@@ -33,14 +27,10 @@ local function MacQualifications(self)
         
 end
 local function GetMacMapName()
-   local macavoca,basemac, playermac,bigmac, total = GetMacsAmount()
-   if macavoca <= 3 then
-        return MacAvoca.kMapName
-   elseif basemac<= 3 then
+   local basemac,bigmac, total = GetMacsAmount()
+   if basemac<= 7 then
        return BaseMac.kMapName
-   elseif playermac <=5 then
-       return PlayerMac.kMapName
-   elseif bigmac == 0 then
+   elseif bigmac <= 3 then
         return  BigMac.kMapName
    end
 
@@ -73,16 +63,16 @@ local function GetArcsAmount()
 end
 local function HasPayLoad(where)
 
-        for _, avocaarc in ipairs(GetEntitiesWithinRange("AvocaArc", where, 999)) do
-            if avocaarc then return true end
-       end
-       return false
+    local arcs = #GetEntitiesWithinRange("AvocaArc", where, 999)
+    local ccs = #GetEntitiesWithinRange("CommandStation", where, 999)
+    
+    
+    if not arcs or ccs>arcs then return false else return true end
+
 end
 local function ArcQualifications(self)
  local boolean = false
-     if (GetArcsAmount() <= 7 or not HasPayLoad(self:GetOrigin()) )  and
-        self:GetTeam():GetTeamResources() >= kARCCost and 
-      --    ( kMaxSupply - GetSupplyUsedByTeam(1) >= LookupTechData(kTechId.ARC, kTechDataSupply, 0)) and 
+     if (GetArcsAmount() <= 7 and  self:GetTeam():GetTeamResources() >= kARCCost) or not HasPayLoad(self:GetOrigin())   and
             self.deployed and 
             GetIsUnitActive(self) and 
            self:GetResearchProgress() == 0 and

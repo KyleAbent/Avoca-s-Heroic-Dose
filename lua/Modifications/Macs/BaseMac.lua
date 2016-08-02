@@ -7,7 +7,10 @@ function BaseMac:OnCreate()
  MAC.OnCreate(self)
  self:AdjustMaxHealth(kMACHealth * 0.5)
  self:AdjustMaxArmor(kMACArmor * 0.5)
+ self:SetPhysicsGroup(PhysicsGroup.PlayerControllersGroup)
 end
+
+local kNanoshieldMaterial = PrecacheAsset("cinematics/vfx_materials/nanoshield.material")
 
 local function GetAutomaticOrder(self)
 
@@ -31,7 +34,7 @@ local function GetAutomaticOrder(self)
         
             -- If there's a friendly entity nearby that needs constructing, constuct it.
             
-            local constructable =  GetNearestMixin(self:GetOrigin(), "Construct", 1, function(ent) return GetIsPointInMarineBase(ent:GetOrigin()) and not ent:GetIsBuilt() and ent:GetCanConstruct(self) and self:CheckTarget(ent:GetOrigin())  end)
+            local constructable =  GetNearestMixin(self:GetOrigin(), "Construct", 1, function(ent) return not ent:GetIsBuilt() and ent:GetCanConstruct(self) and self:CheckTarget(ent:GetOrigin())  end)
                if constructable then
                     target = constructable
                     orderType = kTechId.Construct
@@ -39,7 +42,7 @@ local function GetAutomaticOrder(self)
 
             if not target then
             
-            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return GetIsPointInMarineBase(ent:GetOrigin()) and not ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  end)
+            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return not ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  end)
                if weldable then
                     target = weldable
                     orderType = kTechId.AutoWeld
@@ -183,4 +186,36 @@ function BaseMac:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
+if Client then
+
+    function BaseMac:OnUpdateRender()
+          local showMaterial = not GetAreEnemies(self, Client.GetLocalPlayer())
+    
+        local model = self:GetRenderModel()
+        if model then
+
+            model:SetMaterialParameter("glowIntensity", 4)
+
+            if showMaterial then
+                
+                if not self.hallucinationMaterial then
+                    self.hallucinationMaterial = AddMaterial(model, kNanoshieldMaterial)
+                end
+                
+                self:SetOpacity(0, "hallucination")
+            
+            else
+            
+                if self.hallucinationMaterial then
+                    RemoveMaterial(model, self.hallucinationMaterial)
+                    self.hallucinationMaterial = nil
+                end//
+                
+                self:SetOpacity(1, "hallucination")
+            
+            end //showma
+            
+        end//omodel
+end //up render
+end -- client
 Shared.LinkClassToMap("BaseMac", BaseMac.kMapName, networkVars)
