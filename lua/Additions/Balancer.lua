@@ -27,7 +27,7 @@ end
  */
 function Conductor:FirePhaseCannons(powerpoint, force)
                local powerdrains = 4 --not force and 4 or 2
-               powerdrains = self:GetCanVape() and powerdrains * 2 or powerdrains
+               --powerdrains = self:GetCanVape() and powerdrains * 2 or powerdrains
                for i = 1, math.random(1, powerdrains) do
                  local origin = GetRandomBuildPosition( kTechId.Whip, powerpoint:GetOrigin(), 8 )
                  local braindrain = CreateEntity(PowerDrainer.kMapName, origin, 2)

@@ -78,36 +78,50 @@ local function EntityIsaPowerPoint(nearestenemy)
  return nearestenemy:isa("PowerPoint") and nearestenemy:GetIsBuilt() and not nearestenemy:GetIsDisabled()
 end
 local function CreateAlienMarker(where)
-  /*
-       local gameLength = Shared.GetTime() - GetGamerules():GetGameStartTime()
-      if gameLength <= 300  then
-           local hive = nil
-             for _, hivey in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
-             hive = hivey
-            end
+        
+        
+        local nearestchair = GetNearest(where, "CommandStation", 1, function(ent) return ent:GetIsAlive()  end)
+        local nearestarc = GetNearest(where, "ARC", 1, function(ent) return ent:GetIsAlive()  end)
+        if not nearestarc or not nearestchair then return end 
+        
 
-        local nearestbuiltnode = GetNearest(hive:GetOrigin(), "PowerPoint", 1, function(ent) return ent:GetIsBuilt() and not ent:GetIsDisabled()  end)
-    if nearestbuiltnode then
-         CreatePheromone(kTechId.ThreatMarker,nearestbuiltnode:GetOrigin(), 2)
-         return 
-    end
-      end
-      */
-        local nearestenemy = GetNearestMixin(where, "Combat", 1, function(ent) return not ent:isa("Commander") and ent:GetIsAlive()  end)
-        if not nearestenemy then return end -- hopefully not. Just for now this should be useful anyway.
-        local inCombat = (nearestenemy.timeLastDamageDealt + 8 > Shared.GetTime()) or (nearestenemy.lastTakenDamageTime + 8 > Shared.GetTime())
-        local where = nearestenemy:GetOrigin()
-       if inCombat then 
-        CreatePheromone(kTechId.ThreatMarker,where, 2) 
-        else
-        CreatePheromone(kTechId.ExpandingMarker, where, 2)  
-      end
-      
-      local nearestheal = GetNearestMixin(where, "Combat", 2, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() and ent:GetHealthScalar() <= 0.7 end)
+        local random = math.random(1,4)
+        
+       if random == 1 then 
+       
+        local nearestarc = GetNearest(where, "ARC", 1, function(ent) return ent:GetIsAlive()  end)
+         if nearestarc then 
+           local arcwhere = nearestarc:GetOrigin() 
+        CreatePheromone(kTechId.ThreatMarker,arcwhere, 2) 
+        
+        
+        elseif random == 2 then
+            local nearestchair = GetNearest(where, "CommandStation", 1, function(ent) return ent:GetIsAlive()  end)
+               if nearestchair then
+                    local ccwhere = nearestchair:GetOrigin()
+                   CreatePheromone(kTechId.ThreatMarker, where, 2)  
+                    --CreatePheromone(kTechId.ExpandingMarker, where, 2)  
+                end
+            end
+        elseif random == 3 then
+             local nearestenemy = GetNearestMixin(where, "Combat", 1, function(ent) return not ent:isa("Commander") and ent:GetIsAlive()  end)
+             if not nearestenemy then return end -- hopefully not. Just for now this should be useful anyway.
+             local inCombat = (nearestenemy.timeLastDamageDealt + 8 > Shared.GetTime()) or (nearestenemy.lastTakenDamageTime + 8 > Shared.GetTime())
+              local where = nearestenemy:GetOrigin()
+              CreatePheromone(kTechId.ThreatMarker,where, 2) 
+        elseif random == 4 then
+        
+        
+              local nearestheal = GetNearestMixin(where, "Combat", 2, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() and ent:GetHealthScalar() <= 0.7 and ent:GetCanBeHealed() end)
           if nearestheal then 
            local where = nearestheal:GetOrigin()
                    CreatePheromone(kTechId.NeedHealingMarker,where, 2) 
            end
+           
+           
+      end
+      
+
       
 end
 local function FindMarineMove(where, which)

@@ -247,6 +247,42 @@ local function LocationsMatch(who,whom)
   local whomname = GetLocationForPoint(whom:GetOrigin())
   return true --whoname == whomname
 end
+/*
+local function KillAllStructuresInLocation(where, teamnum)
+  
+           local wherelocation = GetLocationForPoint(where)
+           wherelocation = wherelocation and wherelocation:GetName() or ""
+           if not where or wherelocation then return end
+           
+     for _, eligable in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct", teamnum, where, 72)) do
+     
+           local location = GetLocationForPoint(eligable:GetOrigin())
+           local locationName = location and location:GetName() or ""
+           local sameLocation = locationName == wherelocation
+          if sameLocation then eligable:Kill() end 
+     end
+     
+end
+*/
+local function SpawnJanitorForEach(where)
+  
+           local wherelocation = GetLocationForPoint(where)
+           wherelocation = wherelocation and wherelocation:GetName() or ""
+           if not wherelocation then return end
+           
+     for _, eligable in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct", 1, where, 72)) do
+     
+           local location = GetLocationForPoint(eligable:GetOrigin())
+           local locationName = location and location:GetName() or ""
+           local sameLocation = locationName == wherelocation
+          if sameLocation then 
+                local Janitor = CreateEntity(Janitor.kMapName, FindFreeSpace(eligable:GetOrigin()), 2)
+                Janitor:SetConstructionComplete()
+                Janitor:SetMature()  
+          end --
+     end--
+     
+end
 local orig_PowerPoint_OnConstructionComplete = PowerPoint.OnConstructionComplete
     function PowerPoint:OnConstructionComplete()
         orig_PowerPoint_OnConstructionComplete(self)
@@ -254,17 +290,20 @@ local orig_PowerPoint_OnConstructionComplete = PowerPoint.OnConstructionComplete
        if nearestHarvester then
          nearestHarvester:Kill()
        end
+   --KillAllStructuresInLocation(self:GetOrigin(), 2)
 end
+
 local orig_PowerPoint_OnKill = PowerPoint.OnKill
     function PowerPoint:OnKill(attacker, doer, point, direction)
     orig_PowerPoint_OnKill(self)
+    
+    --if not GetIsPointInMarineBase(self:GetOrigin()) then KillAllStructuresInLocation(self:GetOrigin(), 1) end
+      SpawnJanitorForEach(self:GetOrigin())
+    
        local nearestExtractor = GetNearest(self:GetOrigin(), "Extractor", 1, function(ent) return LocationsMatch(self,ent)  end)
        if nearestExtractor then
          nearestExtractor:Kill()
        end
-        local location = GetLocationForPoint(self:GetOrigin())
-        location = location and location.name 
-       if Client then location:HideDank() end
        
     end
 local function ToSpawnFormula(self,panicstospawn, where)
@@ -388,6 +427,25 @@ function InfantryPortal:ModifyDamageTaken(damageTable, attacker, doer, damageTyp
     if hitPoint ~= nil then
     
         damageTable.damage = 0 --I already know whips and hydras are still gonna try to attack. Gotta filter that elsewhere.
+        
+    end
+
+end
+function ConstructMixin:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil and (attacker ~= nil and attacker:isa("Player") or attacker:isa("Janitor") ) then
+        local mult = 1
+            local wherelocation = GetLocationForPoint(self:GetOrigin())
+           if not wherelocation then return end
+           
+            if self:GetTeamNumber() == 1 then
+            if not wherelocation:GetIsPowerUp() then mult = 2 end
+            
+            elseif self:GetTeamNumber() == 2 then
+            if wherelocation:GetIsPowerUp() then mult = 2 end
+            
+            end
+        damageTable.damage = damageTable.damage * mult
         
     end
 
@@ -571,12 +629,12 @@ end
     end
 function InfantryPortal:OhNoYouDidnt()
 
-     for _, powerconsumer in ipairs(GetEntitiesWithMixinForTeamWithinRange("PowerConsumer", 1, self:GetOrigin(), 24)) do
-          if powerconsumer ~= self and (powerconsumer:GetRequiresPower() and not powerconsumer:GetIsPowered()) then
-          powerconsumer:SetPowerSurgeDuration(16)
-          powerconsumer:TriggerEffects("arc_hit_secondary")
-          end
-     end
+     --for _, powerconsumer in ipairs(GetEntitiesWithMixinForTeamWithinRange("PowerConsumer", 1, self:GetOrigin(), 24)) do
+       --   if powerconsumer ~= self and (powerconsumer:GetRequiresPower() and not powerconsumer:GetIsPowered()) then
+          self:SetPowerSurgeDuration(16)
+          --powerconsumer:TriggerEffects("arc_hit_secondary")
+         -- end
+    -- end
      
      self:TriggerEffects("arc_hit_primary")
      
@@ -589,6 +647,19 @@ function InfantryPortal:OnPowerOff()
  orig_InfantryPortal_OnPowerOff(self)
    self:AddTimedCallback(InfantryPortal.OhNoYouDidnt, 8)
 end
+
+    local orig_NutrientMist_Perform = NutrientMist.Perform
+function NutrientMist:Perform()
+ orig_NutrientMist_Perform(self)
+ 
+     local entities = GetEntitiesWithMixinForTeamWithinRange("Webable", 1, self:GetOrigin(), NutrientMist.kSearchRange)
+    
+    for index, entity in ipairs(entities) do
+        
+        entity:SetWebbed(8)
+        
+    end
+end 
     
     
 end--server

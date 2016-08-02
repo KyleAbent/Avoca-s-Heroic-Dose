@@ -4,10 +4,14 @@ PanicAttack.kMapName = "panicattack"
 
 function PanicAttack:OnCreate()
  Hydra.OnCreate(self)
+ if Server then self:AddTimedCallback(PanicAttack.Killme, 8) end
 end
 
 function PanicAttack:GetSendDeathMessageOverride()
 return false
+end
+function PanicAttack:GetCanBeHealedOverride()
+    return false
 end
 function PanicAttack:OnInitialized()
   Hydra.OnInitialized(self)
@@ -26,13 +30,23 @@ function PanicAttack:OnGetMapBlipInfo()
     local blipType = kMinimapBlipType.Undefined
     local blipTeam = -1
     local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
-    blipType = kMinimapBlipType.Whip
+    blipType = kMinimapBlipType.Hydra
      blipTeam = self:GetTeamNumber()
     if blipType ~= 0 then
         success = true
     end
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
+end
+if Server then
+function PanicAttack:Killme()
+
+     --     local wherelocation = GetLocationForPoint(self:GetOrigin())
+   -- if not wherelocation or wherelocation:GetIsPowerUp() then 
+      self:DeductHealth(50)
+     -- end
+     return self:GetIsAlive()
+end
 end
 function PanicAttack:OnAdjustModelCoords(modelCoords)
     local coords = modelCoords

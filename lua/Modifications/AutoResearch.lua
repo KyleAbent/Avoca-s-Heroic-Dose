@@ -21,7 +21,7 @@ function Hive:UpdateManually()
    if Server then  
      self:UpdatePassive()
    end
-   return true
+   return self:GetIsAlive()
 end
 
 local function GetBioMassLevel()
@@ -87,13 +87,13 @@ function RoboticsFactory:UpdateManually()
    if Server then  
      self:UpdatePassive()
    end
-   return true
+   return self:GetIsAlive()
 end
 function ArmsLab:UpdateManually()
    if Server then  
      self:UpdatePassive()
    end
-   return true
+   return self:GetIsAlive()
 end
 function ArmsLab:OnConstructionComplete()
 self:AddTimedCallback(ArmsLab.UpdateManually, kMarineResearchDelay)
@@ -207,7 +207,6 @@ function ArmsLab:UpdatePassive()
    end
 end
 function Armory:UpdatePassive()
-   //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
     local researchNode = self:GetTeam():GetTechTree():GetTechNode(self.researchingId)
     if (self:GetTechId() == kTechId.AdvancedArmory and GetHasTech(self, kTechId.HeavyMachineGunTech) ) then return false end
     if not  GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
@@ -222,8 +221,7 @@ function Armory:UpdatePassive()
     elseif GetHasTech(self, kTechId.GrenadeTech) and not GetHasTech(self, kTechId.ShotgunTech) then
     techid = kTechId.ShotgunTech
     elseif GetHasTech(self, kTechId.ShotgunTech) and not self:GetTechId() == kTechId.AdvancedArmory then
-    --techid = kTechId.AdvancedArmoryUpgrade   
-     self:SetTechId(kTechId.AdvancedArmory)
+    techid = kTechId.AdvancedArmoryUpgrade   
     elseif self:GetTechId() == kTechId.AdvancedArmory and not GetHasTech(self, kTechId.HeavyMachineGunTech) then
     techid = kTechId.HeavyMachineGunTech   
     else

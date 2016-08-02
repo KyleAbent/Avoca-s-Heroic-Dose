@@ -46,7 +46,10 @@ local function GetTechPoint(where)
 end
 local function BuildAlienHive(who)
      who:AddTimedCallback(function() 
+     if who:GetAttached() == nil then 
      local hive = who:SpawnCommandStructure(2)
+     hive:SetConstructionComplete()
+     end
      
           local nearestPower = GetNearest(who:GetOrigin(), "PowerPoint", 1)
        if nearestPower and not nearestPower:GetIsDisabled() then

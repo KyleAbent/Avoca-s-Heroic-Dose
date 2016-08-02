@@ -57,17 +57,17 @@ local kCloseSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfacto
 local function GetArcsAmount()
     local arcs = 0
         for index, ARC in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
-               if not ARC:isa("AvocaArc") then arcs = arcs + 1 end
+               if not ARC:isa("AvocaArc") and not ARC:isa("BigArc") then arcs = arcs + 1 end
          end
     return  arcs
 end
 local function HasPayLoad(where)
 
     local arcs = #GetEntitiesWithinRange("AvocaArc", where, 999)
-    local ccs = #GetEntitiesWithinRange("CommandStation", where, 999)
+    local bigarcs = #GetEntitiesWithinRange("BigArc", where, 999)
     
     
-    if not arcs or ccs>arcs then return false else return true end
+    if not arcs or bigarcs>arcs then return false else return true end
 
 end
 local function ArcQualifications(self)

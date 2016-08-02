@@ -21,4 +21,9 @@ kDrifterSelfOrderRange = 999 --mapwide eh
 
 kWelderPowerRepairRate = 880
 kBuilderPowerRepairRate = 880
-kWelderSentryRepairRate = 150 * 4
+kWelderSentryRepairRate = 150 * 2.5
+
+kHydraHealth = 700    kHydraArmor = 40    kHydraPointValue = 4
+kMatureHydraHealth = 900    kMatureHydraArmor = 80  
+
+Sentry.kFov = 360

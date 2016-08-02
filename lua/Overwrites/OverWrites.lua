@@ -137,4 +137,68 @@ function ConstructMixin:OnConstructUpdate(deltaTime)
 end
 
 
+ function NS2Gamerules:OnUpdate(timePassed)
+    
+        PROFILE("NS2Gamerules:OnUpdate")
+        
+        GetEffectManager():OnUpdate(timePassed)
+        
+        if Server then
+            
+            if self.justCreated then
+            
+                if not self.gameStarted then
+                    self:ResetGame()
+                end
+                
+                self.justCreated = false
+                
+            end
+            
+            if self:GetMapLoaded() then
+            
+                self:CheckGameStart()
+                self:CheckGameEnd()
+
+                self:UpdateWarmUp()
+                
+                self:UpdatePregame(timePassed)
+                self:UpdateToReadyRoom()
+                self:UpdateMapCycle()
+                self:ServerAgeCheck()
+                self:UpdateAutoTeamBalance(timePassed)
+                
+                self.timeSinceGameStateChanged = self.timeSinceGameStateChanged + timePassed
+                
+                self.worldTeam:Update(timePassed)
+                self.team1:Update(timePassed)
+                self.team2:Update(timePassed)
+                self.spectatorTeam:Update(timePassed)
+                
+                -- concede sequence
+                self:UpdateConcedeSequence()
+                
+                self:UpdatePings()
+                self:UpdateHealth()
+                self:UpdateTechPoints()
+
+                --self:CheckForNoCommander(self.team1, "MarineCommander")
+                --self:CheckForNoCommander(self.team2, "AlienCommander")
+                --self:KillEnemiesNearCommandStructureInPreGame(timePassed)
+                
+                --self:UpdatePlayerSkill()
+                self:UpdateNumPlayersForScoreboard()
+                self:UpdatePerfTags(timePassed)
+                self:UpdateCustomNetworkSettings()
+                
+            end
+
+            self.sponitor:Update(timePassed)
+            self.gameInfo:SetIsGatherReady(Server.GetIsGatherReady())
+            
+        end
+        
+    end
+    
+
 end -- Server
