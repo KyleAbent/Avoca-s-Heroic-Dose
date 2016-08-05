@@ -3,9 +3,9 @@
 --kHiveBiomass = 0.1
 kAlienStructureMoveSpeed = 3.5 --crags move as fast as whips
 
-kLerkCost = 30
-kFadeCost = 60
-kOnosCost = 80
+--kLerkCost = 30
+--kFadeCost = 60
+--kOnosCost = 80
 
 kShiftCost = 10
 kShadeCost = 10
@@ -19,11 +19,18 @@ kSpikeMinDamage = 4 -- Temp nerf for bots without overcomplicating thigns
 
 kDrifterSelfOrderRange = 999 --mapwide eh
 
+/* --not needed with bots having build order
 kWelderPowerRepairRate = 880
 kBuilderPowerRepairRate = 880
 kWelderSentryRepairRate = 150 * 2.5
+*/
 
 kHydraHealth = 700    kHydraArmor = 40    kHydraPointValue = 4
 kMatureHydraHealth = 900    kMatureHydraArmor = 80  
 
 Sentry.kFov = 360
+
+kEggGenerationRate = 8
+
+kEggHealth = 650    kEggArmor = 0    kEggPointValue = 2
+kMatureEggHealth = 800    kMatureEggArmor = 0

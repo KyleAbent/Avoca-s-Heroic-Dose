@@ -5,18 +5,30 @@ if Server then
 Script.Load("lua/Overwrites/AutoResearch.lua")
 Script.Load("lua/Overwrites/EggSpawn.lua")
 end
-
-
-
-
+if Server then
 function CommandStructure:LoginPlayer(player,forced)
  return
 end
+function MaturityMixin:OnConstructionComplete()
 
-function ScaleWithPlayerCount(value, numPlayers, scaleUp)
+            self:SetMature()
+end
+    function MaturityMixin:OnMaturityUpdate(deltaTime)
+        
+    end
 
-return 8 
+end
+function Hive:GetCanBeUsed(player, useSuccessTable)
+        useSuccessTable.useSuccess = false
+end
 
+function Hive:GetCanBeUsedConstructed(byPlayer)
+    return false
+end
+
+-- allow players to enter the hives before game start to signal that they want to command
+function CommandStructure:GetUseAllowedBeforeGameStart()
+    return false
 end
 
 function ConstructMixin:GetCanConstruct(constructor)

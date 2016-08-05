@@ -329,7 +329,7 @@ function GUIInsight_TopBar:Update(deltaTime)
     
     
 
-        if startTime ~= 0 and GetPayloadTime() ~= 0 then 
+        if startTime ~= 0 and GetPayloadTime() >=1 then 
         local timerlength = GetPayloadTime()
         local NowToFront = timerlength - (Shared.GetTime() - PlayerUI_GetGameStartTime())
         local FrontLength =  math.ceil( Shared.GetTime() + NowToFront - Shared.GetTime() )
@@ -339,7 +339,7 @@ function GUIInsight_TopBar:Update(deltaTime)
     local hours = math.floor(minutes / 60)
     minutes = minutes - hours * 60
     seconds = seconds - minutes * 60 - hours * 3600
-     payloadTimetext = string.format("payLoadTimer: %d:%02d", minutes, seconds)
+     payloadTimetext = string.format("ChairDefense: %d:%02d", minutes, seconds)
     else
       payloadTimetext = string.format("Chair(s) Vulnerable!", GetPayloadTime())
 end

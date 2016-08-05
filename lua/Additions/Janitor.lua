@@ -14,6 +14,14 @@ end
 function Janitor:GetSendDeathMessageOverride()
 return false
 end
+function Janitor:ModifyDamageTaken(damageTable, attacker, doer, damageType)
+    local damage = 1
+        if doer and doer:isa("MainRoomArc") then --maybe not bigarc
+         damage = damage * .25
+         -- damage = damage * Clamp(doer:GetHealthScalar(), 0.25, 1) maybe not sure
+         end
+        damageTable.damage = damageTable.damage * damage
+end
 function Janitor:GetMaxHealth()
     return kMatureHydraHealth
 end

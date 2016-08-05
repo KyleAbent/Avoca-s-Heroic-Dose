@@ -85,6 +85,16 @@ function CystAvoca:MoveWhipAvoca(where)
                         whip:GiveOrder(kTechId.Move, nil, FindFreeSpace(where, .5,8), nil, true, true) 
                      end
 end  
+function CystAvoca:TeleportWhipAvoca(where)
+                     local whips = GetEntitiesForTeamWithinRange("WhipAvoca", 2, self:GetOrigin(), 999999)
+                     
+                     if #whips == 0 then return end
+                     
+                     for i = 1, #whips do
+                     local whip = whips[i]
+                       whip:SetOrigin(FindFreeSpace(where))
+                     end
+end  
 function CystAvoca:PreOnKill(attacker, doer, point, direction)
        self:KillWhipAvoca()
 end
@@ -112,11 +122,6 @@ function CystAvoca:SpawnWhipsAtKing(whips, crags, cyst, origin)
                      if random == 4 then
                         whip:SetConstructionComplete()
                      end
-                     
-                     local randomagain = whip:GetIsBuilt() and math.random(1,4)
-                     if randomagain == 4 then
-                        whip:SetMature()
-                      end
                       
                      -- whip:GetTeam():SetTeamResources(whip:GetTeam():GetTeamResources() - tres)
                       -- end
@@ -223,7 +228,7 @@ function CystAvoca:ModifyDamageTaken(damageTable, attacker, doer, damageType, hi
 
 end
 function CystAvoca:Synchronize()
-    if not self:GetIsMature() or self.moving then return true end
+    if self.moving then return true end
        Print("Calling to sync")
                      MoveEggs(self)
                      local whips = GetEntitiesForTeamWithinRange("WhipAvoca", 2, self:GetOrigin(), 999999)
@@ -273,8 +278,9 @@ end
 
 function CystAvoca:OnAdjustModelCoords(modelCoords)
     local coords = modelCoords
-      local matureamt = not self:GetIsMature() and self:GetMaturityFraction() or 1
-        local scale = Clamp( 4 * (self:GetHealthScalar() *  matureamt), .5, 4)
+        local scale =  4 * self:GetHealthScalar()
+        scale = ConditionalValue(self:GetMaxHealth() == 8191, scale * 2, scale) -- lulz
+        scale = Clamp(scale, 2, 8)
        if scale >= 1 then
         coords.xAxis = coords.xAxis * scale
         coords.yAxis = coords.yAxis * scale

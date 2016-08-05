@@ -10,6 +10,7 @@ Script.Load("lua/Additions/Convars.lua")
 Script.Load("lua/Additions/PanicAttack.lua") 
 Script.Load("lua/Additions/FireGrenade.lua") 
 Script.Load("lua/Additions/Janitor.lua") 
+Script.Load("lua/Additions/Vaporizer.lua") 
 
 function Location:MakeSureRoomIsntEmpty()
           --So that the room lights being changed are actually observed, otherwise useless :)

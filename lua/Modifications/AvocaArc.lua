@@ -362,7 +362,7 @@ local function PerformAttack(self)
         local hitEntities = GetEntitiesWithMixinWithinRange("Live", self.targetPosition, ARC.kSplashRadius)
 
         -- Do damage to every target in range
-        RadiusDamage(hitEntities, self.targetPosition, ARC.kSplashRadius, 980, self, true)
+        RadiusDamage(hitEntities, self.targetPosition, ARC.kSplashRadius, 880, self, true)
 
         -- Play hit effect on each
         for index, target in ipairs(hitEntities) do
@@ -405,7 +405,7 @@ function AvocaArc:OnTag(tagName)
         -- notify the target selector that we have moved.
         self.targetSelector:AttackerMoved()
         
-        self:AdjustMaxHealth(kARCDeployedHealth * 2.5)
+        self:AdjustMaxHealth(kARCDeployedHealth)
         
         local currentArmor = self:GetArmor()
         if currentArmor ~= 0 then
@@ -419,7 +419,7 @@ function AvocaArc:OnTag(tagName)
     
         self.deployMode = ARC.kDeployMode.Undeployed
         
-        self:AdjustMaxHealth(kARCHealth * 2.5)
+        self:AdjustMaxHealth(kARCHealth)
         self.deployedArmor = self:GetArmor()
         self:SetMaxArmor(kARCArmor * 2.5)
         self:SetArmor(self.undeployedArmor)

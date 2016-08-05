@@ -5,6 +5,7 @@ Script.Load("lua/Modifications/AvocaRules.lua")
 Script.Load("lua/Modifications/CystAvoca.lua")
 Script.Load("lua/Modifications/AvocaArc.lua")
 Script.Load("lua/Modifications/MainRoomArc.lua")
+Script.Load("lua/Modifications/LocationArc.lua")
 Script.Load("lua/Modifications/HiveCrag.lua")
 Script.Load("lua/Modifications/SentryAvoca.lua")
 Script.Load("lua/Modifications/BaseSentry.lua")
@@ -41,6 +42,16 @@ end
 --Thanks for the trick, modular exo
 
 
+    local orig_Marine_GetMaxSpeed = Marine.GetMaxSpeed
+function Marine:GetMaxSpeed(possible)
+ local original = orig_Marine_GetMaxSpeed(self)
+ local moveSpeed = (self:GetGameEffectMask(kGameEffect.OnInfestation) ) and original * 0.65 or original
+ 
+ return moveSpeed
+
+
+
+end 
 
 local orig_Whip_OnInit = Whip.OnInitialized
 function Whip:OnInitialized()
@@ -97,6 +108,7 @@ end
 function Hive:OnConstructionComplete()
 --biomass 0
     -- Play special tech point animation at same time so it appears that we bash through it.
+    self:AddTimedCallback(Hive.UpdateManually, 15)
     local attachedTechPoint = self:GetAttached()
     if attachedTechPoint then
         attachedTechPoint:SetIsSmashed(true)
@@ -271,7 +283,7 @@ local function SpawnJanitorForEach(where)
            if not wherelocation then return end
            
      for _, eligable in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct", 1, where, 72)) do
-     
+         if not eligable:isa("PowerPoint") and not eligable:isa("Extractor") then
            local location = GetLocationForPoint(eligable:GetOrigin())
            local locationName = location and location:GetName() or ""
            local sameLocation = locationName == wherelocation
@@ -280,6 +292,7 @@ local function SpawnJanitorForEach(where)
                 Janitor:SetConstructionComplete()
                 Janitor:SetMature()  
           end --
+         end
      end--
      
 end
@@ -364,7 +377,7 @@ function Hive:OnTakeDamage(damage, attacker, doer, point)
    if doer and doer:isa("ARC") then 
          Print("PanicAttack Initiated")
          PanicInitiate(self,self:GetOrigin())
-        if self:GetIsBuilt() then  AddPayLoadTime(8)  end
+        if self:GetIsBuilt() then  AddPayLoadTime(10)  end
     end
     
 return orig_Hive_OnTakeDamage(self,damage, attacker, doer, point)
@@ -402,7 +415,7 @@ local function GetTechPoint(where)
 end
 local orig_Hive_OnKill = Hive.OnKill
 function Hive:OnKill(attacker, doer, point, direction)
-if self:GetIsBuilt() then AddPayLoadTime(180) end
+if self:GetIsBuilt() then AddPayLoadTime(8) end
 local child = GetTechPoint(self:GetOrigin())
 BuildRoomPower(child)
 child:SetIsVisible(false)
@@ -422,6 +435,20 @@ function ArmsLab:GetRequiresPower()
 return false
 end
 */
+local function GetIsVaporizing(where)
+    for _, vape in ipairs(GetEntitiesWithinRange("Vaporizer", where, 8)) do
+         if vape then return true end
+    end
+end
+function CommandStation:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil and GetIsVaporizing(self:GetOrigin()) then
+    
+        damageTable.damage = 0 --I already know whips and hydras are still gonna try to attack. Gotta filter that elsewhere.
+        
+    end
+
+end
 function InfantryPortal:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
     if hitPoint ~= nil then
@@ -439,10 +466,11 @@ function ConstructMixin:ModifyDamageTaken(damageTable, attacker, doer, damageTyp
            if not wherelocation then return end
            
             if self:GetTeamNumber() == 1 then
-            if not wherelocation:GetIsPowerUp() then mult = 2 end
-            
+              if not wherelocation:GetIsPowerUp() then 
+                 if  attacker:isa("Janitor")  then mult = 4  else mult = 2 end 
+              end
             elseif self:GetTeamNumber() == 2 then
-            if wherelocation:GetIsPowerUp() then mult = 2 end
+                if wherelocation:GetIsPowerUp() then mult = 2 end
             
             end
         damageTable.damage = damageTable.damage * mult
@@ -661,7 +689,18 @@ function NutrientMist:Perform()
     end
 end 
     
-    
+
+
+
+/*
+function Shade:OnScan()
+local chance = math.random(1,100) 
+ if chance <= 30  and self.lastink == nil or Shared.GetTime() > (self.lastink + kShadeInkCooldown) then
+   self:TriggerInk()
+   self.lastink = Shared.GetTime()
+   end
+end
+  */  
 end--server
 
 

@@ -2,10 +2,29 @@ class 'WhipAvoca' (Whip)
 WhipAvoca.kMapName = "whipavoca"
 
 
+function WhipAvoca:OnCreate()
+ Whip.OnCreate(self)
+  self:AdjustMaxHealth(self:GetMaxHealth())
+ self:AdjustMaxArmor(self:GetMaxArmor())
+end
+
 function WhipAvoca:GetSendDeathMessageOverride()
 return false
 end
-
+function WhipAvoca:GetMaxHealth()
+    return kMatureWhipHealth * 1.3
+end
+function WhipAvoca:GetMaxArmor()
+    return kMatureWhipArmor * 1.3 
+end
+function WhipAvoca:ModifyDamageTaken(damageTable, attacker, doer, damageType)
+local damage = 1
+        if doer and doer:isa("MainRoomArc") then 
+         damage = damage * .25
+         -- damage = damage * Clamp(doer:GetHealthScalar(), 0.25, 1) maybe not sure
+         end
+        damageTable.damage = damageTable.damage * damage
+end
 function WhipAvoca:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

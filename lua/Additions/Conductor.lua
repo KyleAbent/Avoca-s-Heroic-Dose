@@ -175,6 +175,20 @@ local function DefendPayLoad(player, where)
                return
         end
 end
+ local function ForSingleMarineDefendArc(who,where)
+           if who and who:GetIsAlive() and not who:isa("Commander") then
+               DefendPayLoad(who, who:GetOrigin())
+           end
+end
+local function BuildDisabledPower(player, where)
+         local powerpoint = GetNearest(where, "PowerPoint", 1, function(ent) return ent:GetIsDisabled() end)
+         if powerpoint then
+               player:GiveOrder(kTechId.Build, powerpoint:GetId(), powerpoint:GetOrigin(), nil, true, true)
+               return
+        else 
+             ForSingleMarineDefendArc(who,where)
+        end
+end
  local function ForAllMarinesDefendArc(where)
           for _, player in ipairs(GetEntitiesWithinRange("Marine", where, 999)) do
            if player:GetIsAlive() and not player:isa("Commander") then
@@ -182,7 +196,22 @@ end
            end
          end
 end
-local function FindOrCreateKingCyst(where, which)
+ local function ForAllMarinesBuildPower(where)
+          for _, player in ipairs(GetEntitiesWithinRange("Marine", where, 999)) do
+           if player:GetIsAlive() and not player:isa("Commander") then
+               BuildDisabledPower(player, player:GetOrigin())
+           end
+         end
+end
+local function SendMarineOrders(where)
+   local random = math.random(1,2)
+   if random == 1 then
+    ForAllMarinesDefendArc(where)
+   elseif random == 2 then
+     ForAllMarinesBuildPower(where)
+   end
+end
+local function FindOrCreateKingCyst(where, which, opcyst)
  local king = false
  local temphack =  GetNearest(where, "Player", nil, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() end) 
   if not temphack then return end
@@ -199,15 +228,22 @@ local function FindOrCreateKingCyst(where, which)
           end
           
           if hasking and king then
-              if king:GetIsMature() and not king.moving then
+              if not king.moving then
+                if king:CheckTarget(toplace) then
                king:GiveOrder(kTechId.Move, nil, toplace, nil, true, true) 
                king:MoveWhipAvoca(toplace)
+                 else
+                    king:SetOrigin(toplace)
+                    king:TeleportWhipAvoca(toplace)
+              end
+               if opcyst then king:AdjustMaxHealth(8191) king:AdjustMaxArmor(2045) end
                end
           else
               local KingCyst = CreateEntity(CystAvoca.kMapName, where, 2)
               KingCyst:SetConstructionComplete()
               KingCyst:SetInfestationRadius(0)
               king = KingCyst
+             if opcyst then king:AdjustMaxHealth(8191) king:AdjustMaxArmor(2045) end
           end
      else
 --       Print("No spot found for king cyst!")
@@ -260,6 +296,7 @@ local function SetupBaseDefense(self)
 
 end
 function Conductor:OnRoundStart() 
+
            if Server then
               BuildAllNodes(self)
               PlaceExtraRes(self)
@@ -288,20 +325,34 @@ end
 function Conductor:GetTimeLeftTillPC()
  return self.phaseCannonTime
 end
+local function SetMarineBaseAsMain(self)
+    local chair = nil
+         for _, mainent in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do
+                    if mainent:GetIsAlive() then chair = mainent break end
+             end
+               if chair then
+                    local ccwhere = chair:GetOrigin()
+                    self:SetMainRoom(ccwhere, GetLocationForPoint(ccwhere), true)
+               end
+end
 function Conductor:PickMainRoom()
        --Print("Picking main room")
+       if self:CounterComplete() then
+             SetMarineBaseAsMain(self)
+      else
        local location = self:GetLocationWithMostMixedPlayers()
        if not location then return true end
-       self:SetMainRoom(location:GetOrigin(), location) 
+       self:SetMainRoom(location:GetOrigin(), location, opcyst) 
        --self:OnPickMainRoom(location)
+        end
        return true
 end
-function Conductor:SetMainRoom(where, which)
+function Conductor:SetMainRoom(where, which, opcyst)
         if Server then MoveArcs(where) end 
         CoordinateWithPowerNode(which.name)
         CreateAlienMarker(where) 
-        ForAllMarinesDefendArc(where)
-        FindOrCreateKingCyst(where, which)
+        SendMarineOrders(where)
+        FindOrCreateKingCyst(where, which, opcyst)
 end
 local function SuddenDeathConditionsCheck(self)
           local arc = GetPayLoadArc()
@@ -310,7 +361,7 @@ local function SuddenDeathConditionsCheck(self)
           
           return false
 end
-function Conductor:GetCanVape()
+function Conductor:CounterComplete()
            local gamestarttime = GetGamerules():GetGameStartTime()
            local gameLength = Shared.GetTime() - gamestarttime
            return  gameLength >= self.payLoadTime
@@ -333,13 +384,20 @@ local function FirePCAllBuiltRooms(self)
                 end
                 
 end
+
+local function DisableVaporizer()
+            for _, vaporizer in ientitylist(Shared.GetEntitiesWithClassname("Vaporizer")) do
+                    if vaporizer then DestroyEntity(vaporizer) end
+             end
+end
 function Conductor:PayloadTimer()
 
    local boolean = false
-       if  self:GetCanVape() then
+       if  self:CounterComplete() then
                   boolean = true
              if not SuddenDeathConditionsCheck(self) then
                --GetGamerules():SetGameState(kGameState.Team2Won)
+               DisableVaporizer()
              else
                AddPayLoadTime(8)
              end
@@ -358,7 +416,7 @@ function Conductor:PCTimer()
        return not boolean
 end
 function Conductor:AddTime(seconds)
-  self.payLoadTime = self.payLoadTime + seconds
+  if not self:CounterComplete() then self.payLoadTime = self.payLoadTime + seconds end
 end
 function Conductor:SendNotification(who, seconds)
 --replace with shine plugin avocagamerules

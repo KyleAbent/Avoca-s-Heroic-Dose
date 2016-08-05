@@ -105,6 +105,12 @@ local function TrySomethingElse(self)
         */
 
    
+              local ccs = GetEntitiesForTeam("CommandStation", 1)
+              for i = 1, #ccs do
+                local chair = ccs[i]
+                local vaporizer = CreateEntity(Vaporizer.kMapName, chair:GetOrigin(), 1)
+              end 
+
 
 --self:SpawnBaseEntities(self, cc)    
  

@@ -33,7 +33,7 @@ local function IsBeingGrown(self, target)
 
 end
 local function FindTask(self)
-   local eligable =  GetNearestMixin(self:GetOrigin(), "Construct", 2, function(ent) return  not ent:GetIsBuilt() and not IsBeingGrown(self, ent) and (not ent.GetCanAutoBuild or ent:GetCanAutoBuild())  end)
+   local eligable =  GetNearestMixin(self:GetOrigin(), "Construct", 2, function(ent) return not ent:isa("AutoCyst") and not ent:GetIsBuilt() and not IsBeingGrown(self, ent) and (not ent.GetCanAutoBuild or ent:GetCanAutoBuild())  end)
          if eligable then  
             self:GiveOrder(kTechId.Grow, eligable:GetId(), eligable:GetOrigin(), nil, false, false)
             return  

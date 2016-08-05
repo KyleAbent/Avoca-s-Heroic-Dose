@@ -150,7 +150,7 @@ end
 function PrototypeLab:UpdatePassive()
    //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
     if GetHasTech(self, kTechId.ExosuitTech)  then return false end 
-      if not GetHasTech(self, kTechId.AdvancedWeaponry) or not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
+      if not GetHasTech(self, kTechId.Weapons2) or not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
     
     local techid = nil
     
@@ -174,7 +174,7 @@ end
 function ArmsLab:UpdatePassive()
    //Kyle Abent Siege 10.24.15 morning writing twtich.tv/kyleabent
      if GetHasTech(self, kTechId.Armor3) then return false end
-       if not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return false end
+       if self:GetIsResearching() then return true end
     local techid = nil  
     
     if not GetHasTech(self, kTechId.Weapons1) then

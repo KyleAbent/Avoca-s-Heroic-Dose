@@ -55,24 +55,44 @@ local kOpenSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactor
 local kCloseSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_close")
 
 local function GetArcsAmount()
-    local arcs = 0
+    local bigarcs = 0
+    local mainroomarc = 0
+    local locationarc = 0
+    local avocaarc = 0
+    local total = 0
+    
         for index, ARC in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
-               if not ARC:isa("AvocaArc") and not ARC:isa("BigArc") then arcs = arcs + 1 end
+              if ARC:isa("BigArc") then
+              bigarcs = bigarcs + 1
+              elseif ARC:isa("MainRoomArc") then
+              mainroomarc = mainroomarc + 1
+              elseif ARC:isa("LocationArc") then
+              locationarc = locationarc + 1 
+              elseif ARC:isa("AvocaArc") then
+              avocaarc = avocaarc + 1
+              end
          end
-    return  arcs
+         total = bigarcs + mainroomarc + locationarc + avocaarc
+    return  bigarcs, mainroomarc, locationarc, avocaarc, total
 end
-local function HasPayLoad(where)
-
-    local arcs = #GetEntitiesWithinRange("AvocaArc", where, 999)
-    local bigarcs = #GetEntitiesWithinRange("BigArc", where, 999)
-    
-    
-    if not arcs or bigarcs>arcs then return false else return true end
-
+local function GetLocationsCount()
+ /*
+  local locations = {}
+          for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
+               local locationName = location and location:GetName() or ""
+               table.insertunique(locations,locationName)  
+          end
+          
+          return table.count(locations)
+  */
+  return 0
+           
 end
 local function ArcQualifications(self)
  local boolean = false
-     if (GetArcsAmount() <= 7 and  self:GetTeam():GetTeamResources() >= kARCCost) or not HasPayLoad(self:GetOrigin())   and
+ local bigarcs, mainroomarc, locationarc, avocaarc, total = GetArcsAmount()
+            local HasPayLoad = avocaarc >=1 + bigarcs
+     if (total <= (5+GetLocationsCount()) and  self:GetTeam():GetTeamResources() >= kARCCost) or not HasPayLoad   and
             self.deployed and 
             GetIsUnitActive(self) and 
            self:GetResearchProgress() == 0 and
@@ -86,11 +106,13 @@ function RoboticsFactory:ChangeTo(who,mapname)
                       if Server then  
                       self:AddTimedCallback(function() 
                       local newentity = CreateEntity(mapname, who:GetOrigin(), 1)
+                    --  if newentity:isa("LocationArc") then newentity:SetArcLocation() end
                       if newentity.BeginTimer then newentity:BeginTimer() end
                       DestroyEntity(who)
                      end, 4) 
                      end
 end
+
 function RoboticsFactory:OnTag(tagName)
     
     PROFILE("RoboticsFactory:OnTag")
@@ -100,12 +122,22 @@ function RoboticsFactory:OnTag(tagName)
         self.builtEntity:Rollout(self, RoboticsFactory.kRolloutLength)
           
            if Server then
+            local bigarcs, mainroomarc, locationarc, avocaarc, total = GetArcsAmount()
+            local HasPayLoad = avocaarc >=1 + bigarcs 
+            local success = false
                 local entity = self.builtEntity
-                   if not HasPayLoad(entity:GetOrigin()) then
+                   if not HasPayLoad then
                         self:ChangeTo(entity, AvocaArc.kMapName)
-                   else
-                        self:ChangeTo(entity, MainRoomArc.kMapName)
+                        success = true
                    end
+                   if mainroomarc <= 7 and not success then
+                        self:ChangeTo(entity, MainRoomArc.kMapName)
+                        success = true
+                   end
+                --   if GetLocationsCount() > locationarc and not success then 
+                  --      self:ChangeTo(entity, LocationArc.kMapName)
+                   --     success = true
+                   --end
                  self.builtEntity = nil
 end
           
@@ -125,7 +157,7 @@ if Server then
    if self.timeOfLastMacCheck == nil or Shared.GetTime() > self.timeOfLastMacCheck + 8 then
            if self:GetTechId() == kTechId.ARCRoboticsFactory  and ArcQualifications(self) then
            self:OverrideCreateManufactureEntity(kTechId.ARC)
-           self:GetTeam():SetTeamResources(self:GetTeam():GetTeamResources() - cost)
+           --self:GetTeam():SetTeamResources(self:GetTeam():GetTeamResources() - cost)
            end
            
     self.timeOfLastMacCheck = Shared.GetTime()  
