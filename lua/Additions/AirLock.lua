@@ -36,6 +36,12 @@ local lottery = {}
      
      return nil
 end
+local function GetCanSpawn(self)
+          for _, conductor in ientitylist(Shared.GetEntitiesWithClassname("Conductor")) do
+            return not conductor:CounterComplete()
+          end
+          return true
+end
 function Location:BaseDefense() 
   if Server then  
   --                Print("BaseDefense triggered")
@@ -45,7 +51,7 @@ function Location:BaseDefense()
               CreateEntity(FireFlameCloud.kMapName, spawnpoint, 1) --oh fuck i had this set as team 2 LOL 
            end
    end
-     return not self:GetIsDestroyed()
+     return GetCanSpawn(self)
 end
 function Location:GetIsAirLock(ask)
   local marine = false

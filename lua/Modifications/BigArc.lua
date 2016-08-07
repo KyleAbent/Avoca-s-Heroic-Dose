@@ -7,22 +7,16 @@ local kPhaseSound = PrecacheAsset("sound/NS2.fev/marine/structures/phase_gate_te
 local kMoveParam = "move_speed"
 local kMuzzleNode = "fxnode_arcmuzzle"
 
-
-local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
-   local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
-   if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
+function BigArc:OnCreate()
+ ARC.OnCreate(self)
+ self:AdjustMaxHealth(self:GetMaxHealth())
+ self:AdjustMaxArmor(self:GetMaxArmor())
 end
-local function CheckHivesForScan()
-local hives = {}
-           for _, hiveent in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
-             table.insert(hives, hiveent)
-          end
-          if #hives == 0 then return end
-          --Scan hive if arc in range, only 1 check per hive.. not per arc.. or whatever. 
-          for i = 1, #hives do
-             local ent = hives[i]
-             SoTheGameCanEnd(self, ent)
-          end
+function BigArc:GetMaxHealth()
+    return 8000
+end
+function BigArc:GetMaxArmor()
+    return 2000
 end
 function BigArc:GiveDeploy()
 self:GiveOrder(kTechId.ARCDeploy, self:GetId(), self:GetOrigin(), nil, true, true)
@@ -43,6 +37,9 @@ local function GetTechPoint(where)
     for _, techpoint in ipairs(GetEntitiesWithinRange("TechPoint", where, 8)) do
          if techpoint then return techpoint end
     end
+end
+function BigArc:GetDamageType()
+return kDamageType.StructuresOnly
 end
 local function BuildAlienHive(who)
      who:AddTimedCallback(function() 
@@ -232,24 +229,24 @@ function AvocaArc:OnTag(tagName)
         -- notify the target selector that we have moved.
         self.targetSelector:AttackerMoved()
         
-        self:AdjustMaxHealth(kARCDeployedHealth * 2)
+      --  self:AdjustMaxHealth(kARCDeployedHealth * 4)
         
-        local currentArmor = self:GetArmor()
-        if currentArmor ~= 0 then
-            self.undeployedArmor = currentArmor
-        end
+       -- local currentArmor = self:GetArmor()
+       -- if currentArmor ~= 0 then
+       --     self.undeployedArmor = currentArmor
+       -- end
         
-        self:SetMaxArmor(kARCDeployedArmor)
-        self:SetArmor(self.deployedArmor)
+      --  self:SetMaxArmor(kARCDeployedArmor)
+      --  self:SetArmor(self.deployedArmor)
         
     elseif tagName == "undeploy_end" then
     
         self.deployMode = ARC.kDeployMode.Undeployed
         
-        self:AdjustMaxHealth(kARCHealth * 2)
-        self.deployedArmor = self:GetArmor()
-        self:SetMaxArmor(kARCArmor * 2)
-        self:SetArmor(self.undeployedArmor)
+      --  self:AdjustMaxHealth(kARCHealth * 4)
+       -- self.deployedArmor = self:GetArmor()
+       -- self:SetMaxArmor(kARCArmor * 2)
+       -- self:SetArmor(self.undeployedArmor)
 
     end
     

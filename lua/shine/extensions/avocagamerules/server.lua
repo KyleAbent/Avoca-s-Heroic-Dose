@@ -1,15 +1,39 @@
-/*Kyle Abent  
-KyleAbent@gmail.com / 12XNLDBRNAXfBCqwaBfwcBn43W3PkKUkUb
-*/
+--Kyle 'Avoca' Abent
 local Shine = Shine
 local Plugin = Plugin
 
 
 Plugin.Version = "1.0"
 
+local function SpawnSurgeForEach(where)
+  
+           local wherelocation = GetLocationForPoint(where)
+           wherelocation = wherelocation and wherelocation:GetName() or ""
+           if not wherelocation then return end
+           
+     for _, eligable in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct", 2, where, 72)) do
+         if not eligable:isa("Harvester") and not eligable:isa("Cyst") and not eligable:isa("Hive") then --and not GetIsPointInMarineBase(eligable:GetOrigin()) then
+           local location = GetLocationForPoint(eligable:GetOrigin())
+           local locationName = location and location:GetName() or ""
+           local sameLocation = locationName == wherelocation
+          if sameLocation then 
+                eligable:DeductHealth(400, nil, nil, false, false, true)
+                eligable:TriggerEffects("arc_hit_primary")
+                eligable:TriggerEffects("arc_hit_secondary")
+          end --
+         end
+     end--
+     
+end
 
 Shine.Hook.SetupClassHook( "PlayingTeam", "GetCommander", "OnGetCommander", "Replace" )
 Shine.Hook.SetupClassHook( "Conductor", "SendNotification", "OnSendNotification", "Replace" )
+Shine.Hook.SetupClassHook( "PowerPoint", "OnConstructionComplete", "OnConstructionComplete", function( OldFunc, self )
+		OldFunc( self )
+         SpawnSurgeForEach(self:GetOrigin())
+        local nearestHarvester = GetNearest(self:GetOrigin(), "Harvester", 2)
+       if nearestHarvester then nearestHarvester:Kill() end
+end )
 
 function Plugin:NotifyPayloadTimer( Player, String, Format, ... )
 Shine:NotifyDualColour( Player, 255, 165, 0,  "[PayloadTimer]",  math.random(0,255), math.random(0,255), math.random(0,255), String, Format, ... )
@@ -25,9 +49,12 @@ function Plugin:MapPostLoad()
       Server.CreateEntity(Conductor.kMapName)
 
 end
+
+
+
 function Plugin:CommLoginPlayer( Building, Player  )
 
-     return
+     Player:Kill()
       
       
 end

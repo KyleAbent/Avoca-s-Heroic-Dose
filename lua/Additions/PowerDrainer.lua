@@ -6,6 +6,18 @@ local kHallucinationMaterial = PrecacheAsset("materials/power/powered_decal.mate
 
 PowerDrainer.kAnimationGraph = PrecacheAsset("models/alien/powerdrainer/powerdrainer.animation_graph")
 
+function PowerDrainer:OnCreate()
+ Whip.OnCreate(self)
+ self:AdjustMaxHealth(self:GetMaxHealth())
+ self:AdjustMaxArmor(self:GetMaxArmor())
+end
+function PowerDrainer:GetMaxHealth()
+    return kMatureWhipHealth
+end 
+
+function PowerDrainer:GetMaxArmor()
+    return kMatureWhipArmor
+end 
 function PowerDrainer:OnInitialized()
   Whip.OnInitialized(self)
       self:SetModel(Whip.kModelName, PowerDrainer.kAnimationGraph)
@@ -71,7 +83,10 @@ function PowerDrainer:GetCanFireAtTargetActual(target, targetPoint)
 end
 
 function PowerDrainer:ModifyDamageTaken(damageTable, attacker, doer, damageType)
-        damageTable.damage = damageTable.damage * 1.3
+     local damage = 1.3
+        if attacker and attacker:isa("MainRoomArc") then damage = damage * .25 end
+        
+        damageTable.damage = damageTable.damage * damage
 end
 if Client then
 

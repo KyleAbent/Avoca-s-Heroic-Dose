@@ -21,7 +21,7 @@ end
 local function GetBioMassLevel()
            local teamInfo = GetTeamInfoEntity(2)
            local bioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
-           return bioMass
+           return math.round(bioMass / 3, 1, 3)
 end
 local function SpawnRandomEgg(who, where)
 

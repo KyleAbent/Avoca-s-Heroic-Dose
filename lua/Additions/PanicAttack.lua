@@ -5,8 +5,15 @@ PanicAttack.kMapName = "panicattack"
 function PanicAttack:OnCreate()
  Hydra.OnCreate(self)
  if Server then self:AddTimedCallback(PanicAttack.Killme, 8) end
+  self:AdjustMaxHealth(self:GetMaxHealth())
+ self:AdjustMaxArmor(self:GetMaxArmor())
 end
-
+function PanicAttack:GetMaxHealth()
+    return kMatureHydraHealth * 4
+end
+function PanicAttack:GetMaxArmor()
+    return 0
+end
 function PanicAttack:GetSendDeathMessageOverride()
 return false
 end

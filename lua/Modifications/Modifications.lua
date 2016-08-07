@@ -283,7 +283,7 @@ local function SpawnJanitorForEach(where)
            if not wherelocation then return end
            
      for _, eligable in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct", 1, where, 72)) do
-         if not eligable:isa("PowerPoint") and not eligable:isa("Extractor") then
+         if not eligable:isa("PowerPoint") and not eligable:isa("Extractor") and not GetIsPointInMarineBase(eligable:GetOrigin()) then
            local location = GetLocationForPoint(eligable:GetOrigin())
            local locationName = location and location:GetName() or ""
            local sameLocation = locationName == wherelocation
@@ -296,16 +296,35 @@ local function SpawnJanitorForEach(where)
      end--
      
 end
+/*
+local function SpawnSurgeForEach(where)
+  
+           local wherelocation = GetLocationForPoint(where)
+           wherelocation = wherelocation and wherelocation:GetName() or ""
+           if not wherelocation then return end
+           
+     for _, eligable in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct", 2, where, 72)) do
+         if not eligable:isa("Harvester") and not eligable:isa("Cyst") and not eligable:isa("Hive") then --and not GetIsPointInMarineBase(eligable:GetOrigin()) then
+           local location = GetLocationForPoint(eligable:GetOrigin())
+           local locationName = location and location:GetName() or ""
+           local sameLocation = locationName == wherelocation
+          if sameLocation then 
+                eligable:DeductHealth(100, nil, nil, false, false, true)
+                eligable:TriggerEffects("arc_hit_primary")
+                eligable:TriggerEffects("arc_hit_secondary")
+          end --
+         end
+     end--
+     
+end
 local orig_PowerPoint_OnConstructionComplete = PowerPoint.OnConstructionComplete
     function PowerPoint:OnConstructionComplete()
-        orig_PowerPoint_OnConstructionComplete(self)
-       local nearestHarvester = GetNearest(self:GetOrigin(), "Harvester", 2, function(ent) return LocationsMatch(self,ent)  end)
-       if nearestHarvester then
-         nearestHarvester:Kill()
-       end
-   --KillAllStructuresInLocation(self:GetOrigin(), 2)
-end
-
+    orig_PowerPoint_OnConstructionComplete(self)
+         SpawnSurgeForEach(self:GetOrigin())
+        local nearestHarvester = GetNearest(self:GetOrigin(), "Harvester", 2, function(ent) return LocationsMatch(self,ent)  end)
+       if nearestHarvester then nearestHarvester:Kill() end
+   end
+   */
 local orig_PowerPoint_OnKill = PowerPoint.OnKill
     function PowerPoint:OnKill(attacker, doer, point, direction)
     orig_PowerPoint_OnKill(self)
@@ -319,6 +338,7 @@ local orig_PowerPoint_OnKill = PowerPoint.OnKill
        end
        
     end
+
 local function ToSpawnFormula(self,panicstospawn, where)
          for i = 1, panicstospawn do
                            local bitch = GetPayLoadArc()
@@ -413,11 +433,17 @@ local function GetTechPoint(where)
          if techpoint then return techpoint end
     end
 end
+local function DestroyAvocaArcInRadius(where)
+    for _, avocaarc in ipairs(GetEntitiesWithinRange("AvocaArc", where, kARCRange)) do
+         if avocaarc then avocaarc:Kill() end
+    end
+end
 local orig_Hive_OnKill = Hive.OnKill
 function Hive:OnKill(attacker, doer, point, direction)
 if self:GetIsBuilt() then AddPayLoadTime(8) end
 local child = GetTechPoint(self:GetOrigin())
 BuildRoomPower(child)
+DestroyAvocaArcInRadius(self:GetOrigin())
 child:SetIsVisible(false)
  return orig_Hive_OnKill(self,attacker, doer, point, direction)
 end
@@ -436,7 +462,7 @@ return false
 end
 */
 local function GetIsVaporizing(where)
-    for _, vape in ipairs(GetEntitiesWithinRange("Vaporizer", where, 8)) do
+    for _, vape in ipairs(GetEntitiesWithinRange("Vaporizer", where, 16)) do
          if vape then return true end
     end
 end
@@ -451,7 +477,16 @@ function CommandStation:ModifyDamageTaken(damageTable, attacker, doer, damageTyp
 end
 function InfantryPortal:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
-    if hitPoint ~= nil then
+    if hitPoint ~= nil and GetIsVaporizing(self:GetOrigin()) then
+    
+        damageTable.damage = 0 --I already know whips and hydras are still gonna try to attack. Gotta filter that elsewhere.
+        
+    end
+
+end
+function InfantryPortal:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil and GetIsVaporizing(self:GetOrigin()) then
     
         damageTable.damage = 0 --I already know whips and hydras are still gonna try to attack. Gotta filter that elsewhere.
         
@@ -460,14 +495,14 @@ function InfantryPortal:ModifyDamageTaken(damageTable, attacker, doer, damageTyp
 end
 function ConstructMixin:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
-    if hitPoint ~= nil and (attacker ~= nil and attacker:isa("Player") or attacker:isa("Janitor") ) then
+    if not self:isa("CommandStructure") and not self:isa("Cyst") and hitPoint ~= nil and (attacker ~= nil and attacker:isa("Player") or attacker:isa("Janitor") ) then
         local mult = 1
             local wherelocation = GetLocationForPoint(self:GetOrigin())
            if not wherelocation then return end
            
             if self:GetTeamNumber() == 1 then
               if not wherelocation:GetIsPowerUp() then 
-                 if  attacker:isa("Janitor")  then mult = 4  else mult = 2 end 
+                 if  attacker:isa("Janitor")  then mult = 8  else mult = 2 end 
               end
             elseif self:GetTeamNumber() == 2 then
                 if wherelocation:GetIsPowerUp() then mult = 2 end

@@ -228,16 +228,19 @@ local function FindOrCreateKingCyst(where, which, opcyst)
           end
           
           if hasking and king then
-              if not king.moving then
-                if king:CheckTarget(toplace) then
-               king:GiveOrder(kTechId.Move, nil, toplace, nil, true, true) 
-               king:MoveWhipAvoca(toplace)
-                 else
-                    king:SetOrigin(toplace)
-                    king:TeleportWhipAvoca(toplace)
-              end
-               if opcyst then king:AdjustMaxHealth(8191) king:AdjustMaxArmor(2045) end
-               end
+          
+             -- if not king.moving then
+                   if king:CheckTarget(toplace) then
+                      king:GiveOrder(kTechId.Move, nil, toplace, nil, true, true) 
+                      king:MoveWhipAvoca(toplace)
+                  else
+                       king:SetOrigin(toplace)
+                        king:TeleportWhipAvoca(toplace)
+                   end
+                   
+                   if opcyst then king:AdjustMaxHealth(8191) king:AdjustMaxArmor(2045) end
+              -- end
+               
           else
               local KingCyst = CreateEntity(CystAvoca.kMapName, where, 2)
               KingCyst:SetConstructionComplete()
@@ -372,8 +375,11 @@ function Conductor:GetCanFire()
            return  gameLength >= self.phaseCannonTime
 end
 function Conductor:ResetPC()
-self.phaseCannonTime = self.phaseCannonTime + 120 + 5
+--16 seconds for each built node
+self.phaseCannonTime = Shared.GetTime() + Clamp(16*self:CountUnBuiltNodes(), 45, 180)--+ 120
 self:AddTimedCallback(Conductor.PCTimer, 1)
+local built = {}
+local unbuilt = 0
 return false
 end
 local function FirePCAllBuiltRooms(self)
@@ -398,6 +404,7 @@ function Conductor:PayloadTimer()
              if not SuddenDeathConditionsCheck(self) then
                --GetGamerules():SetGameState(kGameState.Team2Won)
                DisableVaporizer()
+               self.payLoadTime = 0
              else
                AddPayLoadTime(8)
              end
@@ -410,7 +417,8 @@ function Conductor:PCTimer()
     if self:GetCanFire() then
          boolean = true
          FirePCAllBuiltRooms(self) -- Ddos!
-         self:AddTimedCallback(Conductor.ResetPC, 4)
+         self.phaseCannonTime = 0
+         self:AddTimedCallback(Conductor.ResetPC, 8)
        end
        
        return not boolean

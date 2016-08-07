@@ -20,7 +20,7 @@ end
 function WhipAvoca:ModifyDamageTaken(damageTable, attacker, doer, damageType)
 local damage = 1
         if doer and doer:isa("MainRoomArc") then 
-         damage = damage * .25
+         damage = damage * .3
          -- damage = damage * Clamp(doer:GetHealthScalar(), 0.25, 1) maybe not sure
          end
         damageTable.damage = damageTable.damage * damage
@@ -39,7 +39,8 @@ function WhipAvoca:OnGetMapBlipInfo()
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
 function WhipAvoca:ActivateSelfDestruct()
-              self:AddTimedCallback(WhipAvoca.Killme, 16)
+            --  self:AddTimedCallback(WhipAvoca.Killme, 16)
+            --wait why?
 end
 function WhipAvoca:UpdateRootState()
     
@@ -60,5 +61,30 @@ end
 function WhipAvoca:Killme()
     self:DeductHealth(100)
      return true
+end
+function WhipAvoca:OnInitialized()
+  Whip.OnInitialized(self)
+      
+  
+  if Server then
+        local targetTypes = { kAlienStaticTargets, kAlienMobileTargets }
+        self.slapTargetSelector = TargetSelector():Init(self, Whip.kRange + 4, true, targetTypes,  { self.FilterTarget(self) })
+        self.bombardTargetSelector = TargetSelector():Init(self, Whip.kBombardRange + 4, true, targetTypes, { self.FilterTarget(self) })
+  end
+      
+end
+function WhipAvoca:FilterTarget()
+
+    local attacker = self
+    return function (target, targetPosition) return attacker:GetCanFireAtTargetActual(target, targetPosition) end
+    
+end
+function WhipAvoca:GetCanFireAtTargetActual(target, targetPoint)    
+      if target:isa("AvocaArc") and not target:GetInAttackMode() then
+    return false
+    end
+    
+    return target.health ~= 0 
+    
 end
 Shared.LinkClassToMap("WhipAvoca", WhipAvoca.kMapName, networkVars)

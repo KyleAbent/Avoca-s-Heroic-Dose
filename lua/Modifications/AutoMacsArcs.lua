@@ -107,6 +107,7 @@ function RoboticsFactory:ChangeTo(who,mapname)
                       self:AddTimedCallback(function() 
                       local newentity = CreateEntity(mapname, who:GetOrigin(), 1)
                     --  if newentity:isa("LocationArc") then newentity:SetArcLocation() end
+                       newentity:SetOrigin(FindFreeSpace( newentity:GetOrigin() ) ) --antistuck sigh
                       if newentity.BeginTimer then newentity:BeginTimer() end
                       DestroyEntity(who)
                      end, 4) 

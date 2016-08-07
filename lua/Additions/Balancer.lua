@@ -1,18 +1,14 @@
 if Server then
 
 
-local function CountNodes()
-local built = {}
+function Conductor:CountUnBuiltNodes()
 local unbuilt = 0
                  for index, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-                   if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
-                     table.insert(built, powerpoint)
-                   elseif powerpoint:GetIsDisabled() or powerpoint:GetIsSocketed() then
+                   if powerpoint:GetIsBuilt() and powerpoint:GetIsDisabled() then
                      unbuilt = unbuilt + 1
                    end
                 end
-               
-               return Clamp(table.count(built) -4, 0, 20), unbuilt, table.random(built)
+                return unbuilt
 
 end
 

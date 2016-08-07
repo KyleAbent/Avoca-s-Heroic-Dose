@@ -241,8 +241,8 @@ local success = false
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
                       --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
                           local minrange = 12
-                          if tospawn == Armory.kMapName then minrange = 12 end
-                          if tospawn == PhaseGate.kMapName then minrange = 42 end
+                          if tospawn == Armory.kMapName then minrange = 16 end
+                          if tospawn == PhaseGate.kMapName then minrange = 54 end
                           if tospawn == Observatory.kMapName then minrange = kScanRadius end
                           if tospawn == RoboticsFactory.kMapName then minrange = 52  end
                           if tospawn == SentryAvoca.kMapName then minrange = GetSentryMinRangeReq(randomspawn) end

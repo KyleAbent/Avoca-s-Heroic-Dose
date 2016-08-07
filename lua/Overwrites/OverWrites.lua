@@ -68,7 +68,7 @@ function Whip:SlapTarget(target)
     -- fudge a bit - put the point of attack 0.5m short of the target
     local hitPosition = targetPoint - hitDirection * 0.5
     local damage = Whip.kDamage 
-    local damage = not self:isa("PowerDrainer") and Clamp(damage * self:GetHealthScalar(), 1, damage) or Whip.kDamage * 0.3
+    local damage = not self:isa("PowerDrainer") and Clamp(damage * self:GetHealthScalar(), 1, damage) or Whip.kDamage * 0.35
     self:DoDamage(damage, target, hitPosition, hitDirection, nil, true)
     self:TriggerEffects("whip_attack")
 

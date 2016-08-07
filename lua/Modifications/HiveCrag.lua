@@ -2,7 +2,18 @@ class 'HiveCrag' (Crag)
 HiveCrag.kMapName = "hivecrag"
 
 --Nothin yet eh
+function HiveCrag:OnCreate()
+ Crag.OnCreate(self)
+ self:AdjustMaxHealth(self:GetMaxHealth())
+ self:AdjustMaxArmor(self:GetMaxArmor())
+end
+function HiveCrag:GetMaxHealth()
+    return kMatureCragHealth
+end 
 
+function HiveCrag:GetMaxArmor()
+    return kMatureCragArmor
+end 
 function HiveCrag:GetDeathIconIndex()
     return kDeathMessageIcon.Crag
 end

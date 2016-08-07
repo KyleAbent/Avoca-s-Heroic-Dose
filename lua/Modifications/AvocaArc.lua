@@ -7,7 +7,17 @@ local kPhaseSound = PrecacheAsset("sound/NS2.fev/marine/structures/phase_gate_te
 local kMoveParam = "move_speed"
 local kMuzzleNode = "fxnode_arcmuzzle"
 
-
+function AvocaArc:OnCreate()
+ ARC.OnCreate(self)
+ self:AdjustMaxHealth(self:GetMaxHealth())
+ self:AdjustMaxArmor(self:GetMaxArmor())
+end
+function AvocaArc:GetMaxHealth()
+    return 4000
+end
+function AvocaArc:GetMaxArmor()
+    return 1200
+end
 local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
    local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
    if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
@@ -179,12 +189,16 @@ function AvocaArc:GetCanFireAtTargetActual(target, targetPoint)
     
 end
 function AvocaArc:ModifyDamageTaken(damageTable, attacker, doer, damageType)
-local damage = self:GetInAttackMode() and 0.25 or 0 
-        if doer and doer:isa("PanicAttack") then 
-         damage = damage * 8
-          damage = damage * Clamp(doer:GetHealthScalar(), 0.25, 1)
+local damagemult = self:GetInAttackMode() and 0 or 1
+        if doer then 
+           if doer:isa("PanicAttack") then 
+            damagemult = 4
+            damagemult =  damagemult * Clamp(doer:GetHealthScalar(), .4, 1)
+           elseif doer:isa("BileBomb") then
+           damagemult = .3
+           end
          end
-        damageTable.damage = damageTable.damage * damage
+        damageTable.damage = damageTable.damage * damagemult
 
 end
 function AvocaArc:GetDamageType()
@@ -253,10 +267,15 @@ function AvocaArc:Instruct()
    self:SpecificRules()
    return true
 end
-
+local function DestroPanicAttackInRadius(where)
+    for _, panicattack in ipairs(GetEntitiesWithinRange("PanicAttack", where, kARCRange)) do
+         if panicattack then panicattack:Kill() end
+    end
+end
 if Server then
 function AvocaArc:PreOnKill(attacker, doer, point, direction)
-AddPayLoadTime(60) 
+AddPayLoadTime(30) 
+DestroPanicAttackInRadius(self:GetOrigin())
 end 
 function AvocaArc:UpdateMoveOrder(deltaTime)
 
@@ -362,7 +381,7 @@ local function PerformAttack(self)
         local hitEntities = GetEntitiesWithMixinWithinRange("Live", self.targetPosition, ARC.kSplashRadius)
 
         -- Do damage to every target in range
-        RadiusDamage(hitEntities, self.targetPosition, ARC.kSplashRadius, 880, self, true)
+        RadiusDamage(hitEntities, self.targetPosition, ARC.kSplashRadius, 600, self, true)
 
         -- Play hit effect on each
         for index, target in ipairs(hitEntities) do
@@ -405,24 +424,16 @@ function AvocaArc:OnTag(tagName)
         -- notify the target selector that we have moved.
         self.targetSelector:AttackerMoved()
         
-        self:AdjustMaxHealth(kARCDeployedHealth)
-        
         local currentArmor = self:GetArmor()
         if currentArmor ~= 0 then
             self.undeployedArmor = currentArmor
         end
-        
-        self:SetMaxArmor(kARCDeployedArmor)
-        self:SetArmor(self.deployedArmor)
+
         
     elseif tagName == "undeploy_end" then
     
         self.deployMode = ARC.kDeployMode.Undeployed
         
-        self:AdjustMaxHealth(kARCHealth)
-        self.deployedArmor = self:GetArmor()
-        self:SetMaxArmor(kARCArmor * 2.5)
-        self:SetArmor(self.undeployedArmor)
 
     end
     

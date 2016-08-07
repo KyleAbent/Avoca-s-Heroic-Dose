@@ -17,13 +17,5 @@ end
 
 
 
-function PhaseAvoca:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
-    if hitPoint ~= nil  then
-    
-        damageTable.damage = 0 --I already know whips and hydras are still gonna try to attack. Gotta filter that elsewhere.
-        
-    end
-
-end
 Shared.LinkClassToMap("PhaseAvoca", PhaseAvoca.kMapName, networkVars)
