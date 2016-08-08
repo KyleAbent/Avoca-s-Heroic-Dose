@@ -1,3 +1,10 @@
+SetCachedTechData(kTechId.Harvester, kTechDataRequiresInfestation, false)
+SetCachedTechData(kTechId.Crag, kTechDataRequiresInfestation, false)
+SetCachedTechData(kTechId.Whip, kTechDataRequiresInfestation, false)
+SetCachedTechData(kTechId.Egg, kTechDataRequiresInfestation, false)
+SetCachedTechData(kTechId.Shift, kTechDataRequiresInfestation, false)
+SetCachedTechData(kTechId.Shade, kTechDataRequiresInfestation, false)
+
 --kARCDamage = 1350
  kAlienEggsPerHive = 8
 --kHiveBiomass = 0.1

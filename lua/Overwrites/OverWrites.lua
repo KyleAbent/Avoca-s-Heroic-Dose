@@ -2,7 +2,6 @@ Script.Load("lua/Overwrites/Convars.lua")
 Script.Load("lua/Overwrites/CustomLightRules.lua")
 
 if Server then
-Script.Load("lua/Overwrites/AutoResearch.lua")
 Script.Load("lua/Overwrites/EggSpawn.lua")
 end
 if Server then
@@ -17,6 +16,20 @@ end
         
     end
 
+end
+function FollowMoveMixin:SetFollowTarget(target)
+  if self:GetTeamNumber() == 1 then 
+ local nearest = GetNearest(self:GetOrigin(), "AvocaArc", 1)
+--  if not nearest then nearest =  GetNearestMixin(self:GetOrigin(), "Combat", math.random(1,2), function(ent) return ent:GetIsInCombat() end) end
+   if nearest then target = nearest end
+   
+  end
+    if target then
+        self.imposedTargetId = target:GetId()
+    else
+        self.imposedTargetId = Entity.invalidId
+    end
+    
 end
 function Hive:GetCanBeUsed(player, useSuccessTable)
         useSuccessTable.useSuccess = false

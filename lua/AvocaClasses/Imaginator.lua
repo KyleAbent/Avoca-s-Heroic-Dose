@@ -1,6 +1,6 @@
 --Kyle 'Avoca' Abent
 
-class 'Imaginator' (Conductor) --Because I dont want to spawn it other than when conductor is active and that file is already full. 
+class 'Imaginator' (Entity) --Because I dont want to spawn it other than when conductor is active and that file is already full. 
 Imaginator.kMapName = "imaginator"
 
 

@@ -44,7 +44,7 @@ function Janitor:OnInitialized()
         self.targetSelector = TargetSelector():Init(
                 self,
                 72, 
-                true,
+                false,
                 { kAlienStaticTargets, kAlienMobileTargets }, { self.FilterTarget(self) } )  
   end
       

@@ -1,16 +1,7 @@
-Script.Load("lua/Additions/PowerDrainer.lua")
-Script.Load("lua/Additions/Conductor.lua")
-Script.Load("lua/Additions/Imaginator.lua")
-Script.Load("lua/Additions/AirLock.lua")       
-Script.Load("lua/Additions/AutoCyst.lua")   
 Script.Load("lua/Additions/Functions.lua")      
 Script.Load("lua/Additions/Balancer.lua")   
-Script.Load("lua/Additions/HiveDefense.lua") 
 Script.Load("lua/Additions/Convars.lua") 
-Script.Load("lua/Additions/PanicAttack.lua") 
-Script.Load("lua/Additions/FireGrenade.lua") 
-Script.Load("lua/Additions/Janitor.lua") 
-Script.Load("lua/Additions/Vaporizer.lua") 
+
 
 function Location:MakeSureRoomIsntEmpty()
           --So that the room lights being changed are actually observed, otherwise useless :)

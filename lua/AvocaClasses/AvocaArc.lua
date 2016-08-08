@@ -83,10 +83,11 @@ end
 local function PlayersNearby(who)
 
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 5.5)
-
-    if #players >= 1 then
+local alive = false
+    if not who:GetInAttackMode() and #players >= 1 then
          for i = 1, #players do
             local player = players[i]
+            if player:GetIsAlive() and alive == false then alive = true end
             if ( player:GetIsAlive() and  player.GetIsNanoShielded and not player:GetIsNanoShielded()) then player:ActivateNanoShield() end
            if player:isa("Marine") and( player:GetHealth() == player:GetMaxHealth() ) then
            local addarmoramount = 3 * player:GetArmorLevel()
@@ -97,7 +98,7 @@ local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 5.5
            end
          end
     end
-return #players or 0 
+return alive
 end
 function AvocaArc:SpecificRules()
 --How emberassing to have the 6.22 video show off broken lua but hey that what's given after only 6 hours
@@ -189,12 +190,12 @@ function AvocaArc:GetCanFireAtTargetActual(target, targetPoint)
     
 end
 function AvocaArc:ModifyDamageTaken(damageTable, attacker, doer, damageType)
-local damagemult = self:GetInAttackMode() and 0 or 1
+local damagemult = self:GetInAttackMode() and .25 or 0
         if doer then 
            if doer:isa("PanicAttack") then 
-            damagemult = 4
-            damagemult =  damagemult * Clamp(doer:GetHealthScalar(), .4, 1)
-           elseif doer:isa("BileBomb") then
+            damagemult = 8
+            damagemult =  damagemult * Clamp(doer:GetHealthScalar(), .25, 1)
+           elseif attacker:isa("Bomb") then
            damagemult = .3
            end
          end

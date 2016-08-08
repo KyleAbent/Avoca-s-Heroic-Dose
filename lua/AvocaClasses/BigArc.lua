@@ -1,8 +1,6 @@
 --Kyle 'Avoca' Abent
 class 'BigArc' (ARC)
 BigArc.kMapName = "bigarc"
-local kNanoshieldMaterial = PrecacheAsset("cinematics/vfx_materials/nanoshield.material")
-local kPhaseSound = PrecacheAsset("sound/NS2.fev/marine/structures/phase_gate_teleport")
 
 local kMoveParam = "move_speed"
 local kMuzzleNode = "fxnode_arcmuzzle"
@@ -71,25 +69,6 @@ local stopanddeploy = false
         --Print("stopanddeploy is %s", stopanddeploy)
        return stopanddeploy
 end
-local function FindNewParent(who)
-    local where = who:GetOrigin()
-    local player =  GetNearest(where, "Player", 1, function(ent) return ent:GetIsAlive() end)
-    if player then
-    who:SetOwner(player)
-    end
-end
-local function GiveDeploy(who)
-    --Print("GiveDeploy")
-who:GiveOrder(kTechId.ARCDeploy, who:GetId(), who:GetOrigin(), nil, true, true)
-end
-local function GiveUnDeploy(who)
-     --Print("GiveUnDeploy")
-     who:CompletedCurrentOrder()
-     who:SetMode(ARC.kMode.Stationary)
-     who.deployMode = ARC.kDeployMode.Undeploying
-     who:TriggerEffects("arc_stop_charge")
-     who:TriggerEffects("arc_undeploying")
-end
 function BigArc:GetUnitNameOverride(viewer)
     local unitName = GetDisplayName(self)   
     unitName = string.format(Locale.ResolveString("BigArc") )
@@ -98,38 +77,6 @@ end
 function BigArc:GetDeathIconIndex()
     return kDeathMessageIcon.ARC
 end
-if Client then
-
-    function BigArc:OnUpdateRender()
-          local showMaterial = not self:GetInAttackMode()
-    
-        local model = self:GetRenderModel()
-        if model then
-
-            model:SetMaterialParameter("glowIntensity", 4)
-
-            if showMaterial then
-                
-                if not self.hallucinationMaterial then
-                    self.hallucinationMaterial = AddMaterial(model, kNanoshieldMaterial)
-                end
-                
-                self:SetOpacity(0.5, "hallucination")
-            
-            else
-            
-                if self.hallucinationMaterial then
-                    RemoveMaterial(model, self.hallucinationMaterial)
-                    self.hallucinationMaterial = nil
-                end//
-                
-                self:SetOpacity(1, "hallucination")
-            
-            end //showma
-            
-        end//omodel
-end //up render
-end -- client
 function BigArc:OnAdjustModelCoords(coords)
     
     	local scale = 4 

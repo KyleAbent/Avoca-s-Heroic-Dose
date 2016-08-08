@@ -1,40 +1,8 @@
-/*
-local function SpawnChairThenSpawnBase(self)
-local cc = nil
-local tech = nil
-                    local techPoints = EntityListToTable(Shared.GetEntitiesWithClassname("TechPoint"))
-                    for i=1, #techPoints do
-                             tech = techPoints[i]
-                          if tech:GetAttached() == nil then
-                           local cc = tech:SpawnCommandStructure(1)
-                          cc:SetConstructionComplete()
-                            self:SpawnBaseEntities(self, tech:GetOrigin())
-                          end
-                    end
-
-end
-*/
 local function AlreadySpawned(self, origin)
         local ents = GetEntitiesWithMixinForTeamWithinRange("Construct", 1, origin, 18)
         if ents and #ents >= 4 then return true else return false end
         
 end
-/*
-if Server then
-local function SiegeThisBitchUp(where, teamnum)
-
-        
-    if teamnum == 2 then
-               for i = 1, 4  do
-                      local resNodeSpawned = CreateEntity(ResourcePoint.kMapName, FindFreeSpace(where,8))
-               end
-   else
-   
-   end
-
-end
-end
-*/
 function Conductor:SpawnBaseEntities()
 //messy and mir-air. But whatever. Requires GetGroundPosition
 local techPointOrigin = nil
