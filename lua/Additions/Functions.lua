@@ -14,6 +14,12 @@ function GetPayLoadArc()
     end    
     return nil
 end
+function GetDeployedPayLoadArc()
+           for _, avocaarc in ientitylist(Shared.GetEntitiesWithClassname("AvocaArc")) do
+                 if avocaarc:GetInAttackMode( )then return avocaarc end
+          end
+    return nil
+end
 function GetIsPointInMarineBase(where)    
     local cclocation = nil
            for _, cc in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do

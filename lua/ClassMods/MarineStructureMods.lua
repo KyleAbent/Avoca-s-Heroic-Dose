@@ -78,7 +78,7 @@ local function SpawnSurgeForEach(where)
            local locationName = location and location:GetName() or ""
            local sameLocation = locationName == wherelocation
           if sameLocation then 
-                eligable:DeductHealth(100, nil, nil, false, false, true)
+                eligable:DeductHealth(400, nil, nil, true, false, true)
                 eligable:TriggerEffects("arc_hit_primary")
                 eligable:TriggerEffects("arc_hit_secondary")
           end --

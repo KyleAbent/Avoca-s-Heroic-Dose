@@ -62,7 +62,7 @@ end
 local function GetBioMassLevel()
            local teamInfo = GetTeamInfoEntity(2)
            local bioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
-           return math.round(bioMass / 3, 1, 3)
+           return math.round(bioMass / 4, 1, 3)
 end
 function Hive:UpdatePassive()
        if GetHasTech(self, kTechId.Xenocide) or not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
@@ -99,12 +99,12 @@ function Hive:UpdatePassive()
     
         if techid == nil and self.bioMassLevel <= 1 then
     techid = kTechId.ResearchBioMassOne
-    elseif techid == nil and self.bioMassLevel <= 2 then
+    elseif techid == nil and self.bioMassLevel == 2 then
     techid = kTechId.ResearchBioMassTwo
-    elseif techid == nil and self.bioMassLevel <= 3 then
+    elseif techid == nil and self.bioMassLevel == 3 then
     techid = kTechId.ResearchBioMassThree
-    elseif techid == nil and self.bioMassLevel <= 4 then
-    techid =kTechId.ResearchBioMassFour   
+    elseif techid == nil and self.bioMassLevel == 4 then
+    techid = kTechId.ResearchBioMassFour   
     end
     
     if techid == nil then return true end

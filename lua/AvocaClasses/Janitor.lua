@@ -82,4 +82,41 @@ function Janitor:GetCanFireAtTargetActual(target, targetPoint)
    return false
     
 end
+
+
+
+if Server then
+
+local function CreateSpikeProjectile(self)
+    local startPoint = self:GetBarrelPoint()
+    local directionToTarget = self.target:GetEngagementPoint() - self:GetEyePos()
+    local targetDistanceSquared = directionToTarget:GetLengthSquared()
+    local theTimeToReachEnemy = targetDistanceSquared / (Hydra.kSpikeSpeed * Hydra.kSpikeSpeed)
+    local engagementPoint = self.target:GetEngagementPoint()
+    if self.target.GetVelocity then
+    
+        local targetVelocity = self.target:GetVelocity()
+        engagementPoint = self.target:GetEngagementPoint() - ((targetVelocity:GetLength() * Hydra.kTargetVelocityFactor * theTimeToReachEnemy) * GetNormalizedVector(targetVelocity))
+        
+    end
+    local fireDirection = GetNormalizedVector(engagementPoint - startPoint)
+    local fireCoords = Coords.GetLookIn(startPoint, fireDirection)    
+    local spreadDirection = CalculateSpread(fireCoords, Hydra.kSpread, math.random)
+    local endPoint = startPoint + spreadDirection * Hydra.kRange
+        self:DoDamage(Hydra.kDamage, self.target, endPoint, fireDirection)
+end
+
+function Janitor:AttackTarget()
+
+    self:TriggerUncloak()
+    
+    CreateSpikeProjectile(self)    
+    self:TriggerEffects("hydra_attack")
+    
+    self.timeOfNextFire = Shared.GetTime() + 1.5
+    
+end
+
+
+end
 Shared.LinkClassToMap("Janitor", Janitor.kMapName, networkVars)

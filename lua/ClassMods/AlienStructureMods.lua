@@ -52,28 +52,14 @@ return true
 
 end
 
-function Hive:GetTechButtons()
-
-    local techButtons = { kTechId.ShiftHatch, kTechId.None, kTechId.None, kTechId.LifeFormMenu,
-                          kTechId.None, kTechId.None, kTechId.None, kTechId.None }
-    
-    if self.bioMassLevel <= 1 then
-        techButtons[2] = kTechId.ResearchBioMassOne
-    elseif self.bioMassLevel == 2 then
-        techButtons[2] = kTechId.ResearchBioMassTwo 
-    elseif self.bioMassLevel == 3 then
-        techButtons[2] = kTechId.ResearchBioMassThree 
-    elseif self.bioMassLevel == 4 then
-        techButtons[2] = kTechId.ResearchBioMassFour
-    end
-    
-    return techButtons
-    
-end
-
 if Server then
 
 
+function Hive:UpdateAliensWeaponsManually() ///Seriously this makes more sense than spamming some complicated formula every 0.5 seconds no?
+ for _, alien in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do 
+        alien:HiveCompleteSoRefreshTechsManually() 
+end
+end
 
 local function LocationsMatch(who,whom)
    
@@ -104,7 +90,7 @@ end
 local function SendAnxietyAttack(self, where, who)
          for i = 1, #who do
                            local panicattack = who[i]
-                           local bitch = GetPayLoadArc()
+                           local bitch = GetDeployedPayLoadArc()
                            if bitch and GetIsPointWithinHiveRadius(bitch:GetOrigin()) and GetRange(panicattack,bitch:GetOrigin()) >= 16 then                  
                            local spawnpoint = FindFreeSpace(bitch:GetOrigin(), 4, 8)
                               if spawnpoint then
@@ -180,6 +166,7 @@ local function DestroyAvocaArcInRadius(where)
 end
 local orig_Hive_OnKill = Hive.OnKill
 function Hive:OnKill(attacker, doer, point, direction)
+ self:UpdateAliensWeaponsManually()
 if self:GetIsBuilt() then AddPayLoadTime(8) end
 local child = GetTechPoint(self:GetOrigin())
 BuildRoomPower(child)
@@ -187,9 +174,20 @@ DestroyAvocaArcInRadius(self:GetOrigin())
 child:SetIsVisible(false)
  return orig_Hive_OnKill(self,attacker, doer, point, direction)
 end
+/*
+local orig_Hive_OnResearchComplete = Hive.OnResearchComplete
+function Hive:OnResearchComplete(researchId)
+ self:UpdateAliensWeaponsManually()
+ return orig_Hive_OnResearchComplete(researchId, self)
+end
+*/
 
 
-
+local orig_Hive_OnDestroy = Hive.OnDestroy
+function Hive:OnDEstroy()
+orig_Hive_OnDestroy(self)
+self:UpdateAliensWeaponsManually()
+end
 
     local orig_NutrientMist_Perform = NutrientMist.Perform
 function NutrientMist:Perform()

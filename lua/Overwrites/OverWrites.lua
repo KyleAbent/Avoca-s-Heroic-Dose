@@ -17,6 +17,7 @@ end
     end
 
 end
+
 function FollowMoveMixin:SetFollowTarget(target)
   if self:GetTeamNumber() == 1 then 
  local nearest = GetNearest(self:GetOrigin(), "AvocaArc", 1)
@@ -31,6 +32,7 @@ function FollowMoveMixin:SetFollowTarget(target)
     end
     
 end
+
 function Hive:GetCanBeUsed(player, useSuccessTable)
         useSuccessTable.useSuccess = false
 end

@@ -86,4 +86,3 @@ kBioMassFourTime = 20
 kHiveHealth = 8000    kHiveArmor = 2000    kHivePointValue = 30
 kBioMassUpgradePointValue = 10 kUgradedHivePointValue = 5
 kMatureHiveHealth = 8000 kMatureHiveArmor = 2000
-kMatureHiveHealth = 8000 kMatureHiveArmor = 2000

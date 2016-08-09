@@ -90,7 +90,7 @@ local alive = false
             if player:GetIsAlive() and alive == false then alive = true end
             if ( player:GetIsAlive() and  player.GetIsNanoShielded and not player:GetIsNanoShielded()) then player:ActivateNanoShield() end
            if player:isa("Marine") and( player:GetHealth() == player:GetMaxHealth() ) then
-           local addarmoramount = 3 * player:GetArmorLevel()
+           local addarmoramount = 4 * player:GetArmorLevel()
            addarmoramount = who:GetInAttackMode() and addarmoramount * 1.5 or addarmoramount
            player:AddHealth(addarmoramount, false, not true, nil, nil, true)
            else
@@ -115,11 +115,11 @@ local attacking = self.deployMode == ARC.kDeployMode.Deployed
 local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self)  
 --Print("inradius is %s", inradius) 
 
-local shouldstop = PlayersNearby(self) == 0
+local shouldstop = not PlayersNearby(self)
 --Print("shouldstop is %s", shouldstop) 
 local shouldmove = not shouldstop and not moving and not inradius
 --Print("shouldmove is %s", shouldmove) 
-local shouldstop = moving and PlayersNearby(self) == 0
+local shouldstop = moving and not PlayersNearby(self)
 --Print("shouldstop is %s", shouldstop) 
 local shouldattack = inradius and not attacking 
 --Print("shouldattack is %s", shouldattack) 
@@ -196,7 +196,7 @@ local damagemult = self:GetInAttackMode() and .25 or 0
             damagemult = 8
             damagemult =  damagemult * Clamp(doer:GetHealthScalar(), .25, 1)
            elseif attacker:isa("Bomb") then
-           damagemult = .3
+           damagemult = .45
            end
          end
         damageTable.damage = damageTable.damage * damagemult
@@ -242,7 +242,7 @@ function AvocaArc:BeginTimer()
 end
 function AvocaArc:OnAdjustModelCoords(coords)
     
-    	local scale = 1.37 
+    	local scale = self:GetInAttackMode() and 1.37 or 1
         coords.xAxis = coords.xAxis * scale
         coords.yAxis = coords.yAxis * scale
         coords.zAxis = coords.zAxis * scale
@@ -275,7 +275,7 @@ local function DestroPanicAttackInRadius(where)
 end
 if Server then
 function AvocaArc:PreOnKill(attacker, doer, point, direction)
-AddPayLoadTime(30) 
+AddPayLoadTime(8) 
 DestroPanicAttackInRadius(self:GetOrigin())
 end 
 function AvocaArc:UpdateMoveOrder(deltaTime)

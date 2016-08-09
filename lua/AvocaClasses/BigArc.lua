@@ -18,6 +18,13 @@ function BigArc:GetMaxArmor()
 end
 function BigArc:GiveDeploy()
 self:GiveOrder(kTechId.ARCDeploy, self:GetId(), self:GetOrigin(), nil, true, true)
+ self:AddTimedCallback(BigArc.Forgivemeforthis, 4)
+ return false
+end
+function BigArc:Forgivemeforthis()
+ self:AdjustMaxHealth(self:GetMaxHealth())
+ self:AdjustMaxArmor(self:GetMaxArmor())
+ return false
 end
 local function MoveToHives(who) --Closest hive from origin
 local where = who:GetOrigin()
@@ -55,7 +62,7 @@ local function BuildAlienHive(who)
 end
 function BigArc:OnKill(attacker, doer, point, direction)
 local child = GetTechPoint(self:GetOrigin())
-if Server then AddPayLoadTime(45) end
+if Server then AddPayLoadTime(8) end
 BuildAlienHive(child)
 end
 local function CheckForAndActAccordingly(who)
