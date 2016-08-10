@@ -10,13 +10,7 @@ function Marine:GetMaxSpeed(possible)
 
 end 
 
-local orig_Marine_OnCreate = Marine.OnCreate
-function Marine:OnCreate()
-    orig_Marine_OnCreate(self)
-    if Client then
-        GetGUIManager():CreateGUIScriptSingle("GUIInsight_TopBar")  
-    end
-end
+
 
 local orig_Alien_OnCreate = Alien.OnCreate
 function Alien:OnCreate()
@@ -30,6 +24,16 @@ end
 
 
 if Server then
+
+
+local orig_Marine_InitWeapons = Marine.InitWeapons
+function Marine:InitWeapons()
+    orig_Marine_InitWeapons(self)
+    self:GiveItem(Welder.kMapName)
+    self:SetQuickSwitchTarget(Pistol.kMapName)
+    self:SetActiveWeapon(Rifle.kMapName)
+end
+
 
 function Alien:HiveCompleteSoRefreshTechsManually()
 UpdateAvocaAvailability(self, self:GetTierOneTechId(), self:GetTierTwoTechId(), self:GetTierThreeTechId())

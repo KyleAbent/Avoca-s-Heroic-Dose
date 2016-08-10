@@ -86,3 +86,14 @@ kBioMassFourTime = 20
 kHiveHealth = 8000    kHiveArmor = 2000    kHivePointValue = 30
 kBioMassUpgradePointValue = 10 kUgradedHivePointValue = 5
 kMatureHiveHealth = 8000 kMatureHiveArmor = 2000
+
+RoboticsFactory.kRolloutLength = .25
+
+
+kWeapons1ResearchTime = 30-- 3.5 min
+kWeapons2ResearchTime = 60-- 4.5 min
+kWeapons3ResearchTime = 90 -- 6 min
+kArmor1ResearchTime = 30 -- 30 sec
+kArmor2ResearchTime = 60 -- 1.5min
+kArmor3ResearchTime = 90 -- 3 min
+

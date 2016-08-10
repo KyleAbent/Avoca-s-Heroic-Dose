@@ -193,7 +193,7 @@ function AvocaArc:ModifyDamageTaken(damageTable, attacker, doer, damageType)
 local damagemult = self:GetInAttackMode() and .25 or 0
         if doer then 
            if doer:isa("PanicAttack") then 
-            damagemult = 8
+            damagemult = 6.5
             damagemult =  damagemult * Clamp(doer:GetHealthScalar(), .25, 1)
            elseif attacker:isa("Bomb") then
            damagemult = .45
@@ -275,7 +275,7 @@ local function DestroPanicAttackInRadius(where)
 end
 if Server then
 function AvocaArc:PreOnKill(attacker, doer, point, direction)
-AddPayLoadTime(8) 
+AddPayLoadTime(16) 
 DestroPanicAttackInRadius(self:GetOrigin())
 end 
 function AvocaArc:UpdateMoveOrder(deltaTime)

@@ -4,6 +4,11 @@ Script.Load("lua/Overwrites/CustomLightRules.lua")
 if Server then
 Script.Load("lua/Overwrites/EggSpawn.lua")
 end
+
+function CorrodeMixin:OnUpdate(deltaTime)   
+   return
+end
+
 if Server then
 function CommandStructure:LoginPlayer(player,forced)
  return
@@ -16,6 +21,11 @@ end
         
     end
 
+end
+function CorrodeMixin:__initmixin()
+
+return
+    
 end
 
 function FollowMoveMixin:SetFollowTarget(target)

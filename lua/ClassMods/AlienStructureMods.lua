@@ -167,7 +167,7 @@ end
 local orig_Hive_OnKill = Hive.OnKill
 function Hive:OnKill(attacker, doer, point, direction)
  self:UpdateAliensWeaponsManually()
-if self:GetIsBuilt() then AddPayLoadTime(8) end
+if self:GetIsBuilt() then AddPayLoadTime(16) end
 local child = GetTechPoint(self:GetOrigin())
 BuildRoomPower(child)
 DestroyAvocaArcInRadius(self:GetOrigin())

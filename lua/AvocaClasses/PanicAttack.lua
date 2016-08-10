@@ -9,7 +9,7 @@ function PanicAttack:OnCreate()
  self:AdjustMaxArmor(self:GetMaxArmor())
 end
 function PanicAttack:GetMaxHealth()
-    return kMatureHydraHealth * 4
+    return kMatureHydraHealth
 end
 function PanicAttack:GetMaxArmor()
     return 0

@@ -113,7 +113,7 @@ function Janitor:AttackTarget()
     CreateSpikeProjectile(self)    
     self:TriggerEffects("hydra_attack")
     
-    self.timeOfNextFire = Shared.GetTime() + 1.5
+    self.timeOfNextFire = Shared.GetTime() + 1.25
     
 end
 

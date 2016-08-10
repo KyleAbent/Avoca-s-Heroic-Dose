@@ -20,7 +20,7 @@ end
 function WhipAvoca:ModifyDamageTaken(damageTable, attacker, doer, damageType)
 local damage = 1
         if doer and doer:isa("MainRoomArc") then 
-         damage = damage * .3
+         damage = damage * .35
          -- damage = damage * Clamp(doer:GetHealthScalar(), 0.25, 1) maybe not sure
          end
         damageTable.damage = damageTable.damage * damage
