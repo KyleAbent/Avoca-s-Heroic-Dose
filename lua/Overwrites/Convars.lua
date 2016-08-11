@@ -96,4 +96,5 @@ kWeapons3ResearchTime = 90 -- 6 min
 kArmor1ResearchTime = 30 -- 30 sec
 kArmor2ResearchTime = 60 -- 1.5min
 kArmor3ResearchTime = 90 -- 3 min
+kAdvancedArmoryResearchTime = 30
 

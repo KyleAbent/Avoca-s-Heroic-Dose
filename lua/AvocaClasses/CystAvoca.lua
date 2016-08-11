@@ -26,7 +26,7 @@ return 999
 end
 
 function CystAvoca:GetMaxSpeed()
-    return 3
+    return 3 * self:GetHealthScalar()
 end
 if Server then
 
@@ -228,7 +228,7 @@ function CystAvoca:ModifyDamageTaken(damageTable, attacker, doer, damageType, hi
 
 end
 function CystAvoca:Synchronize()
-    if self.moving then return true end
+    if self.moving or not self:GetIsAlive() then return true end
        Print("Calling to sync")
                      MoveEggs(self)
                      local whips = GetEntitiesForTeamWithinRange("WhipAvoca", 2, self:GetOrigin(), 999999)
@@ -278,7 +278,7 @@ end
 
 function CystAvoca:OnAdjustModelCoords(modelCoords)
     local coords = modelCoords
-        local scale =  4 * self:GetHealthScalar()
+        local scale =  Clamp(4 * self:GetHealthScalar(), 1, 4)
         scale = ConditionalValue(self:GetMaxHealth() == 8191, scale * 2, scale) -- lulz
         scale = Clamp(scale, 2, 8)
        if scale >= 1 then

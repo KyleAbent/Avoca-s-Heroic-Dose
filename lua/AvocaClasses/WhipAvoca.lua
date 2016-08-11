@@ -39,8 +39,7 @@ function WhipAvoca:OnGetMapBlipInfo()
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
 function WhipAvoca:ActivateSelfDestruct()
-            --  self:AddTimedCallback(WhipAvoca.Killme, 16)
-            --wait why?
+        self:Kill()
 end
 function WhipAvoca:UpdateRootState()
     
@@ -58,10 +57,6 @@ function WhipAvoca:UpdateRootState()
     
 end
 
-function WhipAvoca:Killme()
-    self:DeductHealth(100)
-     return true
-end
 function WhipAvoca:OnInitialized()
   Whip.OnInitialized(self)
       

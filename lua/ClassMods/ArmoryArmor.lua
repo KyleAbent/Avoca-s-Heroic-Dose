@@ -61,11 +61,11 @@ function Armory:ResupplyPlayer(player)
                    //Heal Health First, Then Armor, 3 armor per level of armor
                    //then add level bonus
            if ( player:GetHealth() == player:GetMaxHealth() ) then
-           local addarmoramount = 3 * player:GetArmorLevel()
+           local addarmoramount = kArmoryAvoArcAddArmrAmt * player:GetArmorLevel()
            
            player:AddHealth(addarmoramount, false, not true, nil, nil, true)
            else
-           player:AddHealth(Armory.kHealAmount, false, false, nil, nil, true)   
+           player:AddHealth(Armory.kHealAmount * 2, false, false, nil, nil, true)   
            end
            
         self:TriggerEffects("armory_health", {effecthostcoords = Coords.GetTranslation(player:GetOrigin())})

@@ -90,7 +90,7 @@ local alive = false
             if player:GetIsAlive() and alive == false then alive = true end
             if ( player:GetIsAlive() and  player.GetIsNanoShielded and not player:GetIsNanoShielded()) then player:ActivateNanoShield() end
            if player:isa("Marine") and( player:GetHealth() == player:GetMaxHealth() ) then
-           local addarmoramount = 4 * player:GetArmorLevel()
+           local addarmoramount = kArmoryAvoArcAddArmrAmt * player:GetArmorLevel()
            addarmoramount = who:GetInAttackMode() and addarmoramount * 1.5 or addarmoramount
            player:AddHealth(addarmoramount, false, not true, nil, nil, true)
            else
