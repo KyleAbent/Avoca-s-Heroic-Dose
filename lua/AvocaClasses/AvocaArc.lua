@@ -195,8 +195,8 @@ local damagemult = self:GetInAttackMode() and .25 or 0
            if doer:isa("PanicAttack") then 
             damagemult = 6.5
             damagemult =  damagemult * Clamp(doer:GetHealthScalar(), .25, 1)
-           elseif attacker:isa("Bomb") then
-           damagemult = .45
+           else
+           damagemult = 0
            end
          end
         damageTable.damage = damageTable.damage * damagemult

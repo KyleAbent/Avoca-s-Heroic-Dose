@@ -33,7 +33,7 @@ function Janitor:Killme()
 
      --     local wherelocation = GetLocationForPoint(self:GetOrigin())
    -- if not wherelocation or wherelocation:GetIsPowerUp() then 
-      self:DeductHealth(100)
+      self:DeductHealth(124)
      -- end
      return self:GetIsAlive()
 end

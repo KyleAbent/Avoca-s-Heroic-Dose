@@ -3,7 +3,17 @@ Script.Load("lua/Modifications/Remixes.lua")
 Script.Load("lua/Modifications/Criticisms.lua")
 Script.Load("lua/Modifications/GameStart.lua")
 
+/*
+kMarineHealth = 200
+kJetpackHealth = 200
 
+
+kSkulkGestateTime = 1
+kGorgeGestateTime = 1
+kLerkGestateTime = 1
+kFadeGestateTime = 1
+kOnosGestateTime = 1
+*/
 
 
 if Server then
@@ -92,7 +102,7 @@ function UpdateAvocaAvailability(forAlien, tierOneTechId, tierTwoTechId, tierThr
         end
           return false
 end
-
+/*
 -- Find team start with team 0 or for specified team. Remove it from the list so other teams don't start there. Return nil if there are none.
 function NS2Gamerules:ChooseTechPoint(techPoints, teamNumber)
 
@@ -139,7 +149,7 @@ function NS2Gamerules:ChooseTechPoint(techPoints, teamNumber)
     
 end
 
-
+*/
 
 
     

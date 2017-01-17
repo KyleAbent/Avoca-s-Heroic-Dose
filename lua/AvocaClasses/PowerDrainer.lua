@@ -12,12 +12,13 @@ function PowerDrainer:OnCreate()
  self:AdjustMaxArmor(self:GetMaxArmor())
 end
 function PowerDrainer:GetMaxHealth()
-    return kMatureWhipHealth
+    return kMatureWhipHealth * 1.3
 end 
 
 function PowerDrainer:GetMaxArmor()
-    return kMatureWhipArmor
+    return kMatureWhipArmor * 1.3
 end 
+
 function PowerDrainer:OnInitialized()
   Whip.OnInitialized(self)
       self:SetModel(Whip.kModelName, PowerDrainer.kAnimationGraph)

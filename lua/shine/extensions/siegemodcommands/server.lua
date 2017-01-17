@@ -130,7 +130,20 @@ end
 local MineModeCommand = self:BindCommand( "sh_minemode", "minemode", MineMode, true)
 MineModeCommand:Help( "Pregame only mine fun" )
 */
-
+local function OpenFrontDoors(self)
+    local entityList = Shared.GetEntitiesWithClassname("SandCastle")
+    if entityList:GetSize() > 0 then
+               local sandcastle = entityList:GetEntityAtIndex(0)
+               sandcastle.FrontTimer = 0
+    end
+end
+local function OpenSiegeDoors(self)
+    local entityList = Shared.GetEntitiesWithClassname("SandCastle")
+    if entityList:GetSize() > 0 then
+               local sandcastle = entityList:GetEntityAtIndex(0)
+               sandcastle.SiegeTimer = 0
+    end
+end
 local function Stalemate( Client )
 local Gamerules = GetGamerules()
 if not Gamerules then return end
@@ -144,13 +157,14 @@ local Gamerules = GetGamerules()
 
      if String == "Front" or String == "front" then
        Gamerules:OpenFrontDoors()
+         OpenFrontDoors(self)
      elseif String == "Side" or String == "side" then
-       Gamerules:OpenSideDoors()
+      -- Gamerules:OpenSideDoors()
      elseif String == "Siege" or String == "siege" then
-        Gamerules:OpenSiegeDoors()
+        OpenSiegeDoors(self)
      elseif String == "funcmoveable" or String == "FuncMoveable" then
-        Gamerules:ToggleFuncMoveable()
-         self:NotifyGeneric( nil, "toggled the %s doors", true, String)  
+     --   Gamerules:ToggleFuncMoveable()
+     --    self:NotifyGeneric( nil, "toggled the %s doors", true, String)  
          return
     end 
   self:NotifyGeneric( nil, "Opened the %s doors", true, String)  

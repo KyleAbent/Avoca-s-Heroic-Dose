@@ -1,54 +1,5 @@
---arcs/macs spawning without robo
-if Server then
 
-local function GetMacsAmount()
-    local basemac = 0
-    local bigmac = 0
-    local total = 0
-        for index, mac in ientitylist(Shared.GetEntitiesWithClassname("MAC")) do
-             if mac:isa("BaseMac") then
-             basemac = basemac + 1
-             elseif mac:isa("BigMac") then
-             basemac = basemac + 1
-             end
-             
-         end
-         total = basemac + bigmac
-    return  basemac, bigmac, total
-end
-local function MacQualifications(self)
-    local basemac,bigmac, total = GetMacsAmount()
- local boolean = false
-     if total <= 7 then
-            boolean = true
-      end
-      
-      return boolean
-        
-end
-local function GetMacMapName()
-   local basemac,bigmac, total = GetMacsAmount()
-   if basemac<= 7 then
-       return BaseMac.kMapName
-   elseif bigmac <= 3 then
-        return  BigMac.kMapName
-   end
 
-end
-function Conductor:CheckAndMaybeBuildMac()
-  local chair = nil
-            for _, mainent in ientitylist(Shared.GetEntitiesWithClassname("CommandStructure")) do
-                    if mainent:GetTeamNumber() == 1 then chair = mainent break end
-             end
-             
-           if MacQualifications(self) then
-           local mac = CreateEntity(GetMacMapName(), FindFreeSpace(chair:GetOrigin()), 1 )
-           end
-           
-           return true
-end
-
-end
 
 
 local kOpenSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_open")

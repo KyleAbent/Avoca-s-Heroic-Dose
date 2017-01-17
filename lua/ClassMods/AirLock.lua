@@ -48,7 +48,7 @@ function Location:BaseDefense()
           local spawnpoint = GetRandom(self, self.name)
             if spawnpoint ~= nil and IsPowerUp(self) then 
                  -- Print("SpawnDefense triggered")
-              CreateEntity(FireFlameCloud.kMapName, spawnpoint, 1) --oh fuck i had this set as team 2 LOL 
+              CreateEntity(FireFlameCloud.kMapName, spawnpoint, 1)
            end
    end
      return GetCanSpawn(self)
@@ -64,11 +64,4 @@ function Location:GetIsAirLock(ask)
      return boolean
 end
 
-if Client then
 
-    function Location:HideDank()
-          --nevermind
-    end
-    
-   
-end

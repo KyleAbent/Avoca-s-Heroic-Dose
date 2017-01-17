@@ -21,21 +21,19 @@ end
 local function GetBioMassLevel()
            local teamInfo = GetTeamInfoEntity(2)
            local bioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
-           return math.round(bioMass / 4, 1, 3)
+           --Print("biomass is %s", bioMass)
+           return bioMass
 end
 local function SpawnRandomEgg(who, where)
 
 
        
       local eggtechmapnames = {}
-      local gorgechance = math.random(1,2)
-      local lerkchance = math.random(1,3)
-      local fadechance = math.random(1,4)
-      local onoschance = math.random(1,5)
-      if gorgechance == 1 and GetBioMassLevel() >= 3 then  table.insert(eggtechmapnames, kTechId.GorgeEgg) end
-      if lerkchance == 1 and GetBioMassLevel() >= 5 then   table.insert(eggtechmapnames, kTechId.LerkEgg) end
-      if fadechance == 1 and GetBioMassLevel() >= 7 then   table.insert(eggtechmapnames, kTechId.FadeEgg) end
-      if onoschance == 1 and GetBioMassLevel() >= 9 then   table.insert(eggtechmapnames, kTechId.OnosEgg) end
+      local chance = math.random(1,5)
+      if chance == 2 and GetBioMassLevel() >= 3 then  table.insert(eggtechmapnames, kTechId.GorgeEgg) end
+      if chance == 3 and GetBioMassLevel() >= 5 then   table.insert(eggtechmapnames, kTechId.LerkEgg) end
+      if chance == 4 and GetBioMassLevel() >= 7 then   table.insert(eggtechmapnames, kTechId.FadeEgg) end
+      if chance == 5 and GetBioMassLevel() >= 9 then   table.insert(eggtechmapnames, kTechId.OnosEgg) end
       local egg = CreateEntity(Egg.kMapName, where, 2)
       egg:SetHive(who)
       

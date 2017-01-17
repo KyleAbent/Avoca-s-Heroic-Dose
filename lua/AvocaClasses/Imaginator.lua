@@ -252,7 +252,7 @@ local success = false
                           if range >=  minrange  then
                            local entity = CreateEntity(tospawn, randomspawn, 1)
                                entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
-                               BuildNotificationMessage(randomspawn, self, tospawn)
+                             --  BuildNotificationMessage(randomspawn, self, tospawn)
                                success = true
                           end --
                      else -- it tonly takes 1!
