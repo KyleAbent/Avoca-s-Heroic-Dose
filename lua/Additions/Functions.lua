@@ -1,3 +1,81 @@
+function GetRandomActivePower()
+  local powers = {}
+  for _, power in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
+        if power:GetIsBuilt() and not power:GetIsDisabled() then table.insert(powers,power) end
+    end
+    return table.random(powers)
+end
+function GetIsRoomPowerDown(who)
+ local location = GetLocationForPoint(who:GetOrigin())
+  if not location then return false end
+ local powernode = GetPowerPointForLocation(location.name)
+ if powernode and powernode:GetIsDisabled()  then return true end
+ return false
+end
+local kExtents = Vector(0.4, 0.5, 0.4) -- 0.5 to account for pathing being too high/too low making it hard to palce tunnels
+function isPathable(position)
+--Gorgetunnelability local function
+
+    local noBuild = Pathing.GetIsFlagSet(position, kExtents, Pathing.PolyFlag_NoBuild)
+    local walk = Pathing.GetIsFlagSet(position, kExtents, Pathing.PolyFlag_Walk)
+    return not noBuild and walk
+end
+function InsideLocation(ents, teamnum)
+local origin = nil
+  if #ents == 0  then return origin end
+  for i = 1, #ents do
+    local entity = ents[i]   
+      if teamnum == 2 then
+    if entity:isa("Alien") and entity:GetIsAlive() and isPathable( entity:GetOrigin() ) then return FindFreeSpace(entity:GetOrigin(), math.random(2, 4), math.random(8,24), true) end
+    elseif teamnum == 1 then
+    if entity:isa("Marine") and entity:GetIsAlive() and isPathable( entity:GetOrigin() ) then return FindFreeSpace(entity:GetOrigin(), math.random(2,4), math.random(8,24), false ) end
+    end 
+  end
+return origin
+  
+end
+function GetAllLocationsWithSameName(origin)
+local location = GetLocationForPoint(origin)
+if not location then return end
+local locations = {}
+local name = location.name
+ for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
+        if location.name == name then table.insert(locations, location) end
+    end
+    return locations
+end
+ function GetHasActiveObsInRange(where)
+
+            local obs = GetEntitiesForTeamWithinRange("Observatory", 1, where, kScanRadius)
+            if #obs == 0 then return false end
+            for i = 1, #obs do
+             local ent = obs[i]
+             if GetIsUnitActive(ent) then return true end
+            end
+            
+            return false  
+                
+end
+function GetHasPGInRoom(where)
+
+            local pgs = GetEntitiesForTeamWithinRange("PhaseGate", 1, where, 999999)
+            if #pgs == 0 then return false end
+            for i = 1, #pgs do
+             local ent = pgs[i]
+              if GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(where) then return true end
+            end
+            
+            return false  
+                
+end
+function GetIsTimeUp(timeof, timelimitof)
+ local time = Shared.GetTime()
+ local boolean = (timeof + timelimitof) < time
+ --Print("timeof is %s, timelimitof is %s, time is %s", timeof, timelimitof, time)
+ -- if boolean == true then Print("GetTimeIsUp boolean is %s, timelimitof is %s", boolean, timelimitof) end
+ return boolean
+end
+
 function AddPayLoadTime(seconds)
     local entityList = Shared.GetEntitiesWithClassname("Conductor")
     if entityList:GetSize() > 0 then
@@ -34,10 +112,10 @@ function GetIsPointInMarineBase(where)
           return pointlocation == cclocation
     
 end
-function FindFreeSpace(where, mindistance, maxdistance)    
+function FindFreeSpace(where, mindistance, maxdistance, infestreq)    
      if not mindistance then mindistance = .5 end
      if not maxdistance then maxdistance = 24 end
-        for index = 1, 8 do
+        for index = 1, math.random(4,8) do
            local extents = LookupTechData(kTechId.Skulk, kTechDataMaxExtents, nil)
            local capsuleHeight, capsuleRadius = GetTraceCapsuleFromExtents(extents)  
            local spawnPoint = GetRandomSpawnForCapsule(capsuleHeight, capsuleRadius, where, mindistance, maxdistance, EntityFilterAll())
@@ -51,12 +129,21 @@ function FindFreeSpace(where, mindistance, maxdistance)
            local wherelocation = GetLocationForPoint(where)
            wherelocation = wherelocation and wherelocation.name or nil
            local sameLocation = spawnPoint ~= nil and locationName == wherelocation
+           
+           if infestreq then
+             sameLocation = sameLocation and GetIsPointOnInfestation(spawnPoint)
+           end
         
            if spawnPoint ~= nil and sameLocation   then
               return spawnPoint
            end
        end
-           Print("No valid spot found for FindFreeSpace")
+--           Print("No valid spot found for FindFreeSpace")
+          if infestreq and not GetIsPointOnInfestation(where) then
+             if Server then CreateEntity(Cyst.kMapName, FindFreeSpace(where,1, 6),  2) end
+             --For now anyway, bite me. Remove later? :X or tres spend. Who knows right now. I wanna see this in action.
+          end
+          
            return where
 end
      function FindArcSpace(where)    

@@ -136,36 +136,36 @@ local count = 0
                 
 end
 local function GetMarineSpawnList()
-
+--Requires more complexity like siege simple 8.25.17
 local tospawn = {}
 
      if TresCheck(1,kPhaseGateCost) then
-     table.insert(tospawn, PhaseGate.kMapName)
+     table.insert(tospawn, kTechId.PhaseGate)
        end
        
     if TresCheck(1,kArmoryCost) then
-    table.insert(tospawn, Armory.kMapName)
+    table.insert(tospawn, kTechId.Armory)
     end
     
       if TresCheck(1,kObservatoryCost) then
-       table.insert(tospawn, Observatory.kMapName)
+       table.insert(tospawn, kTechId.Observatory)
       end
       
      if TresCheck(3) then
-     table.insert(tospawn, Scan.kMapName)
+     table.insert(tospawn, kTechId.Scan)
      end
        
       if TresCheck(1,kRoboticsFactoryCost) then
-      table.insert(tospawn, RoboticsFactory.kMapName)
+      table.insert(tospawn, kTechId.RoboticsFactory)
       end
       
 
     if TresCheck(1,8) then
-    table.insert(tospawn, SentryAvoca.kMapName)
+    table.insert(tospawn, kTechId.Sentry)
     end
     
      if TresCheck(1,kPrototypeLabCost) then
-     table.insert(tospawn, PrototypeLab.kMapName)
+     table.insert(tospawn, kTechId.PrototypeLab)
      end
      
      --if TresCheck(4) then
@@ -204,13 +204,6 @@ local function GetTechId(mapname)
       end
       return nil
 end
-local function GetActiveAirLock()
-  local airlocks = {}
-  for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
-        if location:GetIsAirLock(true) then table.insert(airlocks,location) end
-    end
-    return table.random(airlocks) 
-end
 local function GetScanMinRangeReq(where)
 
             local obs = #GetEntitiesForTeamWithinRange("Observatory", 1, where, kScanRadius)
@@ -224,42 +217,65 @@ local function GetScanMinRangeReq(where)
 end
 local function BuildNotificationMessage(where, self, mapname)
 end
+
+local function FindPosition(location, searchEnt, teamnum)
+  if not location or #location == 0  then return end
+  local origin = nil
+  local where = {}
+    for i = 1, #location do
+    local location = location[i]   
+      local ents = location:GetEntitiesInTrigger()
+      local potential = InsideLocation(ents, teamnum)
+      if potential ~= nil then  table.insert(where, potential ) end 
+  end
+     for _, entity in ipairs( GetEntitiesWithMixinForTeamWithinRange("Construct", teamnum, searchEnt:GetOrigin(), 24) ) do
+       if  GetLocationForPoint(entity:GetOrigin()) ==  GetLocationForPoint(searchEnt:GetOrigin()) then
+          table.insert(where, entity:GetOrigin() )
+       end
+     end
+  if #where == 0 then return nil end
+  local random = table.random(where)
+  local actualWhere = FindFreeSpace(random)
+  if random == actualWhere then return nil end -- ugh
+  return actualWhere
+
+end
+
 function Imaginator:ActualFormulaMarine()
 
---Print("AutoBuildConstructs")
 local randomspawn = nil
-local tospawn = GetMarineSpawnList()
-local airlock = GetActiveAirLock()
+local tospawn, cost, gamestarted = GetMarineSpawnList(self)
+ --ManageMacs() 
+  --ManageDropExos(self) not working debug
+--if gamestarted and not string.find(Shared.GetMapName(), "pl_") then ManageRoboticFactories(self)  ManageArcs(self) end
+--if  GetIsTimeUp(self.lastMarineBeacon, 30) then self:ManageMarineBeacons() end
+local powerpoint = GetRandomActivePower()
 local success = false
-            if airlock and tospawn then
-                local powerpoint = GetPowerPointForLocation(airlock.name)
-             if powerpoint then
-                local randomspawn = FindFreeSpace(FindRandomPerson(airlock, powerpoint))
+local entity = nil
+            if powerpoint and tospawn then
+                 local potential = FindPosition(GetAllLocationsWithSameName(powerpoint:GetOrigin()), powerpoint, 1)
+                 if potential == nil then local roll = math.random(1,3) if roll == 3 then self:ActualFormulaMarine() return else return end end
+                 randomspawn = FindFreeSpace(potential, 2.5)
             if randomspawn then
-                local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetMapName() == tospawn end)
+                local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetTechId() == tospawn or ( ent:GetTechId() == kTechId.AdvancedArmory and tospawn == kTechId.Armory)  or ( ent:GetTechId() == kTechId.ARCRoboticsFactory and tospawn == kTechId.RoboticsFactory) end)
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
-                      --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
-                          local minrange = 12
-                          if tospawn == Armory.kMapName then minrange = 16 end
-                          if tospawn == PhaseGate.kMapName then minrange = 54 end
-                          if tospawn == Observatory.kMapName then minrange = kScanRadius end
-                          if tospawn == RoboticsFactory.kMapName then minrange = 52  end
-                          if tospawn == SentryAvoca.kMapName then minrange = GetSentryMinRangeReq(randomspawn) end
-                          if tospawn == PrototypeLab.kMapName then minrange = 52  end
-                          if tospawn == Scan.kMapName then minrange = GetScanMinRangeReq(randomspawn)  cost = 3 end
-                          if tospawn == SentryBattery.kMapName then minrange = 16 end
+                  --    Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
+                          local minrange = math.random(4,24) --nearestof:GetMinRangeAC()
+                          if tospawn == kTechId.Scan and GetHasActiveObsInRange(randomspawn) then return end
+                          if tospawn == kTechId.PhaseGate and GetHasPGInRoom(randomspawn) then return end
+                          
                           if range >=  minrange  then
-                           local entity = CreateEntity(tospawn, randomspawn, 1)
-                               entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
-                             --  BuildNotificationMessage(randomspawn, self, tospawn)
+                            entity = CreateEntityForTeam(tospawn, randomspawn, 1)
+                        if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
+                               --BuildNotificationMessage(randomspawn, self, tospawn)
                                success = true
                           end --
                      else -- it tonly takes 1!
-                        CreateEntity(tospawn, randomspawn, 1)
+                       entity = CreateEntityForTeam(tospawn, randomspawn, 1)
+                        if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                         success = true
-                     end
-               end   
+                     end  
             end
   end
     
@@ -275,24 +291,28 @@ local function GetAlienSpawnList(cystonly)
 
 local tospawn = {}
 
-      if cystonly then 
-      return AutoCyst.kMapName
+      if cystonly == true then 
+      return kTechId.Cyst
       end
       
+       if TresCheck(2,kCragCost) then
+      table.insert(tospawn, kTechId.Crag)
+          end
+          
           if TresCheck(2,kShiftCost) then
-      table.insert(tospawn, Shade.kMapName)
+      table.insert(tospawn, kTechId.Shade)
           end
           if TresCheck(2,kShadeCost) then
-      table.insert(tospawn, Shift.kMapName)
+      table.insert(tospawn, kTechId.Shift)
           end
           if TresCheck(2,kWhipCost) then
-      table.insert(tospawn, Whip.kMapName)
+      table.insert(tospawn, kTechId.Whip)
       end
       
       return table.random(tospawn)
 end
 function Imaginator:AlienConstructs(cystonly)
-
+--Print("AlienConstructs cystonly %s", cystonly)
        for i = 1, 8 do
          local success = self:ActualAlienFormula(cystonly)
          if success == true then break end
@@ -302,39 +322,96 @@ return true
 
 end
 
+local function GetAlienSpawnNearEntity()
+ local ents = {}
+  local location = nil
+  --Fine tuned ;)
+            for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
+                    if powerpoint and  (powerpoint:GetIsDisabled() or ( powerpoint:GetIsSocketed() and not powerpoint:GetIsBuilt() ) )  then
+                    table.insert(ents, powerpoint)
+                    end
+             end
+
+            for _, cyst in ientitylist(Shared.GetEntitiesWithClassname("Cyst")) do
+               if cyst:GetIsBuilt() then
+                  --  local location = GetLocationForPoint(cyst:GetOrigin())
+                 --   local powerpoint =  location and GetPowerPointForLocation(location.name)
+                 --   if powerpoint and not powerpoint:GetIsDisabled() and powerpoint:GetIsBuilt()  then
+                     table.insert(ents, cyst)
+                   -- end
+                end
+             end
+        
+             for _, entity in ipairs( GetEntitiesWithMixinForTeam("Construct", 2 ) ) do
+               if not entity:GetGameEffectMask(kGameEffect.OnInfestation) then 
+                  local location = GetLocationForPoint(entity:GetOrigin())
+                  local powerpoint =  location and GetPowerPointForLocation(location.name)
+                  if powerpoint and powerpoint:GetIsDisabled() then
+                     table.insert(ents, entity)
+                   end
+               end
+            end
+       
+        
+ if #ents == 0 then return nil end
+return table.random(ents)
+
+end
+
+local function FakeCyst(where) 
+         local cyst = GetEntitiesWithinRange("Cyst",where, kCystRedeployRange)
+         local cost = 1 
+        if not (#cyst >=1) and TresCheck(2, cost) then
+        where = FindFreeSpace(where, 1, kCystRedeployRange-1, false)
+        entity = CreateEntityForTeam(kTechId.Cyst, where, 2)
+        entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
+        end
+end
+
+
 function Imaginator:ActualAlienFormula(cystonly)
 --Print("AutoBuildConstructs")
+--local  hivecount = #GetEntitiesForTeam( "Hive", 2 )
+--if hivecount < 3 and not GetSandCastle():GetSDBoolean() then return end -- build hives first, 6.18.17 maybe if Sg open and tres>=80 then build other..
 local randomspawn = nil
-local powerPoints = GetDisabledPowerPoints()
-local tospawn = GetAlienSpawnList(cystonly)
+local spawnNearEnt = GetAlienSpawnNearEntity() 
+local tospawn = GetAlienSpawnList(self, cystonly) --, cost, gamestarted = GetAlienSpawnList(self, cystonly)
 local success = false
-     if powerPoints and tospawn then
-                local powerpoint = table.random(powerPoints)
-             if powerpoint and powerpoint:GetIsDisabled() then
-                local randomspawn = FindFreeSpace(FindRandomPerson(GetLocationForPoint(powerpoint:GetOrigin()), powerpoint))
+local entity = nil
+
+if spawnNearEnt then
+Print("ActualAlienFormula cystonly %s, spawnNearEnt %s, tospawn %s", cystonly,  spawnNearEnt:GetMapName() or nil, LookupTechData(tospawn, kTechDataMapName)  )
+end
+
+     if spawnNearEnt and tospawn then     
+                 local potential = FindPosition(GetAllLocationsWithSameName(spawnNearEnt:GetOrigin()), spawnNearEnt, 2)
+                 if potential == nil then local roll = math.random(1,3) if roll == 3 then self:ActualAlienFormula() return else return end  end              
+                 randomspawn = FindFreeSpace(potential, math.random(2.5, 4) , math.random(8, 16), not tospawn == kTechId.Cyst )
             if randomspawn then
-                local nearestof = GetNearestMixin(randomspawn, "Construct", 2, function(ent) return ent:GetMapName() == tospawn end)
+                local nearestof = GetNearestMixin(randomspawn, "Construct", 2, function(ent) return ent:GetTechId() == tospawn end)
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
+                      Print("ActualAlienFormula range is %s", range)
                       --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
-                          local minrange = 12
-                          if tospawn == Cyst.kMapName then minrange = kCystRedeployRange end
-                          if tospawn == Shade.kMapName then minrange = 17 end
-                          if tospawn == Shift.kMapName then minrange = kEnergizeRange end
-                          if tospawn == Whip.kMapName then minrange = GetWhipMinRangeReq(randomspawn) end
+                          local minrange =  nearestof.GetMinRangeAC and nearestof:GetMinRangeAC() or math.random(4,8) --nearestof:GetMinRangeAC()
+                         -- if tospawn == kTechId.NutrientMist then minrange = NutrientMist.kSearchRange end
                           if range >=  minrange then
-                           CreateEntity(tospawn, randomspawn, 2)
+                           Print("ActualAlienFormula range range >=  minrange")
+                            entity = CreateEntityForTeam(tospawn, randomspawn, 2)
+                           -- cost = GetAlienCostScalar(self, cost)
+                          if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                           end
                           success = true
                      else -- it tonly takes 1!
-                        local entity = CreateEntity(tospawn, randomspawn, 2)
-                        entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
+                         entity = CreateEntityForTeam(tospawn, randomspawn, 2)
+                       -- if entity:isa("Cyst") then CystChain(entity:GetOrigin()) end
+                           if not entity:isa("Cyst") then FakeCyst(entity:GetOrigin()) end
+                        if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                         success = true
-                     end
-               end   
+                     end 
             end
   end
-    
+   -- if success and entity then self:AdditionalSpawns(entity) end
   return success
  end
 function Imaginator:AutoBuildResTowers()
