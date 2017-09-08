@@ -20,7 +20,7 @@ function SaltMixin:SetIsACreditStructure(boolean)
      -- Print("SaltMixin SetIsACreditStructure %s isacreditstructure is %s", self:GetClassName(), self.isacreditstructure)
 end
 function SaltMixin:GetCanStick()
-     local canstick = not GetSetupConcluded()
+     local canstick = false --not GetSetupConcluded()
      --Print("Canstick = %s", canstick)
      return canstick and self:GetIsACreditStructure() 
 end

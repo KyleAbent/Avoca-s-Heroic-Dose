@@ -339,9 +339,9 @@ function GUIInsight_TopBar:Update(deltaTime)
     local hours = math.floor(minutes / 60)
     minutes = minutes - hours * 60
     seconds = seconds - minutes * 60 - hours * 3600
-     payloadTimetext = string.format("BaseDefense: %d:%02d", minutes, seconds)
+     payloadTimetext = string.format("TBD: %d:%02d", minutes, seconds)
     else
-      payloadTimetext = string.format("Base Vulnerable!", GetPayloadTime())
+      payloadTimetext = string.format("Countdown Ended!", GetPayloadTime())
 end
        if startTime ~= 0 and GetPCTime() ~= 0 then 
            local timerlength = GetPCTime()
@@ -353,7 +353,7 @@ end
            local hours = math.floor(minutes / 60)
            minutes = minutes - hours * 60
            seconds = seconds - minutes * 60 - hours * 3600
-          siegeTimeText = string.format("TBD: %d:%02d", minutes, seconds)
+          siegeTimeText = string.format("Contamination: %d:%02d", minutes, seconds)
      else
        siegeTimeText = string.format("SHOTS FIRED")
         end

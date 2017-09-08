@@ -168,7 +168,7 @@ function GetPayLoadArc()
 end
 function GetDeployedPayLoadArc()
            for _, avocaarc in ientitylist(Shared.GetEntitiesWithClassname("AvocaArc")) do
-                 if  if ARC.avoca == true and avocaarc:GetInAttackMode( )then return avocaarc end
+                  if ARC.avoca == true and avocaarc:GetInAttackMode( )then return avocaarc end
           end
     return nil
 end

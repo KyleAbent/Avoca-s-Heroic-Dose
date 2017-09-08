@@ -21,7 +21,7 @@ end
  
  end
  */
-function Conductor:FirePhaseCannons(powerpoint, force)
+function Conductor:FirePhaseCannons(powerpoint)
              --  local powerdrains = 4 --not force and 4 or 2
                --powerdrains = self:GetCanVape() and powerdrains * 2 or powerdrains
             --     local origin = GetRandomBuildPosition( kTechId.Whip, powerpoint:GetOrigin(), 8 )
@@ -29,6 +29,21 @@ function Conductor:FirePhaseCannons(powerpoint, force)
             --      braindrain:SetConstructionComplete()
             --      braindrain:ActivateSelfDestruct()
              --     braindrain:SetMature()
+             
+             local origin = FindFreeSpace(powerpoint:GetOrigin())
+             CreateEntity(Contamination.kMapName, FindFreeSpace(origin), 2)
+             
+             for i = 1, 4 do
+               local whip = CreateEntity(Whip.kMapName, FindFreeSpace(origin), 2)
+               whip:SetConstructionComplete()
+             end
+             
+             for i = 1 , 2 do
+             local crag = CreateEntity(Crag.kMapName, FindFreeSpace(origin), 2)
+             crag:SetConstructionComplete()
+             end
+             
+             --Every 30s, 6 entities spawning without limit. Hm?
     
 end
 

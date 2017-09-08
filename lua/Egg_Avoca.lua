@@ -1,5 +1,8 @@
+if Server then
+
+
 local origInit = Egg.OnInitialized
-function Egg:DelayedActivation()
+function Egg:OnInitialized()
    origInit(self)
     self:AddTimedCallback(Egg.ResearchSpecifics, 8 )
 end
@@ -54,4 +57,6 @@ function Egg:ResearchSpecifics()
           
       
       return false
+end
+
 end

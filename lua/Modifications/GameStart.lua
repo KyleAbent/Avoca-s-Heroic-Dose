@@ -3,6 +3,9 @@ local function AlreadySpawned(self, origin)
         if ents and #ents >= 4 then return true else return false end
         
 end
+/*
+
+
 function Conductor:SpawnBaseEntities()
 //messy and mir-air. But whatever. Requires GetGroundPosition
 local techPointOrigin = nil
@@ -26,9 +29,6 @@ local techPointOrigin = nil
     CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     CreateEntity(PhaseGate.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     --CreateEntity(Observatory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    for i = 1, 4 do
-   CreateEntity(BaseSentry.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-   end
     
     --if #cc < 3 then
    --   SpawnChairThenSpawnBase(self)
@@ -36,6 +36,9 @@ local techPointOrigin = nil
         
     
 end
+
+*/
+
 /*
 local function SpawnAlienHives(self)
  local hive = nil
@@ -55,6 +58,8 @@ local function SpawnAlienHives(self)
          end
 end
 */
+
+
 local function TrySomethingElse(self)
  local cc = nil
         local ccs = GetEntitiesForTeam("CommandStation", 1)
@@ -72,13 +77,13 @@ local function TrySomethingElse(self)
              end
         */
 
-   
+       /*
               local ccs = GetEntitiesForTeam("CommandStation", 1)
               for i = 1, #ccs do
                 local chair = ccs[i]
                 local vaporizer = CreateEntity(Vaporizer.kMapName, chair:GetOrigin(), 1)
               end 
-
+       */
 
 --self:SpawnBaseEntities(self, cc)    
  
@@ -97,7 +102,7 @@ local tech = nil
 end 
  if Server then
 function Conductor:SpawnInitialStructures()
-    self:SpawnBaseEntities()
+   -- self:SpawnBaseEntities()
     TrySomethingElse(self)
     --SpawnAlienHives(self)
 end

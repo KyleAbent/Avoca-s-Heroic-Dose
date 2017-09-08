@@ -27,13 +27,14 @@ function Imaginator:OnUpdate(deltatime)
    
    if Server then
    
-         
+         /*
        if not  self.timeLastAutomations or self.timeLastAutomations + 16 <= Shared.GetTime() then
         self.timeLastAutomations = Shared.GetTime()
         self:Automations()
         end
+        */
         
-            if not  self.timeLastImaginations or self.timeLastImaginations + 16 <= Shared.GetTime() then
+            if not  self.timeLastImaginations or self.timeLastImaginations + 12 <= Shared.GetTime() then
             self.timeLastImaginations = Shared.GetTime()
         self:Imaginations()
          end
@@ -82,12 +83,15 @@ local function Touch(who, where, what, number)
  local tower = CreateEntityForTeam(what, where, number, nil)
          if tower then
             who:SetAttached(tower)
-           -- if number == 1 then
+            if number == 1 then
            -- tower:SetConstructionComplete()
-           -- end
+             tower.isGhostStructure = false
+            end
             return tower
          end
 end
+/*
+
 local function Envision(who, which)
    if which == 1 then
      Touch(who, who:GetOrigin(), kTechId.Extractor, 1)
@@ -99,10 +103,13 @@ local function AutoDrop(self,who)
   local which = WhoIsQualified(who)
   if which ~= 0 then Envision(who, which) end
 end
+
 function Imaginator:Automations() 
               self:AutoBuildResTowers()
               return true
 end
+*/
+
 function Imaginator:Imaginations() --Tres spending WIP
               self:MarineConstructs()
               self:AlienConstructs(false)
@@ -161,9 +168,21 @@ local count = 0
            return count*16
                 
 end
+
+local function GetHasThreeChairs()
+local CommandStations = #GetEntitiesForTeam( "CommandStation", 1 )
+
+if CommandStations >= 3 then return true end
+
+return false
+
+end
+
+
 local function GetMarineSpawnList()
---Requires more complexity like siege simple 8.25.17
+--Not sure if count is necessary
 local tospawn = {}
+local canAfford = {}
 
      if TresCheck(1,kPhaseGateCost) then
      table.insert(tospawn, kTechId.PhaseGate)
@@ -197,10 +216,25 @@ local tospawn = {}
      --if TresCheck(4) then
      --table.insert(tospawn, SentryBattery.kMapName)
      -- end
+      local  CommandStation = #GetEntitiesForTeam( "CommandStation", 1 )
+      
 
 
+               --gamelength around 3 mins to drop this way more power are built
+      if not GetHasThreeChairs() then
+      table.insert(tospawn, kTechId.CommandStation)
+      end
+      
+       for _, techid in pairs(tospawn) do
+        local cost = LookupTechData(techid, kTechDataCostKey)
+           if TresCheck(1,cost) then
+             table.insert(canAfford, techid)
+           end
+    end
+    
+     local finalchoice = table.random(canAfford), true
 
-return table.random(tospawn)
+return finalchoice, LookupTechData(finalchoice, kTechDataCostKey)
 end
 function Imaginator:MarineConstructs()
        for i = 1, 8 do
@@ -316,14 +350,73 @@ local cc = nil
    
 end
 
+
+local function OrganizedIPCheck(who, self)
+
+-- One entity at a time
+local count = 0
+local ips = GetEntitiesForTeamWithinRange("InfantryPortal", 1, who:GetOrigin(), kInfantryPortalAttachRange)
+ --ADd in getisactive
+      --Add in arms lab because having these spread through the map is a bit odd.
+      local armscost = LookupTechData(kTechId.ArmsLab, kTechDataCostKey)
+      local  ArmsLabs = GetEntitiesForTeam( "ArmsLab", 1 )
+      local labs = #ArmsLabs or 0
+      if #ArmsLabs >= 1 then 
+
+      
+      for i = 1, #ArmsLabs do
+          local ent = ArmsLabs[i]
+          if ( ent:GetIsBuilt() and not ent:GetIsPowered() ) then
+          labs = labs - 1
+          end
+      end
+      
+      end
+      
+      if labs < 2 and TresCheck(1, armscost) then
+               local origin = FindFreeSpace(who:GetOrigin(), 1, kInfantryPortalAttachRange)
+               local armslab = CreateEntity(ArmsLab.kMapName, origin,  1)
+              armslab:GetTeam():SetTeamResources(armslab:GetTeam():GetTeamResources() - armscost)
+              return --one at a time
+      end
+      
+
+            for index, ent in ipairs(ips) do
+              if ent:GetIsPowered() or not ent:GetIsBuilt() and not GetIsACreditStructure(ent) then
+                  count = count + 1
+               end   
+           end
+           
+           if count >= 2 then return end
+           
+         --  for i = 1, math.abs( 2 - count ) do --one at a time
+           local cost = 20
+               if TresCheck(1, cost) then 
+                local where = who:GetOrigin()
+               local origin = FindFreeSpace(where, 4, kInfantryPortalAttachRange)
+                 if origin ~= where then
+                 local ip = CreateEntity(InfantryPortal.kMapName, origin,  1)
+                ip:GetTeam():SetTeamResources(ip:GetTeam():GetTeamResources() - cost)
+                end
+           end
+           
+              
+           
+end
+
+
+local function HaveCCsCheckIps(self)
+   local CommandStations = GetEntitiesForTeam( "CommandStation", 1 )
+       if not CommandStations then return end
+        OrganizedIPCheck(table.random(CommandStations), self)
+end
+
+
 function Imaginator:ActualFormulaMarine()
  ManageMacs() 
 local randomspawn = nil
 local tospawn, cost, gamestarted = GetMarineSpawnList(self)
- --ManageMacs() 
-  --ManageDropExos(self) not working debug
---if gamestarted and not string.find(Shared.GetMapName(), "pl_") then ManageRoboticFactories(self)  ManageArcs(self) end
---if  GetIsTimeUp(self.lastMarineBeacon, 30) then self:ManageMarineBeacons() end
+if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true HaveCCsCheckIps(self) end
 local powerpoint = GetRandomActivePower()
 local success = false
 local entity = nil
@@ -556,10 +649,15 @@ end
    -- if success and entity then self:AdditionalSpawns(entity) end
   return success
  end
+ 
+ /*
+ 
 function Imaginator:AutoBuildResTowers()
   for _, respoint in ientitylist(Shared.GetEntitiesWithClassname("ResourcePoint")) do
         if respoint:GetAttached() == nil then AutoDrop(self, respoint) end
     end
 end
+
+*/
 
 Shared.LinkClassToMap("Imaginator", Imaginator.kMapName, networkVars)

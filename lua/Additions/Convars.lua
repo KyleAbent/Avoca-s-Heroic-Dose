@@ -2,11 +2,12 @@ kTimeAddPowerBuilt = 2
 kTimeRemovePowerKilled = 0
 kArmoryAvoArcAddArmrAmt = 4 --per armor lvl
 
-kPresArmoryProtoEquivMult= 1.5
-kPresToClassesMult = 9
-kPresToStructuresMult = 3
+kPresArmoryProtoEquivMult= 1
+kPresToClassesMult = 1
+kPresToStructureMult = 1
 
-
+kPresToSaltMultWeapons = 1
+gCreditStructureSentryLimit = 3
 gCreditStructureCostPerDrifter = 5
 
 gCreditStructureWallCost = 15

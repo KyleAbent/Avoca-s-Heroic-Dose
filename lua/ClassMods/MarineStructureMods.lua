@@ -91,12 +91,16 @@ local orig_PowerPoint_OnKill = PowerPoint.OnKill
 
 
 
+/*
 
 local function GetIsVaporizing(where)
     for _, vape in ipairs(GetEntitiesWithinRange("Vaporizer", where, 16)) do
          if vape then return true end
     end
 end
+
+
+
 function CommandStation:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
     if hitPoint ~= nil and GetIsVaporizing(self:GetOrigin()) then
@@ -154,7 +158,7 @@ function ArmsLab:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitP
 
 end
 
-
+*/
 
 
 
@@ -166,9 +170,9 @@ local function GetDestinationGate(self)
   
   if self:isa("PhaseAvoca") then  
   
-    for index, payload  in ipairs( GetEntitiesForTeam("AvocaArc", self:GetTeamNumber()) ) do
-        if GetIsUnitActive(payload) then
-            return payload
+    for index, ARC  in ipairs( GetEntitiesForTeam("ARC", self:GetTeamNumber()) ) do
+        if ARC.avoca == true and GetIsUnitActive(ARC) then
+            return ARC
         end
     end 
     

@@ -14,6 +14,7 @@ local function LocationsMatch(who,whom)
   return true --whoname == whomname
 end
 
+/*
 
 local function ToSpawnFormula(self,panicstospawn, where)
          for i = 1, panicstospawn do
@@ -36,13 +37,13 @@ end
 local function SendAnxietyAttack(self, where, who)
          for i = 1, #who do
                            local panicattack = who[i]
-                           local bitch = GetDeployedPayLoadArc()
-                           if bitch and GetIsPointWithinHiveRadius(bitch:GetOrigin()) and GetRange(panicattack,bitch:GetOrigin()) >= 16 then                  
-                           local spawnpoint = FindFreeSpace(bitch:GetOrigin(), 4, 8)
+                         --  local bitch = GetDeployedPayLoadArc()
+                        --   if bitch and GetIsPointWithinHiveRadius(bitch:GetOrigin()) and GetRange(panicattack,bitch:GetOrigin()) >= 16 then                  
+                           local spawnpoint = FindFreeSpace(where, 4, 8)
                               if spawnpoint then
                                     panicattack:SetOrigin(spawnpoint)
                                end
-                           end
+                         --  end
                end
 end
 local function PanicInitiate(self,where)
@@ -70,10 +71,10 @@ end
 local orig_Hive_OnTakeDamage = Hive.OnTakeDamage
 function Hive:OnTakeDamage(damage, attacker, doer, point)
 
-   if doer and doer.avoca == true then 
+   if attacker then --and doer.avoca == true then 
          Print("PanicAttack Initiated")
-         PanicInitiate(self,self:GetOrigin())
-        if self:GetIsBuilt() then  AddPayLoadTime(10)  end
+         PanicInitiate(self,attacker:GetOrigin())
+        --if self:GetIsBuilt() then  AddPayLoadTime(10)  end
     end
     
 return orig_Hive_OnTakeDamage(self,damage, attacker, doer, point)
@@ -81,7 +82,7 @@ end
 
 
 
-
+*/
 
 
 

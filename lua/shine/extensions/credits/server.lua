@@ -175,7 +175,7 @@ local entities = {}
     end
     
 
-   local delete = GetSetupConcluded()
+   local delete = true --GetSetupConcluded()
       if delete then
             if #entities >= limit then
             local entity = table.random(entities)

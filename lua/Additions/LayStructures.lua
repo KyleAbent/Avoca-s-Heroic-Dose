@@ -232,7 +232,7 @@ local function DropStructure(self, player)
             // Create mine.
             local structure = CreateEntity(self:GetDropMapName(), coords.origin, player:GetTeamNumber())
             if structure then
-               if not self.mapname == BreakableDoor.kMapName then  structure:SetOwner(player) end --aboos
+              structure:SetOwner(player) 
                 if structure.SetConstructionComplete  then
                if structure:GetTeamNumber() == 1 then
                  if not GetIsPointOnInfestation(structure:GetOrigin()) then
@@ -242,10 +242,6 @@ local function DropStructure(self, player)
                    end
                 else --teamnum 2
                 
-                    if not GetIsInSiege(structure) then
-                  if structure.SetConstructionComplete then  structure:SetConstructionComplete() end
-               --  if not structure:isa("Hydra") and not structure:GetGameEffectMask(kGameEffect.OnInfestation) then CreateEntity(Clog.kMapName, structure:GetOrigin(), structure:GetTeamNumber()) end
-                   end --not siege
                 
                 end--teamnum 
                 end--structure
@@ -438,7 +434,7 @@ function LayStructures:GetPositionForStructure(player)
         structPosition = Coords.GetLookIn(displayOrigin, structureFacing, trace.normal)
         
     end
-       if  self.mapname == BreakableDoor.kMapName then isPositionValid = true  end
+      -- if  self.mapname == BreakableDoor.kMapName then isPositionValid = true  end
        
     return foundPositionInRange, structPosition, isPositionValid
     

@@ -38,3 +38,7 @@ ModLoader.SetupFileHook( "lua/Gorge.lua", "lua/Gorge_Avoca.lua", "post" )
 
 
 ModLoader.SetupFileHook( "lua/Drifter.lua", "lua/Drifter_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/PowerPoint.lua", "lua/PowerPoint_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Sentry.lua", "lua/Sentry_Avoca.lua", "post" )

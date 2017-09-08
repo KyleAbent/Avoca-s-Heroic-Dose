@@ -34,10 +34,20 @@ local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
 end
 
 
-
+local function hasScan(who)
+          for _, scan in ipairs(GetEntitiesWithMixinForTeamWithinRange("Scan", 1, who:GetOrigin(), kARCRange)) do
+               if scan then
+                  return true
+             end
+          end
+          
+          return false
+end
 
 local function CheckHivesForScan()
 local hives = {}
+    
+          
            for _, hiveent in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
              table.insert(hives, hiveent)
           end
@@ -46,7 +56,9 @@ local hives = {}
           --Scan hive if arc in range, only 1 check per hive.. not per arc.. or whatever. 
           for i = 1, #hives do
              local ent = hives[i]
+              if not hasScan(ent) then
              SoTheGameCanEnd(self, ent)
+             end
           end
 end
 local function CheckForAndActAccordingly(who)
@@ -93,7 +105,7 @@ function ARC:InRadius()
 return  GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self) 
 end
 local function ShouldStop(who)
-
+if self.mainroom then return false end
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
 if #players >=1 then return false end
 return true

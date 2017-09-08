@@ -15,6 +15,8 @@ function PhaseAvoca:OnGetMapBlipInfo()
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
 
+/*
+
 function InfantryPortal:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
     if hitPoint ~= nil and GetIsVaporizing(self:GetOrigin()) then
@@ -24,6 +26,8 @@ function InfantryPortal:ModifyDamageTaken(damageTable, attacker, doer, damageTyp
     end
 
 end
+
+*/
 
 
 Shared.LinkClassToMap("PhaseAvoca", PhaseAvoca.kMapName, networkVars)

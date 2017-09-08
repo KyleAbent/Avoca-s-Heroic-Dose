@@ -61,7 +61,7 @@ function RoboticsFactory:OnTag(tagName)
 
     if self.open and self.researchId ~= Entity.invalidId and tagName == "end" then
 
-        self.builtEntity:Rollout(self, RoboticsFactory.kRolloutLength)
+      if self.builtEntity then  self.builtEntity:Rollout(self, RoboticsFactory.kRolloutLength) end
           
            if Server then
             local bigarcs, mainroomarc, locationarc, avocaarc, total = GetArcsAmount()

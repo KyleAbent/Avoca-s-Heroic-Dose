@@ -53,6 +53,7 @@ local lottery = {}
      
      return nil
 end
+/*
 
 function Location:InitiateDefense()
    self:AddTimedCallback(Location.BaseDefense, 4)
@@ -68,6 +69,8 @@ function Location:BaseDefense()
      return GetCanSpawn(self)
 end
 
+
+*/
 
 
 function Location:GetRandomMarine()

@@ -280,31 +280,15 @@ local function BuildAllNodes(self)
           end
 
 end
-local function PlaceExtraRes(self)
-  local locations = {}
-          for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
-               local locationName = location and location:GetName() or ""
-               table.insertunique(locations,locationName)  
-          end
+local function DeleteResNodes(self)
    
           for _, resnode in ientitylist(Shared.GetEntitiesWithClassname("ResourcePoint")) do
-               local location = GetLocationForPoint(resnode:GetOrigin())
-               local locationName = location and location:GetName() or ""
-               if table.find(locations, locationName) then table.removevalue(locations,locationName) end
+               DestroyEntity(resnode)
           end   
 
-   if #locations == 0 then return end 
-
-            for i = 1, #locations do
-                local location = locations[i]
-                local powerpoint = GetPowerPointForLocation(location)
-                if powerpoint then
-                   local ResourcePoint = CreateEntity(ResourcePoint.kPointMapName, FindFreeSpace(powerpoint:GetOrigin(), 4, 16))
-                end
-            end    
-          
-
 end
+
+/*
 
 local function SetupBaseDefense(self)
 
@@ -315,12 +299,15 @@ local function SetupBaseDefense(self)
           end
 
 end
+
+*/
+
 function Conductor:OnRoundStart() 
 
            if Server then
               BuildAllNodes(self)
-              PlaceExtraRes(self)
-              SetupBaseDefense(self)
+              DeleteResNodes(self)
+            --  SetupBaseDefense(self)
               self:SpawnInitialStructures()
               local CreateImagination = CreateEntity(Imaginator.kMapName)
               local CreateResearcher = CreateEntity(Researcher.kMapName)
@@ -332,8 +319,8 @@ function Conductor:OnRoundStart()
 end
 function Conductor:OnCreate() 
    if Server then
-   self.payLoadTime = 600
-   self.phaseCannonTime = 999
+   self.payLoadTime = 999
+   self.phaseCannonTime = 30
    self.powerlighth = nil
    end
 end
@@ -394,24 +381,27 @@ function Conductor:GetCanFire()
 end
 function Conductor:ResetPC()
 --16 seconds for each built node
-self.phaseCannonTime = Shared.GetTime() + Clamp(16*self:CountUnBuiltNodes(), 45, 180)--+ 120
+self.phaseCannonTime = Shared.GetTime() + 15 --Clamp(16*self:CountUnBuiltNodes(), 45, 180)--+ 120
 self:AddTimedCallback(Conductor.PCTimer, 1)
 local built = {}
 local unbuilt = 0
 return false
 end
-/*
+
 
 local function FirePCAllBuiltRooms(self)
+local built = {}
                  for index, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
                    if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
-                     self:FirePhaseCannons(powerpoint, force)
+                      table.insert(built, powerpoint)
                     end
                 end
-                
+                if #built == 0 then return end
+                local random = table.random(built)
+                 self:FirePhaseCannons(random)
 end
 
-*/
+
 
 local function DisableVaporizer()
             for _, vaporizer in ientitylist(Shared.GetEntitiesWithClassname("Vaporizer")) do
@@ -438,7 +428,7 @@ function Conductor:PCTimer()
    local boolean = false
     if self:GetCanFire() then
          boolean = true
-        -- FirePCAllBuiltRooms(self) -- Ddos!
+         FirePCAllBuiltRooms(self) -- Ddos!
          self.phaseCannonTime = 0
          self:AddTimedCallback(Conductor.ResetPC, 8)
        end
@@ -469,12 +459,41 @@ if Server then
 
 
 function Conductor:CollectResources()
-   local harvesters = Clamp(SimpleCClass(string.format("Harvester"), true) or 0, 1, 14)
-   local extractors =  Clamp(SimpleCClass(string.format("Extractor"), true) or 0, 1, 14)
+   local builtpower = 0
+   local disabledpower = 0
+   local marineteam = nil
+   local alienteam = nil
    
-   if harvesters <=1 then   GetGamerules():GetTeam2():AddTeamResources(math.random(4,8)) end
-   if extractors <=1 then    GetGamerules():GetTeam1():AddTeamResources(math.random(4,8))  end
+          for index, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
+            if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
+               builtpower = builtpower + 1
+            else
+               disabledpower = disabledpower + 1
+            end
+        end
    
+       for _, player in ipairs(GetEntitiesForTeam("Player", 1)) do
+        if not player:isa("Commander") then
+            player:AddResources(builtpower / 10 ) 
+            if not marineteam then marineteam = player:GetTeam() end
+        end
+    end
+    
+        for _, player in ipairs(GetEntitiesForTeam("Player", 2)) do
+        if not player:isa("Commander") then
+            player:AddResources(disabledpower / 10) 
+             if not alienteam then alienteam = player:GetTeam() end
+        end
+    end
+    
+        if alienteam then
+        alienteam:AddTeamResources(kTeamResourcePerTick, true)
+       end
+       
+        if marineteam then
+        marineteam:AddTeamResources(kTeamResourcePerTick, true)
+       end
+    
    --AddPlayerResources(harvesters, extractors)
 
 end
