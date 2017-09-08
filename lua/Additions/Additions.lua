@@ -1,6 +1,7 @@
 Script.Load("lua/Additions/Functions.lua")      
 Script.Load("lua/Additions/Balancer.lua")   
 Script.Load("lua/Additions/Convars.lua") 
+Script.Load("lua/Additions/LayStructures.lua") 
 
 
 function Location:MakeSureRoomIsntEmpty()

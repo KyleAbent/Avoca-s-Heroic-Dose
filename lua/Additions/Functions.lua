@@ -1,3 +1,79 @@
+ function GetHasCragHive()
+    for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
+       if hive:GetTechId() == kTechId.CragHive then return true end
+    end
+    return false
+end
+ function GetHasShiftHive()
+    for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
+       if hive:GetTechId() == kTechId.ShiftHive then return true end
+    end
+    return false
+end
+ function GetHasShadeHive()
+    for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
+       if hive:GetTechId() == kTechId.ShadeHive then return true end
+    end
+    return false
+end
+
+function GetRandomHive() 
+   local hives = {}
+ for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do 
+       table.insert(hives, hive)
+end
+   if #hives == 0 then return nil end
+   
+   return table.random(hives)
+end
+local function GetHasArcInRoom(who)
+//Though doesn't cover entire area .. then again i didn't measure
+           local arcs = GetEntitiesForTeamWithinRange("ARC", 1, who:GetOrigin(), kScanRadius) --arcradius
+            if #arcs == 0 then return false end
+            
+            for i = 1, #arcs do
+              local ent = arcs[i]
+              local locationName = ent.name
+              if locationName == who.name then 
+            -- Print("GetHasArcInRoom location %s true", locationName) 
+              return true 
+               end
+            end
+
+            return false
+            
+end
+function GetUnpoweredLocationWithoutArc()
+ //gonna be some excess
+
+  local unpoweredloc = {}
+  local goTo = {}
+ 
+   for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
+             local powerpoint = GetPowerPointForLocation(location.name)
+             if powerpoint and powerpoint:GetIsDisabled() then 
+             table.insert(unpoweredloc,powerpoint) 
+          --     Print("GetUnpoweredLocationWithoutArc  location %s powerpoint disabled", location.name)
+             end
+   end
+   
+   for i = 1, #unpoweredloc do
+       local loc = unpoweredloc[i]
+    --   Print("loc %s", loc.name)
+       if not GetHasArcInRoom(loc) then  
+       --  Print("loc %s inswerted into table", loc) 
+         table.insert(goTo, loc) 
+         end
+   end
+   
+   if #unpoweredloc == 0 then return end
+   local random = table.random( goTo )
+   Print("GetUnpoweredLocationWithoutArc  %s", random)
+   return random
+   
+ 
+end
+
 function GetRandomActivePower()
   local powers = {}
   for _, power in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
@@ -85,16 +161,14 @@ function AddPayLoadTime(seconds)
     end    
 end
 function GetPayLoadArc()
-    local entityList = Shared.GetEntitiesWithClassname("AvocaArc")
-    if entityList:GetSize() > 0 then
-                 local arc = entityList:GetEntityAtIndex(0) 
-                 return arc
-    end    
+           for _, arc in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
+                 if ARC.avoca == true then return avocaarc end
+          end
     return nil
 end
 function GetDeployedPayLoadArc()
            for _, avocaarc in ientitylist(Shared.GetEntitiesWithClassname("AvocaArc")) do
-                 if avocaarc:GetInAttackMode( )then return avocaarc end
+                 if  if ARC.avoca == true and avocaarc:GetInAttackMode( )then return avocaarc end
           end
     return nil
 end
@@ -170,6 +244,21 @@ function GetClosestHiveFromCC(point)
     local nearesthivetocc = GetNearest(cc:GetOrigin(), "Hive", 2) 
    return nearesthivetocc  
   
+end
+function GetIsPointWithinTechPointRadius(point)     
+    /*
+    local hivesnearby = GetEntitiesWithinRange("Hive", point, ARC.kFireRange)
+      for i = 1, #hivesnearby do
+           local ent = hivesnearby[i]
+           if ent == GetClosestHiveFromCC(point) then return true end
+              return false   
+     end
+   */
+  
+   local tp = GetEntitiesWithinRange("TechPoint", point, ARC.kFireRange)
+   if #tp >= 1 then return true end
+
+   return false
 end
 function GetIsPointWithinHiveRadius(point)     
     /*

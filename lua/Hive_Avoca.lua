@@ -70,7 +70,7 @@ end
 local orig_Hive_OnTakeDamage = Hive.OnTakeDamage
 function Hive:OnTakeDamage(damage, attacker, doer, point)
 
-   if doer and doer:isa("AvocaArc") then 
+   if doer and doer.avoca == true then 
          Print("PanicAttack Initiated")
          PanicInitiate(self,self:GetOrigin())
         if self:GetIsBuilt() then  AddPayLoadTime(10)  end
@@ -85,13 +85,14 @@ end
 
 
 
+/*
 
 local function DestroyAvocaArcInRadius(where)
     for _, avocaarc in ipairs(GetEntitiesWithinRange("AvocaArc", where, kARCRange)) do
          if avocaarc then avocaarc:Kill() end
     end
 end
-
+*/
 
 local function GetTechPoint(where)
     for _, techpoint in ipairs(GetEntitiesWithinRange("TechPoint", where, 8)) do
@@ -114,8 +115,10 @@ local function BuildRoomPower(who)
        
        
      who:AddTimedCallback(function() 
-     local bigarc = CreateEntity(BigArc.kMapName, who:GetOrigin(), 1)
-     bigarc:GiveDeploy()
+--     local bigarc = CreateEntity(BigArc.kMapName, who:GetOrigin(), 1)
+ --    bigarc:GiveDeploy()
+       local cc = CreateEntity(CommandStation.kMapName, who:GetOrigin(), 1)
+       cc:SetConstructionComplete()
      end, 8)
      
 end
@@ -128,7 +131,7 @@ function Hive:OnKill(attacker, doer, point, direction)
 if self:GetIsBuilt() then AddPayLoadTime(16) end
 local child = GetTechPoint(self:GetOrigin())
 BuildRoomPower(child)
-DestroyAvocaArcInRadius(self:GetOrigin())
+--DestroyAvocaArcInRadius(self:GetOrigin())
 child:SetIsVisible(false)
  return orig_Hive_OnKill(self,attacker, doer, point, direction)
 end

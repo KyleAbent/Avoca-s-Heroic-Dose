@@ -161,50 +161,7 @@ end
 
 --all this just to modify damage -.-
 
-function AvocaArc:OnTag(tagName)
 
-    PROFILE("ARC:OnTag")
-    
-    if tagName == "fire_start" then
-        PerformAttack(self)
-    elseif tagName == "target_start" then
-        self:TriggerEffects("arc_charge")
-    elseif tagName == "attack_end" then
-        self:SetMode(ARC.kMode.Targeting)
-    elseif tagName == "deploy_start" then
-        self:TriggerEffects("arc_deploying")
-    elseif tagName == "undeploy_start" then
-        self:TriggerEffects("arc_stop_charge")
-    elseif tagName == "deploy_end" then
-    
-        -- Clear orders when deployed so new ARC attack order will be used
-        self.deployMode = ARC.kDeployMode.Deployed
-        self:ClearOrders()
-        -- notify the target selector that we have moved.
-        self.targetSelector:AttackerMoved()
-        
-      --  self:AdjustMaxHealth(kARCDeployedHealth * 4)
-        
-       -- local currentArmor = self:GetArmor()
-       -- if currentArmor ~= 0 then
-       --     self.undeployedArmor = currentArmor
-       -- end
-        
-      --  self:SetMaxArmor(kARCDeployedArmor)
-      --  self:SetArmor(self.deployedArmor)
-        
-    elseif tagName == "undeploy_end" then
-    
-        self.deployMode = ARC.kDeployMode.Undeployed
-        
-      --  self:AdjustMaxHealth(kARCHealth * 4)
-       -- self.deployedArmor = self:GetArmor()
-       -- self:SetMaxArmor(kARCArmor * 2)
-       -- self:SetArmor(self.undeployedArmor)
-
-    end
-    
-end
 
 end
 

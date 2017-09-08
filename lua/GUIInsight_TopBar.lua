@@ -353,7 +353,7 @@ end
            local hours = math.floor(minutes / 60)
            minutes = minutes - hours * 60
            seconds = seconds - minutes * 60 - hours * 3600
-          siegeTimeText = string.format("PowerDrainers: %d:%02d", minutes, seconds)
+          siegeTimeText = string.format("TBD: %d:%02d", minutes, seconds)
      else
        siegeTimeText = string.format("SHOTS FIRED")
         end

@@ -45,26 +45,6 @@ function CommandStructure:OnUpdateAnimationInput(modelMixin)
     modelMixin:SetAnimationInput("occupied", true)
     
 end
-local function SpawnJanitorForEach(where)
-  
-           local wherelocation = GetLocationForPoint(where)
-           wherelocation = wherelocation and wherelocation:GetName() or ""
-           if not wherelocation then return end
-           
-     for _, eligable in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct", 1, where, 72)) do
-         if not eligable:isa("PowerPoint") and not eligable:isa("Extractor") and not GetIsPointInMarineBase(eligable:GetOrigin()) then
-           local location = GetLocationForPoint(eligable:GetOrigin())
-           local locationName = location and location:GetName() or ""
-           local sameLocation = locationName == wherelocation
-          if sameLocation then 
-                local Janitor = CreateEntity(Janitor.kMapName, FindFreeSpace(eligable:GetOrigin()), 2)
-                Janitor:SetConstructionComplete()
-                Janitor:SetMature()  
-          end --
-         end
-     end--
-     
-end
 
 local function SpawnSurgeForEach(where)
   
@@ -100,7 +80,6 @@ local orig_PowerPoint_OnKill = PowerPoint.OnKill
     orig_PowerPoint_OnKill(self)
                   AddPayLoadTime(kTimeRemovePowerKilled)
     --if not GetIsPointInMarineBase(self:GetOrigin()) then KillAllStructuresInLocation(self:GetOrigin(), 1) end
-      SpawnJanitorForEach(self:GetOrigin())
     
        local nearestExtractor = GetNearest(self:GetOrigin(), "Extractor", 1, function(ent) return LocationsMatch(self,ent)  end)
        if nearestExtractor then
@@ -147,7 +126,7 @@ function InfantryPortal:ModifyDamageTaken(damageTable, attacker, doer, damageTyp
 end
 function ConstructMixin:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
-    if not self:isa("CommandStructure") and not self:isa("Cyst") and hitPoint ~= nil and (attacker ~= nil and attacker:isa("Player") or attacker:isa("Janitor") ) then
+    if not self:isa("CommandStructure") and not self:isa("Cyst") and hitPoint ~= nil and (attacker ~= nil and attacker:isa("Player")  ) then
         local mult = 1
             local wherelocation = GetLocationForPoint(self:GetOrigin())
            if not wherelocation then return end

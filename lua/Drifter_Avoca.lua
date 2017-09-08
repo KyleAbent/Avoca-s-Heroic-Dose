@@ -1,10 +1,28 @@
-class 'DrifterAvoca' (Drifter)
-DrifterAvoca.kMapName = "drifteravoca"
-
-local kDrifterConstructSound = PrecacheAsset("sound/NS2.fev/alien/drifter/drift")
-
+--All this just to make drifters stack, rediculous.
 local kDetectInterval = 0.5
 local kDetectRange = 1.5
+local kDrifterConstructSound = PrecacheAsset("sound/NS2.fev/alien/drifter/drift")
+Drifter.kOrdered2DSoundName = PrecacheAsset("sound/NS2.fev/alien/drifter/ordered_2d")
+Drifter.kOrdered3DSoundName = PrecacheAsset("sound/NS2.fev/alien/drifter/ordered")
+local function ScanForNearbyEnemy(self)
+
+    -- Check for nearby enemy units. Uncloak if we find any.
+    self.lastDetectedTime = self.lastDetectedTime or 0
+    if self.lastDetectedTime + kDetectInterval < Shared.GetTime() then
+    
+        if #GetEntitiesForTeamWithinRange("Player", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin(), kDetectRange) > 0 then
+        
+            self:TriggerUncloak()
+            
+        end
+        self.lastDetectedTime = Shared.GetTime()
+        
+    end
+    
+end
+
+local kDrifterSelfOrderRange = 12
+
 local function IsBeingGrown(self, target)
 
     if target.hasDrifterEnzyme then
@@ -33,13 +51,22 @@ local function IsBeingGrown(self, target)
 
 end
 local function FindTask(self)
-   local eligable =  GetNearestMixin(self:GetOrigin(), "Construct", 2, function(ent) return not ent:isa("AutoCyst") and not ent:GetIsBuilt() and not IsBeingGrown(self, ent) and (not ent.GetCanAutoBuild or ent:GetCanAutoBuild())  end)
-         if eligable then  
-            self:GiveOrder(kTechId.Grow, eligable:GetId(), eligable:GetOrigin(), nil, false, false)
+
+    -- find ungrown structures
+    for _, structure in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct", self:GetTeamNumber(), self:GetOrigin(), kDrifterSelfOrderRange)) do
+    
+        if  not structure:GetIsBuilt() and (not structure.GetCanAutoBuild or structure:GetCanAutoBuild()) then      
+  
+            self:GiveOrder(kTechId.Grow, structure:GetId(), structure:GetOrigin(), nil, false, false)
+           
             return  
       
         end
+    
+    end
+
 end
+
 
 local function UpdateTasks(self, deltaTime)
 
@@ -83,36 +110,7 @@ local function UpdateTasks(self, deltaTime)
     end
     
 end
-local function ScanForNearbyEnemy(self)
-
-    -- Check for nearby enemy units. Uncloak if we find any.
-    self.lastDetectedTime = self.lastDetectedTime or 0
-    if self.lastDetectedTime + kDetectInterval < Shared.GetTime() then
-    
-        if #GetEntitiesForTeamWithinRange("Player", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin(), kDetectRange) > 0 then
-        
-            self:TriggerUncloak()
-            
-        end
-        self.lastDetectedTime = Shared.GetTime()
-        
-    end
-    
-end
-function DrifterAvoca:OnGetMapBlipInfo()
-    local success = false
-    local blipType = kMinimapBlipType.Undefined
-    local blipTeam = -1
-    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
-    blipType = kMinimapBlipType.Drifter
-     blipTeam = self:GetTeamNumber()
-    if blipType ~= 0 then
-        success = true
-    end
-    
-    return success, blipType, blipTeam, isAttacked, false --isParasited
-end
-function DrifterAvoca:OnUpdate(deltaTime)
+function Drifter:OnUpdate(deltaTime)
 
     ScriptActor.OnUpdate(self, deltaTime)
     
@@ -133,7 +131,7 @@ function DrifterAvoca:OnUpdate(deltaTime)
         self.hasCelerity = GetHasTech(self, kTechId.ShiftHive) == true
         self.hasRegeneration = GetHasTech(self, kTechId.CragHive) == true
 --]]
-        if self.hasRegeneration then
+        --if self.hasRegeneration then
         
             if self:GetIsHealable() and ( not self.timeLastAlienAutoHeal or self.timeLastAlienAutoHeal + kAlienRegenerationTime <= Shared.GetTime() ) then
             
@@ -142,7 +140,7 @@ function DrifterAvoca:OnUpdate(deltaTime)
                 
             end    
         
-        end
+        --end
         
         self.canUseAbilities = self.timeAbilityUsed + kDrifterAbilityCooldown < Shared.GetTime()
         
@@ -165,4 +163,82 @@ function DrifterAvoca:OnUpdate(deltaTime)
     end
     
 end
-Shared.LinkClassToMap("DrifterAvoca", DrifterAvoca.kMapName, networkVars)
+local function PlayOrderedSounds(self)
+
+    StartSoundEffectOnEntity(Drifter.kOrdered3DSoundName, self)
+    
+    local commanders = GetEntitiesForTeam("Commander", self:GetTeamNumber())
+    local currentComm = commanders and commanders[1] or nil
+    
+    if currentComm then
+        Server.PlayPrivateSound(currentComm, Drifter.kOrdered2DSoundName, currentComm, 1.0, Vector(0, 0, 0))
+    end
+    
+end
+function Drifter:OnOverrideOrder(order)
+
+    local orderTarget = nil
+    
+    if order:GetParam() ~= nil then
+        orderTarget = Shared.GetEntity(order:GetParam())
+    end
+    
+    local orderType = order:GetType()
+    
+    if orderType == kTechId.Default or orderType == kTechId.Grow or orderType == kTechId.Move then
+
+        if orderTarget and HasMixin(orderTarget, "Construct") and not orderTarget:GetIsBuilt() and GetAreFriends(self, orderTarget)  and (not orderTarget.GetCanAutoBuild or orderTarget:GetCanAutoBuild()) then    
+            order:SetType(kTechId.Grow)
+        elseif orderTarget and orderTarget:isa("Alien") and orderTarget:GetIsAlive() then
+            order:SetType(kTechId.Follow)
+        else
+            order:SetType(kTechId.Move)
+        end
+    
+    end
+    
+    if GetAreEnemies(self, orderTarget) then
+        order.orderParam = -1
+    end
+    
+    PlayOrderedSounds(self)
+    
+end
+function Drifter:ProcessGrowOrder(moveSpeed, deltaTime)
+
+    local currentOrder = self:GetCurrentOrder()
+    
+    if currentOrder ~= nil then
+    
+        local target = Shared.GetEntity(currentOrder:GetParam())
+        
+        if not target or target:GetIsBuilt() or not target:GetIsAlive() then        
+            self:CompletedCurrentOrder()
+        else
+        
+            local targetPos = target:GetOrigin()  
+            local toTarget = targetPos - self:GetOrigin()
+                -- Continuously turn towards the target. But don't mess with path finding movement if it was done.
+
+            if (toTarget):GetLength() > 3 then
+                self:MoveToTarget(PhysicsMask.AIMovement, targetPos, moveSpeed, deltaTime)
+            else
+            
+                if toTarget then
+                    self:SmoothTurn(deltaTime, GetNormalizedVector(toTarget), 0)
+                end
+                local speed = 0.025
+            --    if  target:isa("Hive") then
+              --         speed = speed / 4 
+              -- end
+                if IsBeingGrown(self, target) then target:Construct(speed) end
+                target:RefreshDrifterConstruct()
+                self.constructing = true
+            end
+
+        end
+    
+    end
+
+end
+--Shared.LinkClassToMap("Drifter", Drifter.kMapName, networkVars)

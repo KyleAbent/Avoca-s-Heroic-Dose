@@ -70,7 +70,7 @@ function PanicAttack:FilterTarget()
 end
 function PanicAttack:GetCanFireAtTargetActual(target, targetPoint)    
 
-    if target:isa("AvocaArc") and not target:GetInAttackMode() then
+    if target.avoca == true and not target:GetInAttackMode() then
     return false
     end
     

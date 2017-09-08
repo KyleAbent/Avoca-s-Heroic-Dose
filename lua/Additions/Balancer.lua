@@ -22,13 +22,13 @@ end
  end
  */
 function Conductor:FirePhaseCannons(powerpoint, force)
-               local powerdrains = 4 --not force and 4 or 2
+             --  local powerdrains = 4 --not force and 4 or 2
                --powerdrains = self:GetCanVape() and powerdrains * 2 or powerdrains
-                 local origin = GetRandomBuildPosition( kTechId.Whip, powerpoint:GetOrigin(), 8 )
-                 local braindrain = CreateEntity(PowerDrainer.kMapName, origin, 2)
-                  braindrain:SetConstructionComplete()
-                  braindrain:ActivateSelfDestruct()
-                  braindrain:SetMature()
+            --     local origin = GetRandomBuildPosition( kTechId.Whip, powerpoint:GetOrigin(), 8 )
+            --     local braindrain = CreateEntity(PowerDrainer.kMapName, origin, 2)
+            --      braindrain:SetConstructionComplete()
+            --      braindrain:ActivateSelfDestruct()
+             --     braindrain:SetMature()
     
 end
 

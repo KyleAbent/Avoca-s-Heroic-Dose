@@ -1,5 +1,10 @@
 --New class eventually?
 
+function Whip:GetMinRangeAC()
+return 14/3       
+end
+
+
 local orig_Whip_OnInit = Whip.OnInitialized
 function Whip:OnInitialized()
     orig_Whip_OnInit(self)
@@ -19,7 +24,7 @@ function Whip:FilterTarget()
 end
 function Whip:GetCanFireAtTargetActual(target, targetPoint)    
 
-    if target:isa("AvocaArc") and not target:GetInAttackMode() then
+    if target.avoca == true and not target:GetInAttackMode() then
     return false
     end
     

@@ -3,6 +3,7 @@
 --https://github.com/KyleAbent/
 
 
+
 class 'Conductor' (Entity)
 Conductor.kMapName = "conductor"
 
@@ -28,12 +29,19 @@ local function AddPlayerResources(harvesters, extractors)
     end
 end
 */   
-              
-local function CoordinateWithPowerNode(locationname)
+function Conductor:ResetLight()
+if not self.powerlighth then return false end 
+self.powerlighth:RestoreColorDerp()
+return false
+end        
+   
+function Conductor:CoordinateWithPowerNode(locationname)
+self.powerlighth = nil
                  local powernode = GetPowerPointForLocation(locationname)
-                    if powernode then
-                    powernode:SetLightMode(kLightMode.MainRoom)
-                    powernode:AddTimedCallback(function() powernode:SetLightMode(kLightMode.Normal) end, 10)
+                    if powernode and powernode:GetIsBuilt() and powernode.lightHandler then
+                    self.powerlighth = powernode.lightHandler
+                     self.powerlighth:DiscoLights()
+                    self:AddTimedCallback( Conductor.ResetLight, math.random(8, 16) )
                     end
 end
 local function MatchOrigins(mac, where)
@@ -211,6 +219,8 @@ local function SendMarineOrders(where)
      ForAllMarinesBuildPower(where)
    end
 end
+/*
+
 local function FindOrCreateKingCyst(where, which, opcyst)
  local king = false
  local temphack =  GetNearest(where, "Player", nil, function(ent) return not ent:isa("Commander") and ent:GetIsAlive() end) 
@@ -256,10 +266,17 @@ local function FindOrCreateKingCyst(where, which, opcyst)
 
 end
 
+*/
+
 local function BuildAllNodes(self)
 
           for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-              powerpoint:SetConstructionComplete()
+             powerpoint:SetConstructionComplete() 
+             local where = powerpoint:GetOrigin()
+               if powerpoint:GetIsBuilt() and powerpoint.lightHandler then  powerpoint.lightHandler:SimpleLights() end
+              if not GetIsPointInMarineBase(where) and math.random(1,2) == 1  then 
+                     powerpoint:Kill() 
+              end 
           end
 
 end
@@ -316,7 +333,8 @@ end
 function Conductor:OnCreate() 
    if Server then
    self.payLoadTime = 600
-   self.phaseCannonTime = 120
+   self.phaseCannonTime = 999
+   self.powerlighth = nil
    end
 end
 function Conductor:GetIsMapEntity()
@@ -352,10 +370,10 @@ function Conductor:PickMainRoom()
 end
 function Conductor:SetMainRoom(where, which, opcyst)
         if Server then MoveArcs(where) end 
-        CoordinateWithPowerNode(which.name)
+        self:CoordinateWithPowerNode(which.name)
         CreateAlienMarker(where) 
         SendMarineOrders(where)
-        FindOrCreateKingCyst(where, which, opcyst)
+       -- FindOrCreateKingCyst(where, which, opcyst)
 end
 local function SuddenDeathConditionsCheck(self)
           local arc = GetPayLoadArc()
@@ -382,6 +400,8 @@ local built = {}
 local unbuilt = 0
 return false
 end
+/*
+
 local function FirePCAllBuiltRooms(self)
                  for index, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
                    if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
@@ -390,6 +410,8 @@ local function FirePCAllBuiltRooms(self)
                 end
                 
 end
+
+*/
 
 local function DisableVaporizer()
             for _, vaporizer in ientitylist(Shared.GetEntitiesWithClassname("Vaporizer")) do
@@ -416,7 +438,7 @@ function Conductor:PCTimer()
    local boolean = false
     if self:GetCanFire() then
          boolean = true
-         FirePCAllBuiltRooms(self) -- Ddos!
+        -- FirePCAllBuiltRooms(self) -- Ddos!
          self.phaseCannonTime = 0
          self:AddTimedCallback(Conductor.ResetPC, 8)
        end
@@ -434,7 +456,7 @@ function Conductor:Automations()
               self:CollectResources()
               self:MaintainHiveDefense()
               self:HandoutMarineBuffs()
-              self:CheckAndMaybeBuildMac()
+            --  self:CheckAndMaybeBuildMac()
               return true
 end
 
@@ -444,53 +466,6 @@ end
 
 if Server then 
 
-local function GetMacsAmount()
-    local basemac = 0
-    local bigmac = 0
-    local total = 0
-        for index, mac in ientitylist(Shared.GetEntitiesWithClassname("MAC")) do
-             if mac:isa("BaseMac") then
-             basemac = basemac + 1
-             elseif mac:isa("BigMac") then
-             basemac = basemac + 1
-             end
-             
-         end
-         total = basemac + bigmac
-    return  basemac, bigmac, total
-end
-local function MacQualifications(self)
-    local basemac,bigmac, total = GetMacsAmount()
- local boolean = false
-     if total <= 7 then
-            boolean = true
-      end
-      
-      return boolean
-        
-end
-local function GetMacMapName()
-   local basemac,bigmac, total = GetMacsAmount()
-   if basemac<= 7 then
-       return BaseMac.kMapName
-   elseif bigmac <= 3 then
-        return  BigMac.kMapName
-   end
-
-end
-
-function Conductor:CheckAndMaybeBuildMac()
-  local chair = nil
-            for _, mainent in ientitylist(Shared.GetEntitiesWithClassname("CommandStructure")) do
-                    if mainent:GetTeamNumber() == 1 then chair = mainent break end
-             end
-             
-           if MacQualifications(self) then
-           local mac = CreateEntity(GetMacMapName(), FindFreeSpace(chair:GetOrigin()), 1 )
-           end
-           
-           return true
-end
 
 
 function Conductor:CollectResources()
@@ -503,6 +478,9 @@ function Conductor:CollectResources()
    --AddPlayerResources(harvesters, extractors)
 
 end
+
+
+
 end
 
 function Conductor:GetLocationWithMostMixedPlayers()

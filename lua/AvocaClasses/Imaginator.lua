@@ -13,13 +13,39 @@ function Imaginator:OnCreate()
    for i = 1, 8 do
      Print("Imaginator created")
    end
+       /*
            if Server then
               --self:AddTimedCallback(Imaginator.PickMainRoom, 16)
-              self:AddTimedCallback(Imaginator.Automations, 8)
-              self:AddTimedCallback(Imaginator.Imaginations, 4)
-              self:AddTimedCallback(Imaginator.CystTimer, 1)
+              self:AddTimedCallback(Imaginator.Automations, 16)
+              self:AddTimedCallback(Imaginator.Imaginations, 16)
+              self:AddTimedCallback(Imaginator.CystTimer, 8)
             end
+        */
+   self:SetUpdates(true)
 end
+function Imaginator:OnUpdate(deltatime)
+   
+   if Server then
+   
+         
+       if not  self.timeLastAutomations or self.timeLastAutomations + 16 <= Shared.GetTime() then
+        self.timeLastAutomations = Shared.GetTime()
+        self:Automations()
+        end
+        
+            if not  self.timeLastImaginations or self.timeLastImaginations + 16 <= Shared.GetTime() then
+            self.timeLastImaginations = Shared.GetTime()
+        self:Imaginations()
+         end
+            if not  self.timeLastCystTimer or self.timeLastCystTimer + 8 <= Shared.GetTime() then
+            self.timeLastCystTimer = Shared.GetTime()
+         self:CystTimer()
+         end
+         
+   end //Server
+   
+end
+
 local function GetDisabledPowerPoints()
  local nodes = {}
  
@@ -56,9 +82,9 @@ local function Touch(who, where, what, number)
  local tower = CreateEntityForTeam(what, where, number, nil)
          if tower then
             who:SetAttached(tower)
-            if number == 1 then
-            tower:SetConstructionComplete()
-            end
+           -- if number == 1 then
+           -- tower:SetConstructionComplete()
+           -- end
             return tower
          end
 end
@@ -241,8 +267,57 @@ local function FindPosition(location, searchEnt, teamnum)
 
 end
 
-function Imaginator:ActualFormulaMarine()
+local function GiveConstructOrder(who, where)
 
+local random = {}
+    for _, ent in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct",1, where, 999999)) do
+      if  not ent:GetIsBuilt() and ent:GetCanConstruct(who) and who:CheckTarget(ent:GetOrigin()) then
+        table.insert(random, ent)
+        end
+    end
+    
+ 
+       local constructable = table.random(random)
+               if constructable then
+                    local target = constructable
+                    local orderType = kTechId.Construct
+                    local where = target:GetOrigin()
+                   return who:GiveOrder(orderType, target:GetId(), where, nil, false, false)   
+                end
+end
+
+local function ManageMacs()
+local cc = nil
+
+   for index, chair in ipairs(GetEntitiesForTeam("CommandStation", 1)) do
+       cc = chair 
+       break
+   end
+   
+   if cc then
+     local where = cc:GetOrigin()
+     local MACS = GetEntitiesForTeamWithinRange("MAC", 1, where, 9999)
+           if not #MACS or #MACS <=3 then
+            CreateEntity(MAC.kMapName, FindFreeSpace(where), 1)
+           end
+   
+   if #MACS >= 1 then
+   
+     for i = 1, #MACS do
+        local mac = MACS[i]
+           if not mac:GetHasOrder() then
+          GiveConstructOrder(mac, mac:GetOrigin())
+          end
+     end
+   
+   end
+   
+   end
+   
+end
+
+function Imaginator:ActualFormulaMarine()
+ ManageMacs() 
 local randomspawn = nil
 local tospawn, cost, gamestarted = GetMarineSpawnList(self)
  --ManageMacs() 
@@ -261,7 +336,7 @@ local entity = nil
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
                   --    Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
-                          local minrange = math.random(4,24) --nearestof:GetMinRangeAC()
+                          local minrange = nearestof.GetMinRangeAC and nearestof:GetMinRangeAC() or math.random(4,24) --nearestof:GetMinRangeAC()
                           if tospawn == kTechId.Scan and GetHasActiveObsInRange(randomspawn) then return end
                           if tospawn == kTechId.PhaseGate and GetHasPGInRoom(randomspawn) then return end
                           
@@ -351,6 +426,8 @@ local function GetAlienSpawnNearEntity()
                    end
                end
             end
+            
+            table.insert(ents, GetRandomHive())
        
         
  if #ents == 0 then return nil end
@@ -368,11 +445,76 @@ local function FakeCyst(where)
         end
 end
 
+local function GetDrifterBuff()
+ local buffs = {}
+ if GetHasShadeHive()  then table.insert(buffs,kTechId.Hallucinate) end
+ if GetHasCragHive()  then table.insert(buffs,kTechId.MucousMembrane) end
+  if GetHasShiftHive()  then table.insert(buffs,kTechId.EnzymeCloud) end
+    return table.random(buffs)
+end
+
+
+local function GiveDrifterOrder(who, where)
+
+local structure =  GetNearestMixin(who:GetOrigin(), "Construct", 2, function(ent) return not ent:GetIsBuilt() and (not ent.GetCanAutoBuild or ent:GetCanAutoBuild())   end)
+local player =  GetNearest(who:GetOrigin(), "Alien", 2, function(ent) return ent:GetIsInCombat() and ent:GetIsAlive() end) 
+    
+    local target = nil
+    
+    if structure then
+      target = structure
+    end
+    
+    
+    if player then
+        local chance = math.random(1,100)
+        local boolean = chance >= 70
+        if boolean then
+        who:GiveOrder(GetDrifterBuff(), player:GetId(), player:GetOrigin(), nil, false, false)
+        return
+        end
+    end
+    
+        if  structure then      
+    
+            who:GiveOrder(kTechId.Grow, structure:GetId(), structure:GetOrigin(), nil, false, false)
+            return  
+      
+        end
+        
+end
+
+
+local function ManageDrifters()
+local hive = GetRandomHive()
+
+
+   
+   if hive then
+     local where = hive:GetOrigin()
+     local Drifters = GetEntitiesForTeamWithinRange("Drifter", 2, where, 9999)
+           if not #Drifters or #Drifters <=3 then
+            CreateEntity(Drifter.kMapName, FindFreeSpace(where), 2)
+           end
+   
+   if #Drifters >= 1 then
+   
+     for i = 1, #Drifters do
+        local drifter = Drifters[i]
+           if not drifter:GetHasOrder() then
+          GiveDrifterOrder(drifter, drifter:GetOrigin())
+          end
+     end
+   
+   end
+   
+   end
+   
+end
+
 
 function Imaginator:ActualAlienFormula(cystonly)
---Print("AutoBuildConstructs")
---local  hivecount = #GetEntitiesForTeam( "Hive", 2 )
---if hivecount < 3 and not GetSandCastle():GetSDBoolean() then return end -- build hives first, 6.18.17 maybe if Sg open and tres>=80 then build other..
+ ManageDrifters() 
 local randomspawn = nil
 local spawnNearEnt = GetAlienSpawnNearEntity() 
 local tospawn = GetAlienSpawnList(self, cystonly) --, cost, gamestarted = GetAlienSpawnList(self, cystonly)
@@ -380,7 +522,7 @@ local success = false
 local entity = nil
 
 if spawnNearEnt then
-Print("ActualAlienFormula cystonly %s, spawnNearEnt %s, tospawn %s", cystonly,  spawnNearEnt:GetMapName() or nil, LookupTechData(tospawn, kTechDataMapName)  )
+--Print("ActualAlienFormula cystonly %s, spawnNearEnt %s, tospawn %s", cystonly,  spawnNearEnt:GetMapName() or nil, LookupTechData(tospawn, kTechDataMapName)  )
 end
 
      if spawnNearEnt and tospawn then     
@@ -391,12 +533,12 @@ end
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 2, function(ent) return ent:GetTechId() == tospawn end)
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
-                      Print("ActualAlienFormula range is %s", range)
+                      --Print("ActualAlienFormula range is %s", range)
                       --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
                           local minrange =  nearestof.GetMinRangeAC and nearestof:GetMinRangeAC() or math.random(4,8) --nearestof:GetMinRangeAC()
                          -- if tospawn == kTechId.NutrientMist then minrange = NutrientMist.kSearchRange end
                           if range >=  minrange then
-                           Print("ActualAlienFormula range range >=  minrange")
+                           --Print("ActualAlienFormula range range >=  minrange")
                             entity = CreateEntityForTeam(tospawn, randomspawn, 2)
                            -- cost = GetAlienCostScalar(self, cost)
                           if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end

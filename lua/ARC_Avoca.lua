@@ -1,37 +1,47 @@
---Kyle 'Avoca' Abent
-class 'MainRoomArc' (ARC)
-MainRoomArc.kMapName = "mainroomarc"
+local networkVars = 
+{
+ avoca = "boolean",
+ mainroom = "boolean",
+ 
+}
 
+/*
 
-local kMoveParam = "move_speed"
-local kMuzzleNode = "fxnode_arcmuzzle"
-
-local kNanoshieldMaterial = PrecacheAsset("cinematics/vfx_materials/nanoshield.material")
-MainRoomArc.kAnimationGraph = PrecacheAsset("models/marine/mainroompayload/mainroompayload.animation_graph")
-
-local networkvars = { }
-
-function MainRoomArc:OnCreate()
+function ARC:OnCreate()
  ARC.OnCreate(self)
 end
-function MainRoomArc:OnInitialized()
- ARC.OnInitialized(self)
-    self:SetModel(ARC.kModelName, MainRoomArc.kAnimationGraph)
+
+
+*/
+if Server then
+
+local origInit = ARC.OnInitialized
+
+function ARC:OnInitialized()
+    origInit(self)
+     self:AddTimedCallback(ARC.Instruct, 2.5)
 end
-function MainRoomArc:GetDamageType()
+function ARC:GetDamageType()
 return kDamageType.StructuresOnly
 end
+
+
+
 
 local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
    local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
    if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
 end
 
+
+
+
 local function CheckHivesForScan()
 local hives = {}
            for _, hiveent in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
              table.insert(hives, hiveent)
           end
+          
           if #hives == 0 then return end
           --Scan hive if arc in range, only 1 check per hive.. not per arc.. or whatever. 
           for i = 1, #hives do
@@ -50,16 +60,20 @@ local stopanddeploy = false
         --Print("stopanddeploy is %s", stopanddeploy)
        return stopanddeploy
 end
-function MainRoomArc:GetDeathIconIndex()
+function ARC:GetDeathIconIndex()
     return kDeathMessageIcon.ARC
 end
-function MainRoomArc:GetCanFireAtTargetActual(target, targetPoint)    
+function ARC:GetCanFireAtTargetActual(target, targetPoint)    
 
     if not target.GetReceivesStructuralDamage or not target:GetReceivesStructuralDamage() then        
         return false
     end
     
     if target:isa("PanicAttack") then
+        return false
+    end
+    
+     if self.avoca and not target:isa("Hive") then
         return false
     end
     
@@ -84,6 +98,7 @@ local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
 if #players >=1 then return false end
 return true
 end
+
 local function FindNewParent(who)
     local where = who:GetOrigin()
     local player =  GetNearest(where, "Player", 1, function(ent) return ent:GetIsAlive() end)
@@ -104,20 +119,54 @@ local function GiveUnDeploy(who)
      who:TriggerEffects("arc_stop_charge")
      who:TriggerEffects("arc_undeploying")
 end
+
+
 local function MoveToMainRoom(self)
-            for index, pheromone in ientitylist(Shared.GetEntitiesWithClassname("Pheromone")) do
-            self:GiveOrder(kTechId.Move, nil, pheromone:GetOrigin(), nil, true, true)
-            break
-           end
-           
+      
+--      for index, pheromone in ientitylist(Shared.GetEntitiesWithClassname("Pheromone")) do
+  --          self:GiveOrder(kTechId.Move, nil, pheromone:GetOrigin(), nil, true, true)
+    --        break
+      --     end
+      
+      local where = GetUnpoweredLocationWithoutArc()
+      if not where then return end
+           self:GiveOrder(kTechId.Move, nil, FindFreeSpace(where:GetOrigin()), nil, true, true)
 
 end
-function MainRoomArc:SpecificRules()
---How emberassing to have the 6.22 video show off broken lua but hey that what's given after only 6 hours
---and saying i would come back to fix the hive origin and of course fix the actual function of the intention
---of payload rules xD
---local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) --or CheckForAndActAccordingly(self)  
---Print("SpecificRules")
+
+local function MoveToHives(who) --Closest hive from origin
+local where = who:GetOrigin()
+ local hive =  GetNearest(where, "Hive", 2, function(ent) return not ent:GetIsDestroyed() end)
+
+ 
+               if hive then
+        local origin = hive:GetOrigin() -- The arc should auto deploy beforehand
+        who:GiveOrder(kTechId.Move, nil, origin, nil, true, true)
+                    return
+                end  
+     --Print("No closest hive????")    
+end
+
+local function AliensStop(who)
+  
+end
+
+local function BuffPlayers(who)
+
+local marines =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 6)
+
+     
+    if not who:GetInAttackMode() and #marines >= 1 then
+         for i = 1, #marines do
+              local marine = marines[i]
+              if marine:isa("Marine") then who:AddHealth(54) marine:AddHealth( math.random(4,8) ) end
+         end
+    end
+
+end
+
+function ARC:SpecificRules()
+BuffPlayers(self)
 
 local moving = self.mode == ARC.kMode.Moving     
 --Print("moving is %s", moving) 
@@ -154,7 +203,11 @@ local shouldundeploy = attacking and not inradius and not moving
          GiveUnDeploy(self)
        else --should move
        --Print("CanMove")
-       MoveToMainRoom(self)
+          if self.mainroom == true then 
+           MoveToMainRoom(self)
+          elseif self.avoca == true then
+             MoveToHives(self)
+          end
        end
        
    elseif shouldattack then
@@ -167,7 +220,7 @@ local shouldundeploy = attacking and not inradius and not moving
     end
     
 end
-function MainRoomArc:OnGetMapBlipInfo()
+function ARC:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
     local blipTeam = -1
@@ -180,7 +233,7 @@ function MainRoomArc:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
-function MainRoomArc:GetCanMove()
+function ARC:GetCanMove()
 local moving = self.mode == ARC.kMode.Moving          
 local attacking = self.deployMode == ARC.kDeployMode.Deployed
 local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self)  
@@ -195,107 +248,44 @@ local shouldundeploy = attacking and not inradius and not moving
   end
   return noorder or false
 end
-local function MoveToHives(who) --Closest hive from origin
-local where = who:GetOrigin()
- local hive =  GetNearest(where, "Hive", 2, function(ent) return not ent:GetIsDestroyed() end)
-
- 
-               if hive then
-        local origin = hive:GetOrigin() -- The arc should auto deploy beforehand
-        who:GiveOrder(kTechId.Move, nil, origin, nil, true, true)
-                    return
-                end  
-     --Print("No closest hive????")    
-end
-function MainRoomArc:GetUnitNameOverride(viewer)
-    local unitName = GetDisplayName(self)   
-      if  not self:GetInAttackMode() then
-    unitName = string.format(Locale.ResolveString("MainRoomPayLoad") )
-    else
-    unitName = string.format(Locale.ResolveString("MainRoomArc") )
-    end
-return unitName
-end  
-
-function MainRoomArc:BeginTimer()
-           self:AddTimedCallback(MainRoomArc.Instruct, 4)
-end
 
 
-function MainRoomArc:Instruct()
-   CheckHivesForScan()
+
+
+
+function ARC:Instruct()
+   --Print("Arc instructing")
+    CheckHivesForScan()
    self:SpecificRules()
    return true
 end
-if Server then
-function MainRoomArc:PreOnKill(attacker, doer, point, direction)
---AddPayLoadTime(120) --NO WONDER TIMER WENT LONG LOL
-end 
-function MainRoomArc:UpdateMoveOrder(deltaTime)
 
-    local currentOrder = self:GetCurrentOrder()
-    ASSERT(currentOrder)
-    
-    self:SetMode(ARC.kMode.Moving)  
-    
-    local moveSpeed = ( self:GetIsInCombat() or self:GetGameEffectMask(kGameEffect.OnInfestation) ) and 1.2 or 3
-   -- local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
-    --        if #marines >= 2 then
-    --        moveSpeed = moveSpeed * Clamp(#marines/4, 1.1, 4)
-   --         end
-    local maxSpeedTable = { maxSpeed = moveSpeed }
-    self:ModifyMaxSpeed(maxSpeedTable)
-    
-    self:MoveToTarget(PhysicsMask.AIMovement, currentOrder:GetLocation(), maxSpeedTable.maxSpeed, deltaTime)
-    
-    self:AdjustPitchAndRoll()
-    
-    if self:IsTargetReached(currentOrder:GetLocation(), kAIMoveOrderCompleteDistance) then
-    
-        self:CompletedCurrentOrder()
-        self:SetPoseParam(kMoveParam, 0)
-        
-        -- If no more orders, we're done
-        if self:GetCurrentOrder() == nil then
-            self:SetMode(ARC.kMode.Stationary)
-        end
-        
-    else
-        self:SetPoseParam(kMoveParam, .5)
+local function DestroPanicAttackInRadius(where)
+    for _, panicattack in ipairs(GetEntitiesWithinRange("PanicAttack", where, kARCRange)) do
+         if panicattack then panicattack:Kill() end
     end
-    
 end
-elseif Client then
 
-    function MainRoomArc:OnUpdateRender()
-          local showMaterial = self:GetInAttackMode()
-    
-        local model = self:GetRenderModel()
-        if model then
+function ARC:PreOnKill(attacker, doer, point, direction)
+ if self.avoca then
+AddPayLoadTime(16) 
+DestroPanicAttackInRadius(self:GetOrigin())
+end
 
-            model:SetMaterialParameter("glowIntensity", 4)
+end 
 
-            if showMaterial then
-                
-                if not self.hallucinationMaterial then
-                    self.hallucinationMaterial = AddMaterial(model, kNanoshieldMaterial)
-                end
-                
-                self:SetOpacity(0.5, "hallucination")
-            
-            else
-            
-                if self.hallucinationMaterial then
-                    RemoveMaterial(model, self.hallucinationMaterial)
-                    self.hallucinationMaterial = nil
-                end//
-                
-                self:SetOpacity(1, "hallucination")
-            
-            end //showma
-            
-        end//omodel
-end //up render
-end -- client/server
+end//server
 
-Shared.LinkClassToMap("MainRoomArc", MainRoomArc.kMapName, networkVars)
+function ARC:GetUnitNameOverride(viewer)
+    local unitName = GetDisplayName(self)   
+    if self.mainroom then
+      if  not self:GetInAttackMode() then
+    unitName = string.format(Locale.ResolveString("UnpoweredPL") )
+    end
+   elseif self.avoca then 
+       unitName = string.format(Locale.ResolveString("Hive-Payload") )
+   end
+return unitName
+end  
+
+Shared.LinkClassToMap("ARC", ARC.kMapName, networkVars)

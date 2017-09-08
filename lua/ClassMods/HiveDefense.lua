@@ -24,12 +24,13 @@ local crags = 0
 
 end
 local function GetDefenseEntsInRange(who)
+/*
  local shifts = GetEntitiesForTeamWithinRange("Shift", 2, who:GetOrigin(), 24)
  local crags = GetCragsCount(who:GetOrigin())
  local hivecrags = GetEntitiesWithinRange("HiveCrag", who:GetOrigin(), 24)
  local shades = GetEntitiesForTeamWithinRange("Shade", 2, who:GetOrigin(), 24)
- local drifters = GetEntitiesForTeamWithinRange("DrifterAvoca", 2, who:GetOrigin(), 9999)
-return shifts, crags, hivecrags, shades, drifters
+ */
+return 0,0,0,0--shifts, crags, hivecrags, shades, drifters
 end
 local function UpdateTypeOfHive(who)
 local hasshade = false
@@ -123,14 +124,14 @@ local function SpawnUpgChamber(origin)
             end
             
 end
-function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades, drifters)
+function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades)
         -- local tres = kStructureDropCost
          if not hive:GetIsAlive() then return end
          local origin = hive:GetOrigin()
         local canafford = GetCanSpawnAlienEntity(0)
         if canafford then SpawnUpgChamber(origin) end    
 
-         
+         /*
                    if #shifts <= math.random(1,3) then
                       local tres = 0 --kShiftCost
                      -- if GetCanSpawnAlienEntity(tres) then  
@@ -176,12 +177,12 @@ function Conductor:HiveDefenseMain(hive, shifts, crags, hivecrags, shades, drift
                        local tres = 0 --kShadeCost
                        if not spawned then 
                      -- if GetCanSpawnAlienEntity(tres) then  
-                       local drifter = CreateEntity(DrifterAvoca.kMapName, FindFreeSpace(origin), 2) 
+                       local drifter = CreateEntity(Drifter.kMapName, FindFreeSpace(origin), 2) 
                      -- drifter:GetTeam():SetTeamResources(drifter:GetTeam():GetTeamResources() - tres)
                        --end
                        end
                     end
-        
+        */
 
 
 end

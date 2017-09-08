@@ -1,5 +1,8 @@
 
 
+function RoboticsFactory:GetMinRangeAC()
+return 54 / 2    
+end
 
 
 local kOpenSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_open")
@@ -15,11 +18,9 @@ local function GetArcsAmount()
         for index, ARC in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
               if ARC:isa("BigArc") then
               bigarcs = bigarcs + 1
-              elseif ARC:isa("MainRoomArc") then
+              elseif  ARC.mainroom then
               mainroomarc = mainroomarc + 1
-              elseif ARC:isa("LocationArc") then
-              locationarc = locationarc + 1 
-              elseif ARC:isa("AvocaArc") then
+              elseif ARC.avoca then
               avocaarc = avocaarc + 1
               end
          end
@@ -53,17 +54,6 @@ local function ArcQualifications(self)
       
       return boolean
 end
-function RoboticsFactory:ChangeTo(who,mapname)
-                      if Server then  
-                      self:AddTimedCallback(function() 
-                      local newentity = CreateEntity(mapname, who:GetOrigin(), 1)
-                    --  if newentity:isa("LocationArc") then newentity:SetArcLocation() end
-                       newentity:SetOrigin(FindFreeSpace( newentity:GetOrigin() ) ) --antistuck sigh
-                      if newentity.BeginTimer then newentity:BeginTimer() end
-                      DestroyEntity(who)
-                     end, 4) 
-                     end
-end
 
 function RoboticsFactory:OnTag(tagName)
     
@@ -79,11 +69,11 @@ function RoboticsFactory:OnTag(tagName)
             local success = false
                 local entity = self.builtEntity
                    if not HasPayLoad then
-                        self:ChangeTo(entity, AvocaArc.kMapName)
+                        entity.avoca = true
                         success = true
                    end
                    if mainroomarc <= 7 and not success then
-                        self:ChangeTo(entity, MainRoomArc.kMapName)
+                        entity.mainroom = true
                         success = true
                    end
                 --   if GetLocationsCount() > locationarc and not success then 

@@ -1,5 +1,5 @@
 Script.Load("lua/Overwrites/Convars.lua")
-Script.Load("lua/Overwrites/CustomLightRules.lua")
+
 
 --gotta do this the smart way derphead
 
@@ -94,9 +94,7 @@ function Whip:SlapTarget(target)
     hitDirection:Normalize()
     -- fudge a bit - put the point of attack 0.5m short of the target
     local hitPosition = targetPoint - hitDirection * 0.5
-    local damage = Whip.kDamage 
-    local damage = not self:isa("PowerDrainer") and Clamp(damage * self:GetHealthScalar(), 1, damage) or Whip.kDamage * 0.35
-    self:DoDamage(damage, target, hitPosition, hitDirection, nil, true)
+    self:DoDamage(Whip.kDamage, target, hitPosition, hitDirection, nil, true)
     self:TriggerEffects("whip_attack")
 
 end

@@ -17,10 +17,10 @@ local techPointOrigin = nil
     CreateEntity(ArmsLab.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     CreateEntity(RoboticsFactory.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     
-    CreateEntity(BaseMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
-    CreateEntity(BaseMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+  --  CreateEntity(BaseMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+   -- CreateEntity(BaseMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     
-    CreateEntity(BigMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
+--    CreateEntity(BigMac.kMapName, FindFreeSpace(techPointOrigin,4), 1)
 
     --CreateEntity(PrototypeLab.kMapName, FindFreeSpace(techPointOrigin,4), 1)
     CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(techPointOrigin,4), 1)
