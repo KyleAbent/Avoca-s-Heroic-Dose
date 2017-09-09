@@ -1,4 +1,17 @@
 
+function RoboticsFactory:GetTechButtons(techId) --so researcher doesn't spawn mac or arc
+--maybe add arc conditional if less than 12. But then seperate method for setting avoca and main
+
+    local techButtons = {  kTechId.None, kTechId.None, kTechId.None, kTechId.None, 
+               kTechId.None, kTechId.None, kTechId.None, kTechId.None }
+               
+    if self:GetTechId() ~= kTechId.ARCRoboticsFactory then
+        techButtons[5] = kTechId.UpgradeRoboticsFactory
+    end           
+
+    return techButtons
+    
+end
 
 function RoboticsFactory:GetMinRangeAC()
 return 54 / 2    

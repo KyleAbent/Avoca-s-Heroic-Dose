@@ -79,6 +79,9 @@ end
 local function WhoIsQualified(who)
    return PowerPointStuff(who)
 end
+
+/*
+
 local function Touch(who, where, what, number)
  local tower = CreateEntityForTeam(what, where, number, nil)
          if tower then
@@ -90,7 +93,7 @@ local function Touch(who, where, what, number)
             return tower
          end
 end
-/*
+
 
 local function Envision(who, which)
    if which == 1 then
@@ -178,6 +181,14 @@ return false
 
 end
 
+local function GetHasThreeHives()
+local Hives = #GetEntitiesForTeam( "Hive", 2 )
+
+if Hives >= 3 then return true end
+
+return false
+
+end
 
 local function GetMarineSpawnList()
 --Not sure if count is necessary
@@ -320,6 +331,8 @@ local random = {}
                 end
 end
 
+/*
+
 local function ManageMacs()
 local cc = nil
 
@@ -350,6 +363,7 @@ local cc = nil
    
 end
 
+*/
 
 local function OrganizedIPCheck(who, self)
 
@@ -413,7 +427,7 @@ end
 
 
 function Imaginator:ActualFormulaMarine()
- ManageMacs() 
+ --ManageMacs() 
 local randomspawn = nil
 local tospawn, cost, gamestarted = GetMarineSpawnList(self)
 if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true HaveCCsCheckIps(self) end
@@ -476,15 +490,130 @@ local tospawn = {}
           if TresCheck(2,kWhipCost) then
       table.insert(tospawn, kTechId.Whip)
       end
-      
+    
+    /*
+      if TresCheck(2,40) then
+          for _, techpoint in ientitylist(Shared.GetEntitiesWithClassname("TechPoint")) do
+                   local location = GetLocationForPoint(techpoint:GetOrigin())
+                    local powerpoint =  location and GetPowerPointForLocation(location.name)
+             if techpoint:GetAttached() == nil and powerpoint and powerpoint:GetIsDisabled()  or not powerpoint:GetIsBuilt() then 
+                  local hive = techpoint:SpawnCommandStructure(2) 
+                  if hive then hive:GetTeam():SetTeamResources(hive:GetTeam():GetTeamResources() - 40) break end
+             end
+          end
+     end
+   */
+   
+       if not GetHasThreeHives() then
+      table.insert(tospawn, kTechId.Hive)
+      end
+  
       return table.random(tospawn)
 end
+
+local function UpgChambers()
+local gamestarted = not GetGameInfoEntity():GetWarmUpActive()   
+if not gamestarted then return true end     
+ local tospawn = {}
+local canafford = {}    
+
+
+        if GetHasShiftHive() then  
+            --  Print("GetHasShiftHive true")
+              local  Spur = #GetEntitiesForTeam( "Spur", 2 )
+              if Spur < 3 then table.insert(tospawn, kTechId.Spur) end
+       end
+
+        if GetHasCragHive()  then  
+            --   Print("GetHasCragHive true")
+              local  Shell = #GetEntitiesForTeam( "Shell", 2 )
+              if Shell < 3 then table.insert(tospawn, kTechId.Shell) end
+       end
+        if GetHasShadeHive() then  
+            --     Print("GetHasShadeHive true")
+                local  Veil = #GetEntitiesForTeam( "Veil", 2 )
+                if Veil < 3 then table.insert(tospawn, kTechId.Veil) end
+       end
+       
+             
+       for _, techid in pairs(tospawn) do
+          local cost = LookupTechData(techid, kTechDataCostKey)
+           if not gamestarted or TresCheck(2,cost) then
+             table.insert(canafford, techid)   
+           end
+    end
+       
+      local finalchoice = table.random(canafford)
+      local finalcost = LookupTechData(finalchoice, kTechDataCostKey)
+      finalcost = not gamestarted and 0 or finalcost
+    --  Print("GetAlienSpawnList() UpgChambers() return finalchoice %s, finalcost %s", finalchoice, finalcost)
+      return finalchoice, finalcost, gamestarted
+       
+end
+local function GetHive()
+ local hivey = nil
+            for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
+               hivey = hive
+               break   
+             end
+
+
+return hivey
+
+end
+
+
+function Imaginator:DoBetterUpgs()
+local tospawn, cost, gamestarted = UpgChambers()
+local success = false
+local randomspawn = nil
+local hive = GetHive()
+     if hive and tospawn then             
+                 randomspawn = FindFreeSpace( hive:GetOrigin(), 4, 24, true)
+            if randomspawn then
+                   local entity = CreateEntityForTeam(tospawn, randomspawn, 2)
+                    if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
+            end
+  end
+    
+  return success
+end
+
+
+local function HandleShiftCallReceive()
+   local shifts = {}
+   
+ --   local boolean = GetSiegeDoorOpen()
+  --  if boolena then return end
+      for index, shift in ipairs(GetEntitiesForTeam("Shift", 2)) do
+          table.insert(shifts, shift)
+          shift.calling = false
+          shift.receiving = true
+      end
+      local random = table.random(shifts)
+      if not random then return end
+      
+      random.receiving = false
+      random.calling = true
+      
+      for i = 1, #shifts do
+          local shift = shifts[i]
+          shift:AutoCommCall()
+      end
+end
+
 function Imaginator:AlienConstructs(cystonly)
 --Print("AlienConstructs cystonly %s", cystonly)
        for i = 1, 8 do
          local success = self:ActualAlienFormula(cystonly)
          if success == true then break end
        end
+       
+        --  if  GetHasShiftHive() then
+        --    HandleShiftCallReceive() 
+        --  end
+          
+              self:DoBetterUpgs()
 
 return true
 

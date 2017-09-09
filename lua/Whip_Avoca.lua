@@ -33,6 +33,12 @@ function Whip:GetCanFireAtTargetActual(target, targetPoint)
 end
 if Server then
 
+local origupdate = Whip.OnUpdate
+function Whip:OnUpdate(deltaTime)
+        origupdate(self, deltaTime)
+        Whip.kDamage = kWhipSlapDamage * Clamp(self:GetHealthScalar(), .3, 1)
+end
+
 function Whip:UpdateRootState()
     
     local infested = true --self:GetGameEffectMask(kGameEffect.OnInfestation)

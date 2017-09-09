@@ -233,18 +233,7 @@ local function DropStructure(self, player)
             local structure = CreateEntity(self:GetDropMapName(), coords.origin, player:GetTeamNumber())
             if structure then
               structure:SetOwner(player) 
-                if structure.SetConstructionComplete  then
-               if structure:GetTeamNumber() == 1 then
-                 if not GetIsPointOnInfestation(structure:GetOrigin()) then
-                  structure:SetConstructionComplete()
-                   else
-                   structure.isGhostStructure = false
-                   end
-                else --teamnum 2
-                
-                
-                end--teamnum 
-                end--structure
+                 if structure.SetConstructionComplete then structure:SetConstructionComplete() end
                 structure:SetOwner(player)
                 if HasMixin(structure, "Salt") then structure:SetIsACreditStructure(true) end
                -- if structure:isa("ARC") then structure:DelayDeploy() end

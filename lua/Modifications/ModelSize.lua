@@ -25,7 +25,7 @@ function RoboticsFactory:OnAdjustModelCoords(coords)
 end
  function LiveMixin:OnAdjustModelCoords(modelCoords)
          local coords = modelCoords
-    if self:GetTeamNumber() == 2 and not self:isa("PowerDrainer") then
+    if self:GetTeamNumber() == 2 and not self:isa("PowerDrainer") and not self:isa("Hive") then
     local isplayer = self:isa("Alien")
         local value = Clamp(self:GetHealthScalar(), .3, 1)
     	local scale = Clamp(value + (isplayer and .8 or 0), value, 1)  --Because I dont want 70%hp to drop to 70% size 

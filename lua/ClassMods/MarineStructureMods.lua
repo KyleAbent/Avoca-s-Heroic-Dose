@@ -1,30 +1,37 @@
-function SentryBattery:GetUnitNameOverride(viewer)
-    local unitName = GetDisplayName(self)   
-    unitName = string.format(Locale.ResolveString("BackupPower") )
-return unitName
-end  
-
 function GhostStructureMixin:__initmixin()
 
     -- init the entity in ghost structure mode
     if Server then
-        self.isGhostStructure = self:isa("Extractor")
+        self.isGhostStructure = false
     end
     
-end
-function RoboticsFactory:GetTechButtons(techId)
+end 
 
-    local techButtons = {  kTechId.None, kTechId.None, kTechId.None, kTechId.None, 
-               kTechId.None, kTechId.None, kTechId.None, kTechId.None }
-               
-    if self:GetTechId() ~= kTechId.ARCRoboticsFactory then
-        techButtons[5] = kTechId.UpgradeRoboticsFactory
-    end           
 
-    return techButtons
-    
-end
+
 if Server then
+
+
+function ConstructMixin:HealWPower()
+  if GetIsRoomPowerUp(self) then self:AddHealth(100) self:AddArmor(25) end
+  return self:GetIsBuilt()
+end
+
+local orig consOn = ConstructMixin.OnConstructionComplete
+function ConstructMixin:OnConstructionComplete(builder)
+      consOn(self, builder)
+      if self:GetTeamNumber() == 1 then
+      self:AddTimedCallback(ConstructMixin.HealWPower, 4)
+      end
+end
+
+function ConstructMixin:OnUpdate(deltaTime)
+  if not self:isa("PowerPoint") and self:GetTeamNumber() == 1 and not self:GetIsBuilt() and GetIsRoomPowerUp(self) then
+ -- Print("derp")
+  self:Construct(0.0125)
+  end
+end
+
 
 local function LocationsMatch(who,whom)
    
@@ -46,47 +53,7 @@ function CommandStructure:OnUpdateAnimationInput(modelMixin)
     
 end
 
-local function SpawnSurgeForEach(where)
-  
-           local wherelocation = GetLocationForPoint(where)
-           wherelocation = wherelocation and wherelocation:GetName() or ""
-           if not wherelocation then return end
-           
-     for _, eligable in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct", 2, where, 72)) do
-        -- if not eligable:isa("Harvester") and not eligable:isa("Cyst") and not eligable:isa("Hive") then --and not GetIsPointInMarineBase(eligable:GetOrigin()) then
-           local location = GetLocationForPoint(eligable:GetOrigin())
-           local locationName = location and location:GetName() or ""
-           local sameLocation = locationName == wherelocation
-          if sameLocation then 
-                eligable:DeductHealth(400, nil, nil, true, false, true)
-                eligable:TriggerEffects("arc_hit_primary")
-          end --
-        -- end
-     end--
-     
-end
-local orig_PowerPoint_StopDamagedSound = PowerPoint.StopDamagedSound
-    function PowerPoint:StopDamagedSound()
-    orig_PowerPoint_StopDamagedSound(self)
-        if self:GetHealthScalar() ~= 1 then return end
-         SpawnSurgeForEach(self:GetOrigin())
-       --  AddPayLoadTime(kTimeAddPowerBuilt)
-        local nearestHarvester = GetNearest(self:GetOrigin(), "Harvester", 2, function(ent) return LocationsMatch(self,ent)  end)
-       if nearestHarvester then nearestHarvester:Kill() end
-   end
-   
-local orig_PowerPoint_OnKill = PowerPoint.OnKill
-    function PowerPoint:OnKill(attacker, doer, point, direction)
-    orig_PowerPoint_OnKill(self)
-                  AddPayLoadTime(kTimeRemovePowerKilled)
-    --if not GetIsPointInMarineBase(self:GetOrigin()) then KillAllStructuresInLocation(self:GetOrigin(), 1) end
-    
-       local nearestExtractor = GetNearest(self:GetOrigin(), "Extractor", 1, function(ent) return LocationsMatch(self,ent)  end)
-       if nearestExtractor then
-         nearestExtractor:Kill()
-       end
-       
-    end
+
 
 
 

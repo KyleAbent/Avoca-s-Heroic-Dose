@@ -1,4 +1,42 @@
- function GetHasCragHive()
+ function UpdateTypeOfHive(who)
+local techids = {}
+if GetHasCragHive() == false then table.insert(techids, kTechId.CragHive) end
+if GetHasShadeHive() == false then table.insert(techids, kTechId.ShadeHive) end
+if GetHasShiftHive() == false then table.insert(techids, kTechId.ShiftHive) end
+   
+   if #techids == 0 then return end 
+    for i = 1, #techids do
+      local current = techids[i]
+      if who:GetTechId() == techid then
+      table.remove(techids, current)
+      end
+    end
+    
+    local random = table.random(techids)
+    
+    who:UpgradeToTechId(random) 
+    who:GetTeam():GetTechTree():SetTechChanged()
+
+end
+
+function GetIsOriginInHiveRoom(point)  
+ local location = GetLocationForPoint(point)
+ local hivelocation = nil
+     local hives = GetEntitiesWithinRange("Hive", point, 999)
+     if not hives then return false end
+     
+     for i = 1, #hives do  --better way to do this i know
+     local hive = hives[i]
+     hivelocation = GetLocationForPoint(hive:GetOrigin())
+     break
+     end
+     
+     if location == hivelocation then return true end
+     
+     return false
+     
+end
+function GetHasCragHive()
     for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
        if hive:GetTechId() == kTechId.CragHive then return true end
     end
@@ -83,7 +121,11 @@ function GetRandomDisabledPower()
         if power:GetIsDisabled() then table.insert(powers,power) end
     end
     if #powers == 0 then return nil end
-    return table.random(powers)
+    local power = table.random(powers)
+           local Location = GetLocationForPoint(power:GetOrigin())
+            locationName = Location.name
+            Print(" EnableRandomPower %s", locationName)
+    return  power
 end
 function GetRandomActivePower()
   local powers = {}
@@ -91,6 +133,13 @@ function GetRandomActivePower()
         if power:GetIsBuilt() and not power:GetIsDisabled() then table.insert(powers,power) end
     end
     return table.random(powers)
+end
+function GetIsRoomPowerUp(who)
+ local location = GetLocationForPoint(who:GetOrigin())
+  if not location then return false end
+ local powernode = GetPowerPointForLocation(location.name)
+ if powernode and powernode:GetIsBuilt() and not powernode:GetIsDisabled()  then return true end
+ return false
 end
 function GetIsRoomPowerDown(who)
  local location = GetLocationForPoint(who:GetOrigin())

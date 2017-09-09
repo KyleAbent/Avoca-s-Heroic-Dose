@@ -1,4 +1,4 @@
-Script.Load("lua/ClassMods/HiveDefense.lua") 
+
 
 
 

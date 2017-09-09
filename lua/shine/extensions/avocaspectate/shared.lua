@@ -7,4 +7,6 @@ self.Enabled = true
 return true
 end
 
-Shine:RegisterExtension( "mapstats", Plugin )
+
+
+Shine:RegisterExtension( "avocaspectate", Plugin )

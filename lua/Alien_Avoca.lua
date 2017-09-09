@@ -12,6 +12,20 @@ end
 if Server then
 
 
+function Alien:CreditBuy(techId)
+        local cost = LookupTechData(techId, kTechDataCostKey, 0)
+         self:AddResources(cost)
+        local upgradetable = {}
+        local upgrades = Player.lastUpgradeList
+        if upgrades and #upgrades > 0 then
+            table.insert(upgradetable, upgrades)
+        end
+        
+        table.insert(upgradetable, techId)
+        self:ProcessBuyAction(upgradetable, true)
+        self:AddResources(cost)
+end
+
 
 
 

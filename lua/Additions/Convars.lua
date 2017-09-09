@@ -5,6 +5,7 @@ kArmoryAvoArcAddArmrAmt = 4 --per armor lvl
 kPresArmoryProtoEquivMult= 3
 kPresToClassesMult = 3
 kPresToStructureMult = 3
+kPresToSaltMult = 3
 
 kPresToSaltMultWeapons = 1
 gCreditStructureSentryLimit = 3

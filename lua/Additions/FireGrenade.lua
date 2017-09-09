@@ -1,5 +1,6 @@
 /*
 Modified version of GasGrenade with custom cinematics and fire dmg rules
+Kyle 'Avoca' Abent
 */
 
 Script.Load("lua/Weapons/Projectile.lua")
@@ -174,7 +175,7 @@ if Client then
         local cinematic = Client.CreateCinematic(RenderScene.Zone_Default)
         cinematic:SetCinematic(FireFlameCloud.kEffectName)
         cinematic:SetParent(self)
-        cinematic:SetRepeatStyle(Cinematic.Repeat_Loop)
+        cinematic:SetRepeatStyle(Cinematic.Repeat_Endless)
         cinematic:SetCoords(Coords.GetIdentity())
         
     end
@@ -218,13 +219,9 @@ function FireFlameCloud:DoSetOnFire()
     for _, entity in ipairs(GetEntitiesWithMixinForTeamWithinRange("Live", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin(), 2*kFireFlameCloudRadius)) do
 
         if not GetRecentlyDamaged(entity:GetId(), (Shared.GetTime() - kCloudUpdateRate)) and GetIsInCloud(self, entity, radius) then
-          local stackdmg = GetEntitiesWithinRange("FireGrenade", self:GetOrigin(), 4)
-          local number = #stackdmg
-          local variantdamage = 24
-           variantdamage = ConditionalValue(entity:isa("Player"), variantdamage * 0.9, variantdamage)
-          number = Clamp(number, 1, 4)
-            self:DoDamage( (number * variantdamage) * kCloudUpdateRate, entity, entity:GetOrigin(), GetNormalizedVector(self:GetOrigin() - entity:GetOrigin()), "none")
-         //   entity:SetOnFire(4)
+          local damage = kFlamethrowerDamage
+             if HasMixin(entity, "Construct") then damage = damage * 4 end 
+            self:DoDamage( damage, entity, entity:GetOrigin(), GetNormalizedVector(self:GetOrigin() - entity:GetOrigin()), "none")
             SetRecentlyDamaged(entity:GetId())
             
         end

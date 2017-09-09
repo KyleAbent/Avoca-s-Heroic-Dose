@@ -2,7 +2,7 @@ local networkVars =
 {
  avoca = "boolean",
  mainroom = "boolean",
- 
+ lastCheck = "time",
 }
 
 /*
@@ -20,6 +20,7 @@ local origInit = ARC.OnInitialized
 function ARC:OnInitialized()
     origInit(self)
      self:AddTimedCallback(ARC.Instruct, 2.5)
+     self.lastCheck = 0
 end
 function ARC:GetDamageType()
 return kDamageType.StructuresOnly
@@ -32,10 +33,42 @@ local function SoTheGameCanEnd(who) --Although HiveDefense prolongs it
    local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
    if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
 end
+local function CanMoveTo(self, target)    
 
+    if not target.GetReceivesStructuralDamage or not target:GetReceivesStructuralDamage() then        
+        return false
+    end
+    
+    if target:isa("PanicAttack") then
+        return false
+    end
+    
+     if self.avoca and not target:isa("Hive") then
+        return false
+    end
+    
+  --  if not target:GetIsSighted() and not GetIsTargetDetected(target) then
+ --       return false
+  --  end
+    
+   -- local distToTarget = (target:GetOrigin() - self:GetOrigin()):GetLengthXZ()
+   -- if (distToTarget > ARC.kFireRange) or (distToTarget < ARC.kMinFireRange) then
+   --     return false
+   -- end
+    
+    return true
+    
+end
+local function GetNearestEligable(self)
+    local nearest = GetNearestMixin(self:GetOrigin(), "Construct", 2, function(ent) return CanMoveTo(self, ent) end)
+    if nearest then
+    return nearest 
+    end
+end
 
-local function hasScan(who)
-          for _, scan in ipairs(GetEntitiesForTeamWithinRange("Scan", 1, who:GetOrigin(), kARCRange)) do
+local function hasScan(who, where)
+          if not where then where = who:GetOrigin() end 
+          for _, scan in ipairs(GetEntitiesForTeamWithinRange("Scan", 1, where, kScanRadius)) do
                if scan then
                   return true
              end
@@ -84,7 +117,7 @@ function ARC:GetCanFireAtTargetActual(target, targetPoint)
         return false
     end
     
-     if self.avoca and not target:isa("Hive") then
+     if self.avoca == true and not target:isa("Hive") then
         return false
     end
     
@@ -117,10 +150,39 @@ local function FindNewParent(who)
     who:SetOwner(player)
     end
 end
+function ARC:GiveScan()
+    local where = GetNearestEligable(self):GetOrigin()
+    
+    for _, shade in ipairs(GetEntitiesWithinRange("Shade", where, 20)) do
+         shade.shouldInk = true
+    end
+    
+    if not hasScan(self, where) then  
+      CreateEntity(Scan.kMapName, where , 1) 
+      end
+end
 
+
+local origu = ARC.OnUpdate
+function ARC:OnUpdate(deltaTime)
+    origu(self, deltaTime)
+   
+    if self:GetInAttackMode() and  GetIsTimeUp(self.lastCheck, 4)  then
+      self.lastCheck = Shared.GetTime()
+      self:GiveScan()
+    end
+
+end
+
+
+
+     
 local function GiveDeploy(who)
     --Print("GiveDeploy")
 who:GiveOrder(kTechId.ARCDeploy, who:GetId(), who:GetOrigin(), nil, true, true)
+CreateEntity(Scan.kMapName, who:GetOrigin(), 1) 
+
+
 end
 local function GiveUnDeploy(who)
      --Print("GiveUnDeploy")
@@ -130,40 +192,10 @@ local function GiveUnDeploy(who)
      who:TriggerEffects("arc_stop_charge")
      who:TriggerEffects("arc_undeploying")
 end
-local function CanMoveTo(self, target)    
-
-    if not target.GetReceivesStructuralDamage or not target:GetReceivesStructuralDamage() then        
-        return false
-    end
-    
-    if target:isa("PanicAttack") then
-        return false
-    end
-    
-     if self.avoca and not target:isa("Hive") then
-        return false
-    end
-    
-  --  if not target:GetIsSighted() and not GetIsTargetDetected(target) then
- --       return false
-  --  end
-    
-   -- local distToTarget = (target:GetOrigin() - self:GetOrigin()):GetLengthXZ()
-   -- if (distToTarget > ARC.kFireRange) or (distToTarget < ARC.kMinFireRange) then
-   --     return false
-   -- end
-    
-    return true
-    
-end
 
 
-local function GetNearestEligable(self)
-    local nearest = GetNearestMixin(self:GetOrigin(), "Construct", 2, function(ent) return CanMoveTo(self, ent) end)
-    if nearest then
-    return nearest 
-    end
-end
+
+
 local function MoveToMainRoom(self)
       
 --      for index, pheromone in ientitylist(Shared.GetEntitiesWithClassname("Pheromone")) do
@@ -202,7 +234,7 @@ local marines =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 6)
     if not who:GetInAttackMode() and #marines >= 1 then
          for i = 1, #marines do
               local marine = marines[i]
-              if marine:isa("Marine") then who:AddHealth(54) marine:AddHealth( math.random(4,8) ) end
+              if marine:isa("Marine") then who:AddHealth(200) marine:AddHealth( math.random(4,8) ) end
          end
     end
 

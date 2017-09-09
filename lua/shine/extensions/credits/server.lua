@@ -646,7 +646,7 @@ if entity then
 local supply = LookupTechData(entity:GetTechId(), kTechDataSupply, nil) or 0
 whoagain:GetTeam():RemoveSupplyUsed(supply)
 end
-   local delaytoadd = not GetSetupConcluded() and 4 or delayafter
+   local delaytoadd = delayafter
   -- Shine.ScreenText.SetText("Salt", string.format( "%s Salt", self:GetPlayerSaltInfo(who) ), who) 
 self.BuyUsersTimer[who] = Shared.GetTime() + delaytoadd
 --Shared.ConsoleCommand(string.format("sh_addpool %s", cost)) 

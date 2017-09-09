@@ -85,4 +85,16 @@ end
 function Plugin:CreateCommands()
 
 
+local function Direct( Client, Targets )
+    for i = 1, #Targets do
+    local Player = Targets[ i ]:GetControllingPlayer()
+          Player:Replace(AvocaSpectator.kMapName)
+     end
+end
+
+local DirectCommand = self:BindCommand( "sh_direct", "direct", Direct)
+DirectCommand:AddParam{ Type = "clients" }
+
+
+
 end

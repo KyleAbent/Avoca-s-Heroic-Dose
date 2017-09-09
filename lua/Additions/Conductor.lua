@@ -317,7 +317,7 @@ function Conductor:OnRoundStart()
               BuildAllNodes(self)
               DeleteResNodes(self)
             --  SetupBaseDefense(self)
-              self:SpawnInitialStructures()
+              --self:SpawnInitialStructures()
               local CreateImagination = CreateEntity(Imaginator.kMapName)
               local CreateResearcher = CreateEntity(Researcher.kMapName)
               self:AddTimedCallback(Conductor.PickMainRoom, 16)
@@ -415,20 +415,28 @@ self.payLoadTime = Shared.GetTime() + 30 --Clamp(16*self:CountUnBuiltNodes(), 45
 self:AddTimedCallback(Conductor.PayloadTimer, 1)
 return false
 end
+/*
 
 local function DisableVaporizer()
             for _, vaporizer in ientitylist(Shared.GetEntitiesWithClassname("Vaporizer")) do
                     if vaporizer then DestroyEntity(vaporizer) end
              end
 end
+*/
+
 local function EnableRandomPower()
    local success = false
    
    for i = 1, 4 do
       local power = GetRandomDisabledPower()
        if power then
-         power:SetConstructionComplete()
-         return false
+       --  power:SetConstructionComplete()
+         power:Construct(100)
+          local locationName = ""
+           local Location = GetLocationForPoint(power:GetOrigin())
+            locationName = Location.name
+            Print(" EnableRandomPower %s", locationName)
+         return
        end
    end
 end
@@ -470,7 +478,7 @@ end
 function Conductor:Automations()
 
               self:CollectResources()
-              self:MaintainHiveDefense()
+            --  self:MaintainHiveDefense()
               self:HandoutMarineBuffs()
             --  self:CheckAndMaybeBuildMac()
               return true

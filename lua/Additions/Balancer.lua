@@ -33,14 +33,14 @@ function Conductor:FirePhaseCannons(powerpoint)
              local origin = FindFreeSpace(powerpoint:GetOrigin())
              CreateEntity(Contamination.kMapName, FindFreeSpace(origin), 2)
              
-             for i = 1, 4 do
+             for i = 1, math.random(1,4) do
                local whip = CreateEntity(Whip.kMapName, FindFreeSpace(origin), 2)
-               whip:SetConstructionComplete()
+              -- whip:SetConstructionComplete()
              end
              
-             for i = 1 , 2 do
+             for i = 1 , math.random(1,2) do
              local crag = CreateEntity(Crag.kMapName, FindFreeSpace(origin), 2)
-             crag:SetConstructionComplete()
+            -- crag:SetConstructionComplete()
              end
              
              --Every 30s, 6 entities spawning without limit. Hm?
