@@ -70,7 +70,7 @@ local orig_PowerPoint_StopDamagedSound = PowerPoint.StopDamagedSound
     orig_PowerPoint_StopDamagedSound(self)
         if self:GetHealthScalar() ~= 1 then return end
          SpawnSurgeForEach(self:GetOrigin())
-         AddPayLoadTime(kTimeAddPowerBuilt)
+       --  AddPayLoadTime(kTimeAddPowerBuilt)
         local nearestHarvester = GetNearest(self:GetOrigin(), "Harvester", 2, function(ent) return LocationsMatch(self,ent)  end)
        if nearestHarvester then nearestHarvester:Kill() end
    end
