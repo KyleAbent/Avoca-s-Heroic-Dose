@@ -151,6 +151,9 @@ local function FindMarineOffense(where)
         end
         return nil
 end
+
+/*
+
 local function FindArcOrder(where)
           local neareststructure = GetNearestMixin(where, "Construct", 2, function(ent) return ent:GetIsSighted() and not ent:isa("Harvester") end)
          if neareststructure then
@@ -158,6 +161,9 @@ local function FindArcOrder(where)
         end
         return nil
 end
+
+
+
 local function MoveArcs(where)
         for _, arc in ipairs(GetEntitiesWithinRange("MainRoomArc", where, 999)) do
            if arc:GetCanMove()  then
@@ -166,6 +172,9 @@ local function MoveArcs(where)
        end
        
 end
+
+*/
+
 local function FindMarineDefense(where)
           local nearesttodefend = GetNearestMixin(where, "Combat", 1, function(ent) return HasMixin(ent, "Construct") end)
          if nearesttodefend then
@@ -319,7 +328,7 @@ function Conductor:OnRoundStart()
 end
 function Conductor:OnCreate() 
    if Server then
-   self.payLoadTime = 999
+   self.payLoadTime = 45
    self.phaseCannonTime = 30
    self.powerlighth = nil
    end
@@ -345,18 +354,18 @@ local function SetMarineBaseAsMain(self)
 end
 function Conductor:PickMainRoom()
        --Print("Picking main room")
-       if self:CounterComplete() then
+      -- if self:CounterComplete() then
              SetMarineBaseAsMain(self)
-      else
+      --else
        local location = self:GetLocationWithMostMixedPlayers()
        if not location then return true end
-       self:SetMainRoom(location:GetOrigin(), location, opcyst) 
+       self:SetMainRoom(location:GetOrigin(), location) 
        --self:OnPickMainRoom(location)
-        end
+       -- end
        return true
 end
-function Conductor:SetMainRoom(where, which, opcyst)
-        if Server then MoveArcs(where) end 
+function Conductor:SetMainRoom(where, which)
+      --  if Server then MoveArcs(where) end 
         self:CoordinateWithPowerNode(which.name)
         CreateAlienMarker(where) 
         SendMarineOrders(where)
@@ -383,8 +392,6 @@ function Conductor:ResetPC()
 --16 seconds for each built node
 self.phaseCannonTime = Shared.GetTime() + 15 --Clamp(16*self:CountUnBuiltNodes(), 45, 180)--+ 120
 self:AddTimedCallback(Conductor.PCTimer, 1)
-local built = {}
-local unbuilt = 0
 return false
 end
 
@@ -402,24 +409,43 @@ local built = {}
 end
 
 
+function Conductor:ResetPL()
+--16 seconds for each built node
+self.payLoadTime = Shared.GetTime() + 30 --Clamp(16*self:CountUnBuiltNodes(), 45, 180)--+ 120
+self:AddTimedCallback(Conductor.PayloadTimer, 1)
+return false
+end
 
 local function DisableVaporizer()
             for _, vaporizer in ientitylist(Shared.GetEntitiesWithClassname("Vaporizer")) do
                     if vaporizer then DestroyEntity(vaporizer) end
              end
 end
+local function EnableRandomPower()
+   local success = false
+   
+   for i = 1, 4 do
+      local power = GetRandomDisabledPower()
+       if power then
+         power:SetConstructionComplete()
+         return false
+       end
+   end
+end
 function Conductor:PayloadTimer()
 
    local boolean = false
        if  self:CounterComplete() then
                   boolean = true
-             if not SuddenDeathConditionsCheck(self) then
+           --  if not SuddenDeathConditionsCheck(self) then
                --GetGamerules():SetGameState(kGameState.Team2Won)
-               DisableVaporizer()
+              -- DisableVaporizer()
+                EnableRandomPower()
                self.payLoadTime = 0
-             else
-               AddPayLoadTime(8)
-             end
+            self:AddTimedCallback(Conductor.ResetPL, 8)      
+            -- else
+             --  AddPayLoadTime(8)
+           --  end
        end
        return not boolean
        

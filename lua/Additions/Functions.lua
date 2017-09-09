@@ -26,6 +26,8 @@ end
    
    return table.random(hives)
 end
+/*
+
 local function GetHasArcInRoom(who)
 //Though doesn't cover entire area .. then again i didn't measure
            local arcs = GetEntitiesForTeamWithinRange("ARC", 1, who:GetOrigin(), kScanRadius) --arcradius
@@ -74,6 +76,15 @@ function GetUnpoweredLocationWithoutArc()
  
 end
 
+*/
+function GetRandomDisabledPower()
+  local powers = {}
+  for _, power in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
+        if power:GetIsDisabled() then table.insert(powers,power) end
+    end
+    if #powers == 0 then return nil end
+    return table.random(powers)
+end
 function GetRandomActivePower()
   local powers = {}
   for _, power in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do

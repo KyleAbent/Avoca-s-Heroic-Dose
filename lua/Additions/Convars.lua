@@ -2,9 +2,9 @@ kTimeAddPowerBuilt = 2
 kTimeRemovePowerKilled = 0
 kArmoryAvoArcAddArmrAmt = 4 --per armor lvl
 
-kPresArmoryProtoEquivMult= 1
-kPresToClassesMult = 1
-kPresToStructureMult = 1
+kPresArmoryProtoEquivMult= 3
+kPresToClassesMult = 3
+kPresToStructureMult = 3
 
 kPresToSaltMultWeapons = 1
 gCreditStructureSentryLimit = 3

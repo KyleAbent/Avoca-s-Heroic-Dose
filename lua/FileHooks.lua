@@ -42,3 +42,17 @@ ModLoader.SetupFileHook( "lua/Drifter.lua", "lua/Drifter_Avoca.lua", "post" )
 ModLoader.SetupFileHook( "lua/PowerPoint.lua", "lua/PowerPoint_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Sentry.lua", "lua/Sentry_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Exo.lua", "lua/Exo_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/PrototypeLab.lua", "lua/PrototypeLab_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Weapons/Marine/ExoWeaponHolder.lua", "lua/Weapons/Marine/ExoWeaponHolder_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/TechData.lua", "lua/TechData_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/MarineTeam.lua", "lua/MarineTeam_Avoca.lua", "post" )
+
+
+ModLoader.SetupFileHook( "lua/TechTreeConstants.lua", "lua/TechTreeConstants_Avoca.lua", "post" )
+

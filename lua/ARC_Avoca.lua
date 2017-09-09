@@ -28,14 +28,14 @@ end
 
 
 
-local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
+local function SoTheGameCanEnd(who) --Although HiveDefense prolongs it
    local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
    if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
 end
 
 
 local function hasScan(who)
-          for _, scan in ipairs(GetEntitiesWithMixinForTeamWithinRange("Scan", 1, who:GetOrigin(), kARCRange)) do
+          for _, scan in ipairs(GetEntitiesForTeamWithinRange("Scan", 1, who:GetOrigin(), kARCRange)) do
                if scan then
                   return true
              end
@@ -44,11 +44,10 @@ local function hasScan(who)
           return false
 end
 
-local function CheckHivesForScan()
+local function CheckHivesForScan(who)
 local hives = {}
     
-          
-           for _, hiveent in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
+           for _, hive in ipairs(GetEntitiesForTeamWithinRange("Hive", 2, who:GetOrigin(), kARCRange)) do
              table.insert(hives, hiveent)
           end
           
@@ -57,7 +56,7 @@ local hives = {}
           for i = 1, #hives do
              local ent = hives[i]
               if not hasScan(ent) then
-             SoTheGameCanEnd(self, ent)
+             SoTheGameCanEnd(who)
              end
           end
 end
@@ -105,7 +104,7 @@ function ARC:InRadius()
 return  GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self) 
 end
 local function ShouldStop(who)
-if self.mainroom then return false end
+if who.mainroom then return false end
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
 if #players >=1 then return false end
 return true
@@ -131,8 +130,40 @@ local function GiveUnDeploy(who)
      who:TriggerEffects("arc_stop_charge")
      who:TriggerEffects("arc_undeploying")
 end
+local function CanMoveTo(self, target)    
+
+    if not target.GetReceivesStructuralDamage or not target:GetReceivesStructuralDamage() then        
+        return false
+    end
+    
+    if target:isa("PanicAttack") then
+        return false
+    end
+    
+     if self.avoca and not target:isa("Hive") then
+        return false
+    end
+    
+  --  if not target:GetIsSighted() and not GetIsTargetDetected(target) then
+ --       return false
+  --  end
+    
+   -- local distToTarget = (target:GetOrigin() - self:GetOrigin()):GetLengthXZ()
+   -- if (distToTarget > ARC.kFireRange) or (distToTarget < ARC.kMinFireRange) then
+   --     return false
+   -- end
+    
+    return true
+    
+end
 
 
+local function GetNearestEligable(self)
+    local nearest = GetNearestMixin(self:GetOrigin(), "Construct", 2, function(ent) return CanMoveTo(self, ent) end)
+    if nearest then
+    return nearest 
+    end
+end
 local function MoveToMainRoom(self)
       
 --      for index, pheromone in ientitylist(Shared.GetEntitiesWithClassname("Pheromone")) do
@@ -140,7 +171,7 @@ local function MoveToMainRoom(self)
     --        break
       --     end
       
-      local where = GetUnpoweredLocationWithoutArc()
+      local where = GetNearestEligable(self) --GetUnpoweredLocationWithoutArc()
       if not where then return end
            self:GiveOrder(kTechId.Move, nil, FindFreeSpace(where:GetOrigin()), nil, true, true)
 
@@ -267,7 +298,7 @@ end
 
 function ARC:Instruct()
    --Print("Arc instructing")
-    CheckHivesForScan()
+    CheckHivesForScan(self)
    self:SpecificRules()
    return true
 end
@@ -286,13 +317,25 @@ end
 
 end 
 
+    function ARC:OnDamageDone(doer, target)
+    
+        if doer == self then
+        
+         self:AddHealth(100)
+            
+        end
+        
+    end
+    
+
+
 end//server
 
 function ARC:GetUnitNameOverride(viewer)
     local unitName = GetDisplayName(self)   
     if self.mainroom then
       if  not self:GetInAttackMode() then
-    unitName = string.format(Locale.ResolveString("UnpoweredPL") )
+    unitName = string.format(Locale.ResolveString("StructureFinder") )
     end
    elseif self.avoca then 
        unitName = string.format(Locale.ResolveString("Hive-Payload") )

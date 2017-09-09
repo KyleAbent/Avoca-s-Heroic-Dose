@@ -11,6 +11,8 @@ Script.Load("lua/Additions/Vaporizer.lua")
 Script.Load("lua/Additions/PhaseAvoca.lua") 
 Script.Load("lua/Additions/Researcher.lua") 
 Script.Load("lua/Additions/Director.lua") 
+Script.Load("lua/Additions/ExoFlamer.lua") 
+Script.Load("lua/Additions/ExoWelder.lua") 
 
     
    

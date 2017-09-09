@@ -382,7 +382,7 @@ local ips = GetEntitiesForTeamWithinRange("InfantryPortal", 1, who:GetOrigin(), 
       
 
             for index, ent in ipairs(ips) do
-              if ent:GetIsPowered() or not ent:GetIsBuilt() and not GetIsACreditStructure(ent) then
+              if ent:GetIsPowered() or not ent:GetIsBuilt() then
                   count = count + 1
                end   
            end

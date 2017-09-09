@@ -3,7 +3,7 @@ local function AlreadySpawned(self, origin)
         if ents and #ents >= 4 then return true else return false end
         
 end
-/*
+
 
 
 function Conductor:SpawnBaseEntities()
@@ -37,7 +37,7 @@ local techPointOrigin = nil
     
 end
 
-*/
+
 
 /*
 local function SpawnAlienHives(self)
