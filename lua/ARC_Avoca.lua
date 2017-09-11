@@ -88,6 +88,20 @@ local function GetNearestEligable(self)
     end
 end
 
+
+local function GetRandomEligable(self)
+ local eligable = {}
+        for index, target in ipairs(GetEntitiesWithMixinWithinRange("Construct", self:GetOrigin(), 9999 )) do
+                if target:GetTeamNumber() == 2 and CanMoveTo(self, target) then
+                  table.insert(eligable, target)
+                end
+          end
+          if #eligable == 0 then return nil end
+          local ent = table.random(eligable)
+        --  Print("GetRandomEligable is %s", ent:GetMapName())
+          return  ent
+end
+
 local function hasScan(who, where)
           if not where then where = who:GetOrigin() end 
           for _, scan in ipairs(GetEntitiesForTeamWithinRange("Scan", 1, where, kScanRadius)) do
@@ -243,14 +257,16 @@ end
 
 
 local function MoveToMainRoom(self)
-      
+        Print("MoveToMainRoom 1")
 --      for index, pheromone in ientitylist(Shared.GetEntitiesWithClassname("Pheromone")) do
   --          self:GiveOrder(kTechId.Move, nil, pheromone:GetOrigin(), nil, true, true)
     --        break
       --     end
-      local where = GetNearestEligable(self) --GetUnpoweredLocationWithoutArc()
+      local ent = GetRandomEligable(self) --GetUnpoweredLocationWithoutArc()
+             -- Print("MoveToMainRoom ent is %s", ent:GetMapName())
+      local where = ent:GetOrigin()
       if not where then return end
-      self:GiveOrder(kTechId.Move, nil, FindFreeSpace(where:GetOrigin()), nil, true, true)
+      self:GiveOrder(kTechId.Move, nil, FindFreeSpace(where), nil, true, true)
 
 end
 

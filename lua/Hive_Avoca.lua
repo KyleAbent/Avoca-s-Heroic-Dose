@@ -13,8 +13,8 @@ function Hive:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoin
 
     -- webs can't be destroyed with bullet weapons
     if doer ~= nil then 
-        local scale = ConditionalValue(GetTechPoint(self:GetOrigin()) ~= nil, 1, 0.5) 
-        damageTable.damage = damageTable.damage * scale
+      --  local scale = ConditionalValue(GetTechPoint(self:GetOrigin()) ~= nil, 1, 0.5) 
+      --  damageTable.damage = damageTable.damage * scale
         
         if doer:isa("ARC") and doer.avoca == true then
          damageTable.damage = damageTable.damage * 2
@@ -130,9 +130,10 @@ local function BuildRoomPower(who)
 
      local nearestPower = GetNearest(who:GetOrigin(), "PowerPoint", 1, function(ent) return LocationsMatch(who,ent)  end)
        if nearestPower and nearestPower:GetIsDisabled() then
-            local cheaptrick = CreateEntity(PowerPoint.kMapName, nearestPower:GetOrigin(), 1)
-            cheaptrick:SetConstructionComplete()
-                DestroyEntity(nearestPower) 
+            --local cheaptrick = CreateEntity(PowerPoint.kMapName, nearestPower:GetOrigin(), 1)
+            nearestPower:OnConstructionComplete()
+            nearestPower:SpawnSurgeForEach(nearestPower:GetOrigin(), nearestPower)
+               -- DestroyEntity(nearestPower) 
        end
        
        
@@ -149,10 +150,10 @@ end
 
 local orig_Hive_OnKill = Hive.OnKill
 function Hive:OnKill(attacker, doer, point, direction)
- self:UpdateAliensWeaponsManually()
+ --self:UpdateAliensWeaponsManually()
 --if self:GetIsBuilt() then AddPayLoadTime(16) end
-local child = GetTechPoint(self:GetOrigin())
-BuildRoomPower(child)
+--local child = GetTechPoint(self:GetOrigin())
+BuildRoomPower(self)
 --DestroyAvocaArcInRadius(self:GetOrigin())
 --child:SetIsVisible(false)
  return orig_Hive_OnKill(self,attacker, doer, point, direction)

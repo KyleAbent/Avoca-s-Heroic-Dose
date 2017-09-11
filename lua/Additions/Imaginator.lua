@@ -308,10 +308,10 @@ return false
 
 end
 
-local function GetHasSixHives()
+local function GetHasFourHives()
 local Hives = #GetEntitiesForTeam( "Hive", 2 )
 
-if Hives >= 6 then return true end
+if Hives >= 4 then return true end
 
 return false
 
@@ -645,7 +645,7 @@ local tospawn = {}
       table.insert(tospawn, kTechId.Whip)
       end
     
-    
+    /*
       if TresCheck(2,40) then
           for _, techpoint in ientitylist(Shared.GetEntitiesWithClassname("TechPoint")) do
                    local location = GetLocationForPoint(techpoint:GetOrigin())
@@ -656,9 +656,9 @@ local tospawn = {}
              end
           end
      end
+    */
    
-   
-       if not GetHasSixHives() then
+       if not GetHasFourHives() then
       table.insert(tospawn, kTechId.Hive)
       end
   
