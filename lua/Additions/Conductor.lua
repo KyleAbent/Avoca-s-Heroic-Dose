@@ -384,6 +384,13 @@ function Conductor:GetPhaseFourLength()
  return self.PhaseFourTimer 
 end
 
+
+function Conductor:GetIsPhaseOneBoolean()
+        return  self.isPhaseOne 
+end
+function Conductor:GetIsPhaseTwoBoolean()
+        return  self.isPhaseTwo
+end
 function Conductor:GetIsPhaseTwo()
            local gamestarttime = GetGameInfoEntity():GetStartTime()
            local gameLength = Shared.GetTime() - gamestarttime
@@ -415,6 +422,10 @@ end
 function Conductor:CountPhaseOneTimer()
        if  self:GetIsPhaseOne() then   
         self.isPhaseOne = true
+       self.isPhaseTwo = false
+       self.isPhaseOne = false
+      self.isPhaseThree = false
+      self.isPhaseFour = false
        end 
 end
  
@@ -422,7 +433,11 @@ end
 function Conductor:CountPhaseTwoTimer()
        if  self:GetIsPhaseTwo() then
             Print("Conductor CountPhaseTwoTimer GetIsPhaseTwo true")
-            self.isPhaseTwo = true
+           self.isPhaseOne = false
+           self.isPhaseTwo = true
+           self.isPhaseOne = false
+           self.isPhaseThree = false
+           self.isPhaseFour = false
             self:TriggerPhaseTwo()
        end 
 end
@@ -430,14 +445,22 @@ end
  
 function Conductor:CountPhaseThreeTimer()
        if  self:GetIsPhaseThree() then
-        self.isPhaseThree = true
+           self.isPhaseOne = false
+           self.isPhaseTwo = true
+           self.isPhaseOne = false
+           self.isPhaseThree = true
+           self.isPhaseFour = false
        end 
 end
 
 
 function Conductor:CountPhaseFourTimer()
        if  self:GetIsPhaseFour() then
-        self.isPhaseFour = true
+           self.isPhaseOne = false
+           self.isPhaseTwo = true
+           self.isPhaseOne = false
+           self.isPhaseThree = true
+           self.isPhaseFour = true
        end 
 end
 
@@ -450,7 +473,7 @@ if Server then
      if gamestarted then 
        if not self.timelasttimerup or self.timelasttimerup + 1 <= Shared.GetTime() then
        if not self.isPhaseOne then self:CountPhaseOneTimer() end
-           if not self.isPhaseTwo then
+           if self.isPhaseOne then
            self:CountPhaseTwoTimer() 
         --   elseif self.SiegeTimer == 0 and not self.isSuddenDeath  then
           -- self:CountSDTimer() 

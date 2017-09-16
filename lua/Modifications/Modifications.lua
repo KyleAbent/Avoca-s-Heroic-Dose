@@ -15,6 +15,73 @@ kFadeGestateTime = 1
 kOnosGestateTime = 1
 */
 
+/*
+
+if Server then
+
+
+local origkill = LiveMixin.Kill
+function LiveMixin:Kill(attacker, doer, point, direction)
+  if self:GetIsAlive() and self:GetCanDie() then
+          ---Rebirth
+          
+         if self:isa("Alien") then
+         
+           Print("Alien On Kill")
+          if GetConductor():GetIsPhaseOneBoolean() and math.random(1,3) == 3  then
+             Print("Alien On Kill Phase One 30% chance")
+            if self:isa("Skulk") and math.random(1,3) == 3 then
+             Print("Alien On Kill Phase One SKulk Trigger Xeno")
+              self:TriggerXenocide()
+            end
+             
+          
+                    if attacker and attacker:isa("Player")  then 
+                      local points = self:GetPointValue()
+                       attacker:AddScore(points)
+                     end 
+                       Print("Alien On Kill Rebirth")
+                self:TriggerRebirth()
+                return
+                end
+              
+             
+
+             
+         end
+            
+            --Hunger
+            /*
+      if self:GetTeamNumber() == 1 then 
+         if self:isa("Player")  then
+              if attacker and attacker:isa("Alien") and attacker:isa("Player") and GetHasHungerUpgrade(attacker) then
+                  local duration = 6
+                     if attacker:isa("Onos") then
+                       duration = duration * .7
+                       end
+                    attacker:TriggerEnzyme(duration)
+
+          attacker:AddEnergy(attacker:GetMaxEnergy() * .10 )
+          attacker:AddHealth(attacker:GetHealth() * (10/100))
+        end
+      elseif ( HasMixin(self, "Construct") or self:isa("ARC") or self:isa("MAC") ) and attacker and attacker:isa("Player") then 
+              if GetHasHungerUpgrade(attacker) and attacker:isa("Gorge") and doer:isa("DotMarker") then 
+                        attacker:TriggerEnzyme(5)
+                        attacker:AddEnergy(attacker:GetMaxEnergy() * .10)
+               end
+          end
+     end 
+     */
+            
+    /*
+        
+   end     
+return origkill(self, attacker, doer, point, direction)
+end
+
+end
+
+*/
 
 if Server then
 

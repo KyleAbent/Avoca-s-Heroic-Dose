@@ -420,10 +420,10 @@ function ARC:GetUnitNameOverride(viewer)
     local unitName = GetDisplayName(self)   
     if self.mainroom then
       if  not self:GetInAttackMode() then
-    unitName = string.format(Locale.ResolveString("StructureFinder (%s)") )
+    unitName = string.format(Locale.ResolveString("StructureFinder ") )
     end
    elseif self.avoca then 
-       unitName = string.format(Locale.ResolveString("Hive-Payload (%s)") )
+       unitName = string.format(Locale.ResolveString("Hive-Payload") )
    end
 return unitName
 end  

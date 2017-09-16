@@ -796,6 +796,16 @@ GetGamerules().team2
 end
 */
 
+local function HasTeamInNeed(who)
+    for _, entity in ipairs(GetEntitiesWithinRange("Live", who:GetOrigin(), who.kHealRadius)) do
+                     if entity:GetIsAlive() and not entity:isa("Commander") then //marine:GetClient():GetIsVirtual(
+                       if entity:GetIsInCombat() and entity:GetHealthScalar() <= 0.91  then
+                          return true
+                        end
+                     end
+    end
+end
+
 local function AllNearByHealWave(who)
     for _, crag in ipairs(GetEntitiesWithinRange("Crag", who:GetOrigin(), who.kHealRadius)) do
          if not crag:GetIsOnFire() and  GetIsUnitActive(crag) then
@@ -804,13 +814,19 @@ local function AllNearByHealWave(who)
     end
 end
 
-local function GetAlienSpawnList(cystonly)
+local function GetAlienSpawnList(self)
+
+//local tospawn = {}
+
 
 local tospawn = {}
+local canafford = {}
 
      -- if cystonly == true then 
      -- return kTechId.Cyst
     --  end
+      
+      /*
       
        if TresCheck(2,kCragCost) then
       table.insert(tospawn, kTechId.Crag)
@@ -825,6 +841,8 @@ local tospawn = {}
           if TresCheck(2,kWhipCost) then
       table.insert(tospawn, kTechId.Whip)
       end
+      
+      */
     
     /*
       if TresCheck(2,40) then
@@ -839,11 +857,37 @@ local tospawn = {}
      end
     */
    
+   
+      local  Shift = #GetEntitiesForTeam( "Shift", 2 )
+      
+      if Shift <= 14 then
+      table.insert(tospawn, kTechId.Shift)
+      end 
+      
+      local  Whip = #GetEntitiesForTeam( "Whip", 2 )
+      if Whip <= 18 then
+      table.insert(tospawn, kTechId.Whip)
+      end 
+      
+      local  Crag = GetEntitiesForTeam( "Crag", 2 )
+      if #Crag <= 18 then
+      table.insert(tospawn, kTechId.Crag)
+      end 
+      
+      
        if not GetHasSixHives() then
       table.insert(tospawn, kTechId.Hive)
       end
   
   
+         for _, techid in pairs(tospawn) do
+          local cost = LookupTechData(techid, kTechDataCostKey)
+           if not gamestarted or TresCheck(2,cost) then
+             table.insert(canafford, techid)   
+           end
+    end
+  
+      local  Crag = GetEntitiesForTeam( "Crag", 2 )
         --HealWave
       if #Crag >= 1 and  TresCheck(2,2) then
           for i = 1, #Crag do
@@ -858,8 +902,13 @@ local tospawn = {}
           end
       end
       
+      
+      local finalchoice = table.random(canafford)
+      local finalcost = LookupTechData(finalchoice, kTechDataCostKey)
+      --Print("GetAlienSpawnList() return finalchoice %s, finalcost %s", finalchoice, finalcost)
+      return finalchoice, finalcost
   
-      return table.random(tospawn)
+    --  return table.random(tospawn)
 end
 
 local function UpgChambers()
@@ -976,7 +1025,7 @@ local function GetAlienSpawnNearEntity()
   local location = nil
   --Fine tuned ;)
             for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-                    if powerpoint and  powerpoint:GetIsDisabled()  then
+                    if powerpoint and not  powerpoint:GetCanTakeDamageOverride()  then
                     table.insert(ents, powerpoint)
                     end
              end
@@ -994,11 +1043,11 @@ local function GetAlienSpawnNearEntity()
          */
          
              for _, entity in ipairs( GetEntitiesWithMixinForTeam("Construct", 2 ) ) do
-                  local location = GetLocationForPoint(entity:GetOrigin())
-                  local powerpoint =  location and GetPowerPointForLocation(location.name)
-                  if powerpoint and powerpoint:GetIsDisabled() then
+                --  local location = GetLocationForPoint(entity:GetOrigin())
+                --  local powerpoint =  location and GetPowerPointForLocation(location.name)
+                --  if powerpoint and powerpoint:GetIsDisabled() then
                      table.insert(ents, entity)
-                   end
+                 --  end
             end
             
             table.insert(ents, GetRandomHive())
@@ -1095,7 +1144,7 @@ function Imaginator:ActualAlienFormula(cystonly)
  ManageDrifters() 
 local randomspawn = nil
 local spawnNearEnt = GetAlienSpawnNearEntity() 
-local tospawn = GetAlienSpawnList(self, cystonly) --, cost, gamestarted = GetAlienSpawnList(self, cystonly)
+local tospawn, cost = GetAlienSpawnList(self) --, cost, gamestarted = GetAlienSpawnList(self, cystonly)
 local success = false
 local entity = nil
 
