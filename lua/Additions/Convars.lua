@@ -1,3 +1,8 @@
+
+
+--kPhaseOneTimer = 300
+--kPhaseTwoTimer = 900
+
 kTimeAddPowerBuilt = 2
 kTimeRemovePowerKilled = 0
 kArmoryAvoArcAddArmrAmt = 4 --per armor lvl

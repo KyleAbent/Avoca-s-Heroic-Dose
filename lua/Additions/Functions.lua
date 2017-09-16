@@ -1,3 +1,17 @@
+function GetConductor() --it washed away
+    local entityList = Shared.GetEntitiesWithClassname("Conductor")
+    if entityList:GetSize() > 0 then
+                 local conductor = entityList:GetEntityAtIndex(0) 
+                 return conductor
+    end    
+    return nil
+end
+
+ function IsInRangeOfHive(who)
+      local hives = GetEntitiesWithinRange("Hive", who:GetOrigin(), Shade.kCloakRadius)
+   if #hives >=1 then return true end
+   return false
+end
  function GetTechPoint(where) --getnearest
     for _, techpoint in ipairs(GetEntitiesWithinRange("TechPoint", where, 8)) do
          if techpoint then return techpoint end

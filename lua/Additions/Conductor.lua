@@ -12,10 +12,43 @@ Conductor.kMapName = "conductor"
 local networkVars = 
 
 {
+
+   PhaseTwoTimer = "float",
+   PhaseOneTimer = "float",
+   PhaseThreeTimer = "float",
+   PhaseFourTimer = "float",
+   
+   isPhaseOne = "boolean",
+   isPhaseTwo = "boolean",
+   isPhaseThree = "boolean",
+   isPhaseFour = "boolean",
+   
+   
    payLoadTime = "float",
    phaseCannonTime = "float"
 }
 
+function Conductor:TimerValues()
+   if kPhaseOneTimer == nil then kPhaseOneTimer = 300 end
+   if kPhaseTwoTimer == nil then kPhaseTwoTimer = 600 end
+   if kPhaseThreeTimer == nil then kPhaseThreeTimer = 900 end
+   if kPhaseFourTimer == nil then kPhaseFourTimer = 1200 end
+  
+  
+   self.PhaseOneTimer = kPhaseOneTimer
+   self.PhaseTwoTimer = kPhaseTwoTimer
+   self.PhaseThreeTimer = kPhaseThreeTimer
+   self.PhaseFourTimer = kPhaseFourTimer
+   
+   self.isPhaseTwo = false
+   self.isPhaseOne = false
+   self.isPhaseThree = false
+   self.isPhaseFour = false
+   
+end
+function Conductor:OnReset() 
+   self:TimerValues()
+end
 /*
 local function AddPlayerResources(harvesters, extractors)
   --Settling with this cheap stuff for now to just see how it works without spending too much time on it
@@ -318,7 +351,9 @@ function Conductor:OnRoundStart()
               DeleteResNodes(self)
             --  SetupBaseDefense(self)
               self:SpawnInitialStructures()
-             -- self:AddTimedCallback(Conductor.PickMainRoom, 16)
+              
+              ----------------Make these onUpdate
+            --  self:AddTimedCallback(Conductor.PickMainRoom, 16)
               self:AddTimedCallback(Conductor.Automations, 8)
               self:AddTimedCallback(Conductor.PayloadTimer, 1)
               self:AddTimedCallback(Conductor.PCTimer, 1)
@@ -330,7 +365,108 @@ function Conductor:OnCreate()
    self.phaseCannonTime = 30
    self.powerlighth = nil
    end
+  self:TimerValues()
+      self:SetUpdates(true)
 end
+
+
+function Conductor:GetPhaseOneLength()
+ return self.PhaseOneTimer 
+end
+function Conductor:GetPhaseTwoLength()
+ return self.PhaseTwoTimer 
+end
+
+function Conductor:GetPhaseThreeLength()
+ return self.PhaseThreeTimer 
+end
+function Conductor:GetPhaseFourLength()
+ return self.PhaseFourTimer 
+end
+
+function Conductor:GetIsPhaseTwo()
+           local gamestarttime = GetGameInfoEntity():GetStartTime()
+           local gameLength = Shared.GetTime() - gamestarttime
+           return  gameLength >= self.PhaseTwoTimer
+end
+function Conductor:GetIsPhaseOne()
+           local gamestarttime = GetGameInfoEntity():GetStartTime()
+           local gameLength = Shared.GetTime() - gamestarttime
+           return  gameLength >= self.PhaseOneTimer
+end
+ 
+ function Conductor:GetIsPhaseThree()
+           local gamestarttime = GetGameInfoEntity():GetStartTime()
+           local gameLength = Shared.GetTime() - gamestarttime
+           return  gameLength >= self.PhaseThreeTimer
+end
+function Conductor:GetIsPhaseFour()
+           local gamestarttime = GetGameInfoEntity():GetStartTime()
+           local gameLength = Shared.GetTime() - gamestarttime
+           return  gameLength >= self.PhaseFourTimer
+end
+
+
+function Conductor:TriggerPhaseTwo()
+  
+end 
+
+
+function Conductor:CountPhaseOneTimer()
+       if  self:GetIsPhaseOne() then   
+        self.isPhaseOne = true
+       end 
+end
+ 
+   
+function Conductor:CountPhaseTwoTimer()
+       if  self:GetIsPhaseTwo() then
+            Print("Conductor CountPhaseTwoTimer GetIsPhaseTwo true")
+            self.isPhaseTwo = true
+            self:TriggerPhaseTwo()
+       end 
+end
+
+ 
+function Conductor:CountPhaseThreeTimer()
+       if  self:GetIsPhaseThree() then
+        self.isPhaseThree = true
+       end 
+end
+
+
+function Conductor:CountPhaseFourTimer()
+       if  self:GetIsPhaseFour() then
+        self.isPhaseFour = true
+       end 
+end
+
+
+function Conductor:OnUpdate(deltatime)
+if Server then
+  
+ 
+    local gamestarted = GetGamerules():GetGameStarted()
+     if gamestarted then 
+       if not self.timelasttimerup or self.timelasttimerup + 1 <= Shared.GetTime() then
+       if not self.isPhaseOne then self:CountPhaseOneTimer() end
+           if not self.isPhaseTwo then
+           self:CountPhaseTwoTimer() 
+        --   elseif self.SiegeTimer == 0 and not self.isSuddenDeath  then
+          -- self:CountSDTimer() 
+          elseif self.isPhaseTwo and not self.isPhaseFour  then
+              if not self.isPhaseThree then self:CountPhaseThreeTimer() end
+              self:CountPhaseFourTimer()
+           end
+        self.timeLastAutomations = Shared.GetTime()
+         end
+  end
+  
+  
+  end
+  
+  
+end 
 function Conductor:GetIsMapEntity()
 return true
 end
@@ -415,7 +551,7 @@ end
 
 function Conductor:ResetPL()
 --16 seconds for each built node
-self.payLoadTime = Shared.GetTime() + 30 --Clamp(16*self:CountUnBuiltNodes(), 45, 180)--+ 120
+self.payLoadTime = Shared.GetTime() + 60 --Clamp(16*self:CountUnBuiltNodes(), 45, 180)--+ 120
 self:AddTimedCallback(Conductor.PayloadTimer, 1)
 return false
 end

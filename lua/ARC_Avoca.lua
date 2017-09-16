@@ -1,3 +1,5 @@
+Script.Load("lua/Additions/LevelsMixin.lua")
+
 local networkVars = 
 {
  avoca = "boolean",
@@ -5,14 +7,9 @@ local networkVars =
  lastCheck = "time",
 }
 
-/*
-
-function ARC:OnCreate()
- ARC.OnCreate(self)
-end
+AddMixinNetworkVars(LevelsMixin, networkVars)
 
 
-*/
 
 function ARC:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
@@ -28,6 +25,15 @@ end
 
 if Server then
 
+
+function ARC:OnAddXp()
+  local dmg = kARCDamage
+  self.kAttackDamage = dmg * (self.level/100) + dmg
+end
+
+
+    
+    
 local origInit = ARC.OnInitialized
 
 function ARC:OnInitialized()
@@ -39,7 +45,18 @@ function ARC:OnInitialized()
      else
      self.mainroom = true
         end
+     InitMixin(self, LevelsMixin)
 end
+
+
+    function ARC:GetMaxLevel()
+    return 30
+    end
+    function ARC:GetAddXPAmount()
+    return 0.25
+    end
+    
+
 function ARC:GetDamageType()
 return kDamageType.StructuresOnly
 end
@@ -194,7 +211,7 @@ local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
 
       for i = 1, #players do
         local ent = players[i]
-          if ent:isa("Marine") then ent:AddHealth(200) ent:AddHealth( math.random(4,8) ) end
+           if not  who:GetInAttackMode() and  ent:isa("Marine") then ent:AddHealth(200) ent:AddHealth( math.random(4,8) ) end
          if ent:GetIsAlive() then return false end
       end
       
@@ -257,7 +274,7 @@ end
 
 
 local function MoveToMainRoom(self)
-        Print("MoveToMainRoom 1")
+     --   Print("MoveToMainRoom 1")
 --      for index, pheromone in ientitylist(Shared.GetEntitiesWithClassname("Pheromone")) do
   --          self:GiveOrder(kTechId.Move, nil, pheromone:GetOrigin(), nil, true, true)
     --        break
@@ -388,7 +405,7 @@ end
     function ARC:OnDamageDone(doer, target)
     
         if doer == self then
-        
+         self:AddXP(self:GetAddXPAmount())
          self:AddHealth(100)
             
         end
@@ -403,10 +420,10 @@ function ARC:GetUnitNameOverride(viewer)
     local unitName = GetDisplayName(self)   
     if self.mainroom then
       if  not self:GetInAttackMode() then
-    unitName = string.format(Locale.ResolveString("StructureFinder") )
+    unitName = string.format(Locale.ResolveString("StructureFinder (%s)") )
     end
    elseif self.avoca then 
-       unitName = string.format(Locale.ResolveString("Hive-Payload") )
+       unitName = string.format(Locale.ResolveString("Hive-Payload (%s)") )
    end
 return unitName
 end  

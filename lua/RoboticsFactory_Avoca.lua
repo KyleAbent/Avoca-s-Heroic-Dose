@@ -9,13 +9,13 @@ local function GetArcsAmount()
 end
 
 
-
+/*
 function RoboticsFactory:OnConstructionComplete()
 
    self:UpgradeToTechId(kTechId.ARCRoboticsFactory)
 
 end
-
+*/
 
 function RoboticsFactory:GetTechButtons(techId) 
 

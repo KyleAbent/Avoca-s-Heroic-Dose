@@ -1,3 +1,7 @@
+function Armory:GetMinRangeAC()
+return 16 
+end
+
 function Armory:GetShouldResupplyPlayer(player)
     if not player:GetIsAlive() then
         return false

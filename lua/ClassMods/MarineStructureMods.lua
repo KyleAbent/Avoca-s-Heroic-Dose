@@ -42,7 +42,7 @@ function ConstructMixin:OnConstructionComplete(builder)
 end
 
 function ConstructMixin:OnUpdate(deltaTime)
-  if not self:GetIsInCombat() and not self:isa("PowerPoint") and self:GetTeamNumber() == 1 and not self:GetIsBuilt() and GetIsRoomPowerUp(self) then
+  if ( self.GetIsInCombat  ) and not self:GetIsInCombat() and not self:isa("PowerPoint") and self:GetTeamNumber() == 1 and not self:GetIsBuilt() and GetIsRoomPowerUp(self) then
  -- Print("derp")
   self:Construct(0.0125)
   end

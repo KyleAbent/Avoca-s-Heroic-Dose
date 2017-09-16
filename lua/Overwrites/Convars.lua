@@ -27,9 +27,9 @@ kSpikeMinDamage = 4 -- Temp nerf for bots without overcomplicating thigns
 kDrifterSelfOrderRange = 999 --mapwide eh
 
 
-kWelderPowerRepairRate = 880
-kBuilderPowerRepairRate = 880
-kWelderSentryRepairRate = 150 * 2.5
+--kWelderPowerRepairRate = 880
+--kBuilderPowerRepairRate = 880
+--kWelderSentryRepairRate = 150 * 2.5
 
 
 kHydraHealth = 700    kHydraArmor = 40    kHydraPointValue = 4
