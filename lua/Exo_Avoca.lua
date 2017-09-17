@@ -138,20 +138,10 @@ local function HealSelf(self)
 
 
   local toheal = true
-  local stack = 1
-  
-                for _, proto in ipairs(GetEntitiesForTeamWithinRange("PrototypeLab", 1, self:GetOrigin(), 4)) do
-                    
-                    if GetIsUnitActive(proto) then
-                        stack = stack + 1
-                    end
-                    
-                end
-           
-          --  Print("toheal is %s", toheal)
+   --  Print("toheal is %s", toheal)
     if toheal then
     local amt = kNanoArmorHealPerSecond
-    amt = Clamp(amt * stack, 1, 3)
+    amt = amt * ConditionalValue(self:GetIsInCombat(), 0, 2)
     self:SetArmor(self:GetArmor() + amt, true) 
     end
     return true
@@ -174,7 +164,7 @@ function Exo:OnInitialized()
 oninit(self)
     InitMixin(self, StunMixin)
    self:SetTechId(kTechId.Exo)
-  -- self:AddTimedCallback(function() HealSelf(self) return true end, 1) 
+   self:AddTimedCallback(function() HealSelf(self) return true end, 1) 
   --  self.currentWallWalkingAngles = Angles(0.0, 0.0, 0.0)
  --   self.timeLastWallJump = 0
 end

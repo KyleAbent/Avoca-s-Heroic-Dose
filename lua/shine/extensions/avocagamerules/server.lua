@@ -8,7 +8,7 @@ Plugin.Version = "1.0"
 
 Shine.Hook.SetupClassHook( "PlayingTeam", "GetCommander", "OnGetCommander", "Replace" )
 
-Shine.Hook.SetupClassHook( "Conductor", "TriggerPhaseTwo", "OnTriggerPhaseTwo", "Replace" )
+Shine.Hook.SetupClassHook( "Conductor", "TriggerPhaseTwo", "OnTriggerPhaseTwo", "PassivePost" )
 
 function Plugin:NotifyPayloadTimer( Player, String, Format, ... )
 Shine:NotifyDualColour( Player, 255, 165, 0,  "[PayloadTimer]",  math.random(0,255), math.random(0,255), math.random(0,255), String, Format, ... )

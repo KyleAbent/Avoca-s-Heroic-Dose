@@ -1,4 +1,6 @@
 
+kEggBeaconBuildTime = 8
+kStructureBeaconBuildTime = 8
 
 --kPhaseOneTimer = 300
 --kPhaseTwoTimer = 900
@@ -7,12 +9,7 @@ kTimeAddPowerBuilt = 2
 kTimeRemovePowerKilled = 0
 kArmoryAvoArcAddArmrAmt = 4 --per armor lvl
 
-kPresArmoryProtoEquivMult= 3
-kPresToClassesMult = 3
-kPresToStructureMult = 3
-kPresToSaltMult = 3
 
-kPresToSaltMultWeapons = 1
 gCreditStructureSentryLimit = 3
 gCreditStructureCostPerDrifter = 5
 
@@ -49,23 +46,23 @@ gCreditStructureExtractorLimit = 1
 
 
 --Classes Credits Cost
-gCreditClassCostJetPack = 15 * kPresArmoryProtoEquivMult
+gCreditClassCostJetPack = 15 
 
-gCreditClassCostRailGunExo = 34 * kPresArmoryProtoEquivMult
-gCreditClassCostMiniGunExo = 35 * kPresArmoryProtoEquivMult
+gCreditClassCostRailGunExo = 34 
+gCreditClassCostMiniGunExo = 35 
 
-gCreditClassCostWelderExo = 25 * kPresArmoryProtoEquivMult
-gCreditClassCostFlamerExo = 30 * kPresArmoryProtoEquivMult
+gCreditClassCostWelderExo = 25 
+gCreditClassCostFlamerExo = 30 
 
 gCreditClassDelayJetPack = 10
 gCreditClassDelayRailGun = 15
 gCreditClassDelayMiniGun = 15
 
 gCreditClassCostSkulk = 1
-gCreditClassCostGorge = 10 
-gCreditClassCostLerk = 20 
-gCreditClassCostFade = 40 
-gCreditClassCostOnos = 65 
+gCreditClassCostGorge = 20 
+gCreditClassCostLerk = 40 
+gCreditClassCostFade = 80 
+gCreditClassCostOnos = 100 
 
 gCreditClassDelaySkulk = 1
 gCreditClassDelayGorge = 5
@@ -76,16 +73,16 @@ gCreditClassDelayOnos = 20
 
 --Weapons Credits Cost
 
-gCreditWeaponCostHeavyRifle =  kHeavyRifleCost * kPresArmoryProtoEquivMult
-gCreditWeaponCostMines = kMineCost * kPresArmoryProtoEquivMult
-gCreditWeaponCostWelder = kWelderCost * kPresArmoryProtoEquivMult
-gCreditWeaponCostHMG = kHeavyMachineGunCost * kPresArmoryProtoEquivMult
-gCreditWeaponCostShotGun = kShotgunCost * kPresArmoryProtoEquivMult
-gCreditWeaponCostFlameThrower = kFlamethrowerCost * kPresArmoryProtoEquivMult
-gCreditWeaponCostGrenadeLauncher = kGrenadeLauncherCost * kPresArmoryProtoEquivMult
-gCreditWeaponCostGrenadeGas = kClusterGrenadeCost * kPresArmoryProtoEquivMult
-gCreditWeaponCostGrenadeCluster = kClusterGrenadeCost * kPresArmoryProtoEquivMult
-gCreditWeaponCostGrenadePulse = kClusterGrenadeCost * kPresArmoryProtoEquivMult
+gCreditWeaponCostHeavyRifle =  kHeavyRifleCost 
+gCreditWeaponCostMines = kMineCost 
+gCreditWeaponCostWelder = kWelderCost
+gCreditWeaponCostHMG = kHeavyMachineGunCost 
+gCreditWeaponCostShotGun = kShotgunCost 
+gCreditWeaponCostFlameThrower = kFlamethrowerCost 
+gCreditWeaponCostGrenadeLauncher = kGrenadeLauncherCost 
+gCreditWeaponCostGrenadeGas = kClusterGrenadeCost 
+gCreditWeaponCostGrenadeCluster = kClusterGrenadeCost 
+gCreditWeaponCostGrenadePulse = kClusterGrenadeCost 
 
 
 

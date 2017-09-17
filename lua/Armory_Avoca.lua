@@ -2,6 +2,17 @@ function Armory:GetMinRangeAC()
 return 16 
 end
 
+
+local origbuttons = Armory.GetTechButtons
+function Armory:GetTechButtons(techId)
+
+local buttons = origbuttons(self, techId)
+    
+    buttons[6] = kTechId.FlamethrowerRangeTech
+    return buttons
+end
+
+
 function Armory:GetShouldResupplyPlayer(player)
     if not player:GetIsAlive() then
         return false

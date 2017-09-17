@@ -8,6 +8,8 @@
 --Script.Load("lua/Additions/LayStructures.lua")
 Script.Load("lua/Additions/ExoWelder.lua")
 Script.Load("lua/Additions/ExoFlamer.lua")
+Script.Load("lua/Additions/EggBeacon.lua")
+Script.Load("lua/Additions/StructureBeacon.lua")
 
 
 
@@ -159,7 +161,7 @@ local kAvoca_TechData =
      [kTechDataDisplayName] = "Onicide",
 [kTechDataTooltipInfo] = "wip"},
 
-
+*/
 
 
 			
@@ -195,7 +197,7 @@ local kAvoca_TechData =
 [kTechDataMaxHealth] = kStructureBeaconHealth, [kTechDataMaxArmor] = kStructureBeaconArmor},
                
 
-		
+		/*
 
                   --Thanks dragon ns2c
        { [kTechDataId] = kTechId.PrimalScream,  

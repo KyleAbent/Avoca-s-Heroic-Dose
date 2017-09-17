@@ -29,7 +29,7 @@ Shine.VoteMenu:AddPage ("SpendStructures", function( self )
 		--self:AddSideButton("PetDrifter: "..gCreditStructureCostPetDrifter, function() Shared.ConsoleCommand ("sh_buy PetDrifter")  end)
 		self:AddSideButton("Drifter: "..gCreditStructureCostPerDrifter, function() Shared.ConsoleCommand ("sh_buy Drifter")  end)
 		self:AddSideButton("Hydra: "..gCreditStructureCostHydra, function() Shared.ConsoleCommand ("sh_buy Hydra")  end)
-		--self:AddSideButton("SaltyEgg: "..gCreditStructureCostSaltyEgg, function() Shared.ConsoleCommand ("sh_buy SaltyEgg")  end)
+		--self:AddSideButton("CredityEgg: "..gCreditStructureCostCredityEgg, function() Shared.ConsoleCommand ("sh_buy CredityEgg")  end)
 		--self:AddSideButton("Drifter: "..gCreditStructureCostDrifter, function() Shared.ConsoleCommand ("sh_buy Drifter")  end)
 		self:AddSideButton("Whip: "..gCreditStructureCostWhip, function() Shared.ConsoleCommand ("sh_buy Whip")  end)
 		self:AddSideButton("Shift: "..gCreditStructureCostShift, function() Shared.ConsoleCommand ("sh_buy Shift")  end)
@@ -82,7 +82,7 @@ Shine.VoteMenu:AddPage ("SpendGlow", function( self )
         self:AddSideButton( "Green(5)", function() Shared.ConsoleCommand ("sh_buyglow Green")  end)
         self:AddSideButton( "Gold(5)", function() Shared.ConsoleCommand ("sh_buyglow Gold")  end)
       --  self:AddSideButton( "Red(5)", function() Shared.ConsoleCommand ("sh_buyglow Red")  end)
-        self:AddBottomButton( "Back", function()self:SetPage("SpendSalt")end) 
+        self:AddBottomButton( "Back", function()self:SetPage("SpendCredit")end) 
 end)
 
 Shine.VoteMenu:AddPage ("SpendWeapons", function( self )
@@ -167,36 +167,35 @@ Shine.VoteMenu:AddPage ("SpendPres", function( self )
 end)
 
 
-Script.Load("lua/shine/extensions/credits/client_Salt_menu.lua")
-Shine.VoteMenu:AddPage ("SpendSalt", function( self )
+Script.Load("lua/shine/extensions/credits/client_Credit_menu.lua")
+Shine.VoteMenu:AddPage ("SpendCredit", function( self )
        local player = Client.GetLocalPlayer()
-          self:AddSideButton( "CommAbilities", function() self:SetPage( "SpendCommAbilitiesSalt" ) end) 
+          self:AddSideButton( "CommAbilities", function() self:SetPage( "SpendCommAbilitiesCredit" ) end) 
        
        
   if player:GetTeamNumber() == 1 then 
-        self:AddSideButton( "Weapons", function() self:SetPage( "SpendWeaponsSalt" ) end)
+        self:AddSideButton( "Weapons", function() self:SetPage( "SpendWeaponsCredit" ) end)
       end  
 
 
     
 
-     self:AddSideButton( "Classes", function() self:SetPage( "SpendClassesSalt" ) end) 
-     self:AddSideButton( "Structures", function() self:SetPage( "SpendStructuresSalt" ) end)
+     self:AddSideButton( "Classes", function() self:SetPage( "SpendClassesCredit" ) end) 
+     self:AddSideButton( "Structures", function() self:SetPage( "SpendStructuresCredit" ) end)
              --  self:AddSideButton( "Fun", function() self:SetPage( "SpendFun" ) end)
-               self:AddSideButton( "Expensive", function() self:SetPage( "SpendExpeniveSalt" ) end)
+               self:AddSideButton( "Expensive", function() self:SetPage( "SpendExpeniveCredit" ) end)
                
        if player:GetTeamNumber() == 1 then 
-        self:AddSideButton( "Upgrades", function() self:SetPage( "SpendUpgradesSalt" ) end)
+        self:AddSideButton( "Upgrades", function() self:SetPage( "SpendUpgradesCredit" ) end)
       end  
-        self:AddSideButton( "Glow", function() self:SetPage( "SpendGlowSalt" ) end)
-        self:AddSideButton( "Badges", function() self:SetPage( "SpendBadges" ) end)
+        --self:AddSideButton( "Glow", function() self:SetPage( "SpendGlowCredit" ) end)
         self:AddBottomButton( "Back", function()self:SetPage("Main")end)  
 end)
      
      
 Shine.VoteMenu:EditPage( "Main", function( self ) 
 self:AddSideButton( "Disco", function() Shared.ConsoleCommand ("sh_disco")  end)
-self:AddSideButton( "Salt", function()  self:SetPage( "SpendSalt" ) end)
+self:AddSideButton( "Credit", function()  self:SetPage( "SpendCredit" ) end)
 self:AddSideButton( "Pres", function()  self:SetPage( "SpendPres" ) end)
 end)
 

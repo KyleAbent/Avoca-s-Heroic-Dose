@@ -1,10 +1,3 @@
-Script.Load("lua/GlowMixin.lua")
-
-local networkVars = {}
-
-AddMixinNetworkVars(GlowMixin, networkVars)
-
-
    if Server then
 
 

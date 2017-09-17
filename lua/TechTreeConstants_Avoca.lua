@@ -45,6 +45,9 @@ local kAvoca_TechIds =
   --  'ElectrifyStructure',
    -- 'HeavyArmor',
    -- 'Resupply',
+    'StructureBeacon',
+    'EggBeacon',
+
     
 }
 

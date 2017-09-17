@@ -11,7 +11,7 @@ function MarineTeam:InitTechTree()
     
     self.techTree:AddBuyNode(kTechId.DualWelderExosuit, kTechId.ExosuitTech, kTechId.None)
     self.techTree:AddBuyNode(kTechId.DualFlamerExosuit, kTechId.ExosuitTech, kTechId.None)
-
+    self.techTree:AddResearchNode(kTechId.FlamethrowerRangeTech,          kTechId.None) 
     
     self.techTree:SetComplete()
     PlayingTeam.InitTechTree = orig_PlayingTeam_InitTechTree

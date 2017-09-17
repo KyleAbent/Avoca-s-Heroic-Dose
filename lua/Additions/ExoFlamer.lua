@@ -324,7 +324,7 @@ local function ApplyConeDamage(self, player)
             
             if Server and ent:isa("Alien") then
                 ent:CancelEnzyme()
-                ent:CancelPrimal()
+               -- ent:CancelPrimal()
             end
         end
     end

@@ -477,9 +477,9 @@ if Server then
            self:CountPhaseTwoTimer() 
         --   elseif self.SiegeTimer == 0 and not self.isSuddenDeath  then
           -- self:CountSDTimer() 
-          elseif self.isPhaseTwo and not self.isPhaseFour  then
-              if not self.isPhaseThree then self:CountPhaseThreeTimer() end
-              self:CountPhaseFourTimer()
+        --  elseif self.isPhaseTwo and not self.isPhaseFour  then
+        --      if not self.isPhaseThree then self:CountPhaseThreeTimer() end
+        --      self:CountPhaseFourTimer()
            end
         self.timeLastAutomations = Shared.GetTime()
          end

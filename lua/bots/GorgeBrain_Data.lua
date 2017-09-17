@@ -305,12 +305,13 @@ kGorgeBrainActions =
         local weapon = skulk:GetActiveWeapon()
         local canAttack = true 
         local bile = skulk:GetWeaponInHUDSlot(3)
+        local alive = skulk:GetIsAlive()
         
-        if not bile then
+        if alive and not bile then
                 skulk:GiveItem(BileBomb.kMapName)
         end
         
-        if not weapon:isa("BileBomb")  then 
+        if alive and not weapon:isa("BileBomb")  then 
         skulk:SetActiveWeapon(BileBomb.kMapName)  
         end
        

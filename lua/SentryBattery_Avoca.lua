@@ -1,15 +1,15 @@
-Script.Load("lua/Additions/SaltMixin.lua")
+Script.Load("lua/Additions/CreditMixin.lua")
 SentryBattery.kMarineCircleDecalName = PrecacheAsset("models/misc/circle/circle.material")
 
 local networkVars = {}
 
-AddMixinNetworkVars(SaltMixin, networkVars)
+AddMixinNetworkVars(CreditMixin, networkVars)
 
 
     local originit = SentryBattery.OnInitialized
     function SentryBattery:OnInitialized()
         originit(self)
-        InitMixin(self, SaltMixin)
+        InitMixin(self, CreditMixin)
     end
     
 function SentryBattery:OnAdjustModelCoords(modelCoords)

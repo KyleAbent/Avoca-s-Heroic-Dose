@@ -58,7 +58,7 @@ ModLoader.SetupFileHook( "lua/TechData.lua", "lua/TechData_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/MarineTeam.lua", "lua/MarineTeam_Avoca.lua", "post" )
 
-ModLoader.SetupFileHook( "lua/ExoSuit.lua", "lua/ExoSuit_Avoca.lua", "post" )
+ModLoader.SetupFileHook( "lua/Exosuit.lua", "lua/ExoSuit_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/InfantryPortal.lua", "lua/InfantryPortal_Avoca.lua", "post" )
 
