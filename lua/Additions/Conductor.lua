@@ -493,15 +493,23 @@ if Server then
         --      if not self.isPhaseThree then self:CountPhaseThreeTimer() end
         --      self:CountPhaseFourTimer()
            end
-           self:PayloadTimer()
-           self:PCTimer()
-        self.timeLastAutomations = Shared.GetTime()
+        self.timelasttimerup = Shared.GetTime()
          end
          
              if not self.timeLastAutomations or self.timeLastAutomations + 8 <= Shared.GetTime() then
                    self:Automations()
                  self.timeLastAutomations = Shared.GetTime()
            end   
+           
+            if not self.phaseCannonTime or self.phaseCannonTime + 23 <= Shared.GetTime() then
+             self:PCTimer()
+            self.phaseCannonTime = Shared.GetTime()
+            end
+            
+            if not self.payLoadTime or self.payLoadTime + 60 <= Shared.GetTime()  then
+              self:PayloadTimer()
+            end
+           
          
          
   end
@@ -513,12 +521,6 @@ if Server then
 end 
 function Conductor:GetIsMapEntity()
 return true
-end
-function Conductor:GetPayloadLength()
- return self.payLoadTime
-end
-function Conductor:GetTimeLeftTillPC()
- return self.phaseCannonTime
 end
 local function SetMarineBaseAsMain(self)
     local chair = nil
@@ -562,22 +564,6 @@ local function SuddenDeathConditionsCheck(self)
 end
 
 */
-function Conductor:CounterComplete()
-           local gamestarttime = GetGamerules():GetGameStartTime()
-           local gameLength = Shared.GetTime() - gamestarttime
-           return  gameLength >= self.payLoadTime
-end
-function Conductor:GetCanFire()
-           local gamestarttime = GetGamerules():GetGameStartTime()
-           local gameLength = Shared.GetTime() - gamestarttime
-           return  gameLength >= self.phaseCannonTime
-end
-function Conductor:ResetPC()
---16 seconds for each built node
-self.phaseCannonTime = Shared.GetTime() + 15 --Clamp(16*self:CountUnBuiltNodes(), 45, 180)--+ 120
-self:AddTimedCallback(Conductor.PCTimer, 1)
-return false
-end
 
 
 local function FirePCAllBuiltRooms(self)
@@ -593,12 +579,6 @@ local built = {}
 end
 
 
-function Conductor:ResetPL()
---16 seconds for each built node
-self.payLoadTime = Shared.GetTime() + 60 --Clamp(16*self:CountUnBuiltNodes(), 45, 180)--+ 120
-self:AddTimedCallback(Conductor.PayloadTimer, 1)
-return false
-end
 /*
 
 local function DisableVaporizer()
@@ -625,33 +605,10 @@ local function EnableRandomPower()
    end
 end
 function Conductor:PayloadTimer()
-
-   local boolean = false
-       if  self:CounterComplete() then
-                  boolean = true
-           --  if not SuddenDeathConditionsCheck(self) then
-               --GetGamerules():SetGameState(kGameState.Team2Won)
-              -- DisableVaporizer()
-                EnableRandomPower()
-               self.payLoadTime = 0
-            self:AddTimedCallback(Conductor.ResetPL, 8)      
-            -- else
-             --  AddPayLoadTime(8)
-           --  end
-       end
-       return not boolean
-       
+                EnableRandomPower()  
 end
 function Conductor:PCTimer()
-   local boolean = false
-    if self:GetCanFire() then
-         boolean = true
-         FirePCAllBuiltRooms(self) -- Ddos!
-         self.phaseCannonTime = 0
-         self:AddTimedCallback(Conductor.ResetPC, 8)
-       end
-       
-       return not boolean
+         FirePCAllBuiltRooms(self)
 end
 function Conductor:AddTime(seconds)
   if not self:CounterComplete() then self.payLoadTime = self.payLoadTime + seconds end
