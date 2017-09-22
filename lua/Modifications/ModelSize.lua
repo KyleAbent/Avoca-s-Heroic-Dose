@@ -23,6 +23,36 @@ function RoboticsFactory:OnAdjustModelCoords(coords)
     return coords
     
 end
+function PrototypeLab:OnAdjustModelCoords(coords)
+    
+    	local scale = 0.5
+        coords.xAxis = coords.xAxis * scale
+        coords.yAxis = coords.yAxis * scale
+        coords.zAxis = coords.zAxis * scale
+        
+    return coords
+    
+end
+function Armory:OnAdjustModelCoords(coords)
+    
+    	local scale = 0.5
+        coords.xAxis = coords.xAxis * scale
+        coords.yAxis = coords.yAxis * scale
+        coords.zAxis = coords.zAxis * scale
+        
+    return coords
+    
+end
+function InfantryPortal:OnAdjustModelCoords(coords)
+    
+    	local scale = 0.5
+        coords.xAxis = coords.xAxis * scale
+        coords.yAxis = coords.yAxis * scale
+        coords.zAxis = coords.zAxis * scale
+        
+    return coords
+    
+end
  function LiveMixin:OnAdjustModelCoords(modelCoords)
          local coords = modelCoords
     if self:GetTeamNumber() == 2 and not self:isa("PowerDrainer") and not self:isa("Hive") then

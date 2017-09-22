@@ -21,7 +21,13 @@ end
 
 
   function Shade:GetInfestationRadius()
+     if  GetConductor():GetIsPhaseTwoBoolean() then
      return kInfestationRadius
+     elseif  GetConductor():GetIsPhaseOneBoolean() then
+     return kInfestationRadius/3
+     else
+     return kInfestationRadius /4
+     end
    end
    
 function Shade:GetMinRangeAC()

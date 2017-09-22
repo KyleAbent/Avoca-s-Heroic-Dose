@@ -18,13 +18,3 @@ local origUpdate = Sentry.OnUpdate
 end
 
 end
-
- function Sentry:OnAdjustModelCoords(modelCoords)
-         local coords = modelCoords
-    	local scale = 1.5
-        coords.xAxis = coords.xAxis * scale                       
-        coords.yAxis = coords.yAxis * scale                           
-        coords.zAxis = coords.zAxis * scale
-   
-    return coords
-end

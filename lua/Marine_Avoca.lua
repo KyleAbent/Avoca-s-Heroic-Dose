@@ -33,6 +33,15 @@ function Marine:ModifyGravityForce(gravityTable)
        end
 end
 
+function Marine:GetCanBotPhase()
+    if Server then
+        return self:GetIsAlive() and Shared.GetTime() > self.timeOfLastPhase + (2*3) and not GetConcedeSequenceActive()
+    else
+        return self:GetIsAlive() and Shared.GetTime() > self.timeOfLastPhase + (2*3)
+    end
+    
+end
+
 function Marine:GetHasLayStructure()
         local weapon = self:GetWeaponInHUDSlot(5)
         local builder = false

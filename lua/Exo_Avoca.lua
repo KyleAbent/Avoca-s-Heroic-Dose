@@ -2,6 +2,7 @@ Script.Load("lua/StunMixin.lua")
 Script.Load("lua/PhaseGateUserMixin.lua")
 Script.Load("lua/Mixins/LadderMoveMixin.lua")
 Script.Load("lua/Additions/ExoWelder.lua")
+Script.Load("lua/Additions/StunWall.lua")
 
 local networkVars = {   
 
@@ -257,4 +258,48 @@ if Server then
     end
 end
 */
+
+    function Exo:OnKill(attacker, doer, point, direction)
+        
+            
+            local reuseWeapons = self.storedWeaponsIds ~= nil
+            local reuseWeapons = self.storedWeaponsIds ~= nil
+        
+            local marine = self:Replace(self.prevPlayerMapName or Marine.kMapName, self:GetTeamNumber(), false, self:GetOrigin() + Vector(0, 0.2, 0), { preventWeapons = reuseWeapons })
+            marine:SetHealth(self.prevPlayerHealth or kMarineHealth)
+            marine:SetMaxArmor(self.prevPlayerMaxArmor or kMarineArmor)
+            marine:SetArmor(self.prevPlayerArmor or kMarineArmor)
+            
+            
+            marine.onGround = false
+            local initialVelocity = self:GetViewCoords().zAxis
+            initialVelocity:Scale(4)
+            initialVelocity.y = math.max(0,initialVelocity.y) + 9
+            marine:SetVelocity(initialVelocity)
+            
+            if reuseWeapons then
+         
+                for _, weaponId in ipairs(self.storedWeaponsIds) do
+                
+                    local weapon = Shared.GetEntity(weaponId)
+                    if weapon then
+                        marine:AddWeapon(weapon)
+                    end
+                    
+                end
+            
+            end
+            
+            marine:SetHUDSlotActive(1)
+            
+            if marine:isa("JetpackMarine") then
+                marine:SetFuel(0.25)
+            end
+        
+    
+        return false
+    
+end
+
+
 Shared.LinkClassToMap("Exo", Exo.kMapName, networkVars)

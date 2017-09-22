@@ -24,7 +24,7 @@ local function FindNearestPhaseGate(fromPos, favoredGateId)
 
                 assert( gate ~= nil )
 
-                if gate:GetIsBuilt() and gate:GetIsPowered() then
+                if gate:GetIsBuilt() and gate:GetIsPowered() and gate.linked == true then --why not connected -.- and delay bewn
 
                     local dist = fromPos:GetDistance(gate:GetOrigin())
                     if gate:GetId() == favoredGateId then
@@ -64,9 +64,11 @@ end
 --  Handles things like using phase gates
 ------------------------------------------
 local function PerformMove( marinePos, targetPos, bot, brain, move )
-
+ 
+    if bot:GetPlayer():GetCanBotPhase() then --should be here by defauult yo
     local dist, gate = GetPhaseDistanceForMarine( marinePos, targetPos, brain.lastGateId )
-
+    end 
+    
     if gate ~= nil then
 
         local gatePos = gate:GetOrigin()

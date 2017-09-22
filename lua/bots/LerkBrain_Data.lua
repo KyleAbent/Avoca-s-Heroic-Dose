@@ -73,7 +73,7 @@ local function PerformAttackEntity( eyePos, bestTarget, bot, brain, move )
         if distance > 3 then
             move.commands = AddMoveCommand( move.commands, Move.SecondaryAttack )
         else    
-            move.commands = AddMoveCommand( move.commands, Move.PrimaryAttack )
+            move.commands = AddMoveCommand( move.commands, Move.PrimaryAttack ) -- not hitting arcs..
         end
 
         -- Attacking a structure

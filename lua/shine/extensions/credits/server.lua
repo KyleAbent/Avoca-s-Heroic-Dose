@@ -179,20 +179,20 @@ local entities = {}
       if delete then
             if #entities >= limit then
             local entity = table.random(entities)
-             if mapname == Sentry.kMapName or entity:GetMapName() == Wall.kMapName or entity:GetMapName() == Observatory.kMapName or entity:GetMapName() == ARC.kMapName  then return true end
+             if mapname == Sentry.kMapName or entity:GetMapName() == Observatory.kMapName or entity:GetMapName() == ARC.kMapName  then return true end
                 DestroyEntity(entity)
                  self:NotifyCredit( Client, "(Logic Fallacy, Limit Reached):Deleted your old %s so you can spawn a new one.", true, mapname)
                  return false  
             end
       end
-      
+      /*
       if mapname == Sentry.kMapName then
           if not GetCheckSentryLimit(techId, Player:GetOrigin(), normal, commander) then
                  self:NotifyCredit( Client, "(Logic Fallacy):%s Sentrys are allowed per location.", true, Credit)
                  return  false
           end
       end
-      
+      */
      return entitycount >= limit
 end
 function Plugin:PregameLimit(teamnum)
@@ -445,19 +445,14 @@ function Plugin:SaveAllCredits()
                */  
 
 end
-function Plugin:DeductCreditIfNotPregame(self, who, amount, delayafter, isCredit)
+function Plugin:DeductCreditIfNotPregame(self, who, amount, delayafter)
         --Print("DeductCreditIfNotPregame, amount is %s", amount)
  if ( GetGamerules():GetGameStarted() and not GetGamerules():GetCountingDown() )  then
-     if isCredit == true then
-         Print("Cost is %s", amount)
         -- amount = amount * kPrestoCreditMul
         -- Print("Cost is %s", amount)
          self.CreditUsers[ who:GetClient() ] = self:GetPlayerCreditInfo(who:GetClient()) - amount
          self.PlayerSpentAmount[who:GetClient()] = self.PlayerSpentAmount[who:GetClient()]  + amount
          Shine.ScreenText.SetText("Credit", string.format( "%s Credit", self:GetPlayerCreditInfo(who:GetClient()) ), who) 
-    else
-         who:SetResources( who:GetResources() - amount )
-    end
    self.BuyUsersTimer[who:GetClient()] = Shared.GetTime() + delayafter
  else
  self:NotifyCredit(who, "Pregame purchase free of charge", true) 
@@ -572,10 +567,9 @@ local function GetIsAlienInSiege(Player)
     end
     return false
  end
-local function PerformBuy(self, who, String, whoagain, cost, reqlimit, reqground,reqpathing, setowner, delayafter, mapname,limitof, techid, isCredit)
+local function PerformBuy(self, who, String, whoagain, cost, reqlimit, reqground,reqpathing, setowner, delayafter, mapname,limitof, techid)
    local autobuild = false 
    local success = false
-   --Print(" PerformBuy isCredit is %s", isCredit)
 if whoagain:GetHasLayStructure() then 
 self:NotifyCredit(who, "Empty hudslot 5 please.", true)
 return
@@ -625,7 +619,7 @@ end
  end
  
 
-self:DeductCreditIfNotPregame(self, whoagain, cost, delayafter, isCredit)
+self:DeductCreditIfNotPregame(self, whoagain, cost, delayafter)
 
 
 local entity = nil 
@@ -655,7 +649,7 @@ self.BuyUsersTimer[who] = Shared.GetTime() + delaytoadd
 
 
 end
-local function FirstCheckRulesHere(self, Client, Player, String, cost, isastructure, isCredit)
+local function FirstCheckRulesHere(self, Client, Player, String, cost, isastructure)
 local Time = Shared.GetTime()
 local NextUse = self.BuyUsersTimer[Client]
 if NextUse and NextUse > Time and not Shared.GetCheatsEnabled() then
@@ -692,16 +686,11 @@ end
 
 if ( GetGamerules():GetGameStarted() and not GetGamerules():GetCountingDown()  )  then  
 
-    if isCredit and self:GetPlayerCreditInfo(Player:GetClient()) < cost  then 
+    if  self:GetPlayerCreditInfo(Player:GetClient()) < cost  then 
    self:NotifyCredit( Client, "%s costs %s Credit, you have %s Credit. Purchase invalid.", true, String, cost, self:GetPlayerCreditInfo(Player:GetClient()) )
     return true
     end
     
- if not isCredit and Player:GetResources() < cost then 
-   --Print("player has %s, cost is %s", playeramt,cost)
-self:NotifyPres( Client, "%s costs %s pres, you have %s pres. Purchase invalid.", true, String, cost, Player:GetResources() )
-return true
-end
 
 end
 
@@ -709,12 +698,12 @@ end
 
 
 
-local function DeductBuy(self, who, cost, delayafter, isCredit)
-  return self:DeductCreditIfNotPregame(self, who, cost, delayafter, isCredit)
+local function DeductBuy(self, who, cost, delayafter)
+  return self:DeductCreditIfNotPregame(self, who, cost, delayafter)
 end
 
 
-local function TeamOneBuyRules(self, Client, Player, String, isCredit)
+local function TeamOneBuyRules(self, Client, Player, String)
 
 local mapnameof = nil
 local delay = 12
@@ -742,11 +731,6 @@ elseif String == "Armory"  then
 CreditCost = gCreditStructureArmoryCost
 mapnameof = Armory.kMapName
 techid = kTechId.Armory
---elseif String == "Wall"  then
---CreditCost = gCreditStructureWallCost
---mapnameof = Wall.kMapName
---techid = kTechId.Wall
---limit = gCreditStructureWallLimit
 elseif String == "Sentry"  then
 mapnameof = Sentry.kMapName
 techid = kTechId.Sentry
@@ -780,7 +764,7 @@ limit = gCreditStructureRoboticsFactoryLimit
 elseif String == "Mac" then
 techid = kTechId.MAC
 CreditCost = gCreditStructureMacCost
-mapnameof = MACCredit.kMapName --can be networkvar instead
+mapnameof = MAC.kMapName --can be networkvar instead
 limit = gCreditStructureMacLimit
 elseif String == "Arc" then 
 techid = kTechId.ARC
@@ -798,7 +782,7 @@ return mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid
 
 end
 
-local function TeamTwoBuyRules(self, Client, Player, String, isCredit)
+local function TeamTwoBuyRules(self, Client, Player, String)
 
 local mapnameof = nil
 local delay = 12
@@ -889,21 +873,20 @@ end
 return mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid
 
 end
-local function DeductBuy(self, who, cost, delayafter, isCredit)
-  return self:DeductCreditIfNotPregame(self, who, cost, delayafter, isCredit)
+local function DeductBuy(self, who, cost, delayafter)
+  return self:DeductCreditIfNotPregame(self, who, cost, delayafter)
 end
 
 
 function Plugin:CreateCommands()
 
 
-local function TBuy(Client, String, StringTwo)
+local function TBuy(Client, String)
 local Player = Client:GetControllingPlayer()
 local mapname = nil
 local delayafter = 60
 local cost = 1
 if not Player then return end
-local isCredit = StringTwo == "Credit"
 
  
 local Time = Shared.GetTime()
@@ -920,9 +903,9 @@ end
     if String  == "Ink" then cost = 1.5 mapname = ShadeInk.kMapName
    end
    
-    if FirstCheckRulesHere(self, Client, Player, String, cost, false, isCredit ) == true then return end
+    if FirstCheckRulesHere(self, Client, Player, String, cost, false ) == true then return end
    
-      self:DeductCreditIfNotPregame(self, Player, cost, 8, isCredit)
+      self:DeductCreditIfNotPregame(self, Player, cost, 8)
 
 
  
@@ -938,13 +921,12 @@ TBuyCommand:AddParam{ Type = "string" }
 TBuyCommand:AddParam{ Type = "string", Optional = true }
 
 
-local function BuyWP(Client, String, StringTwo)
+local function BuyWP(Client, String)
 local Player = Client:GetControllingPlayer()
 local mapname = nil
 local delayafter = 8 
 local cost = 1
 if not Player then return end
-local isCredit = StringTwo == "credit"
  
 
    
@@ -962,9 +944,9 @@ local isCredit = StringTwo == "credit"
    elseif String == "gasgrenade" then cost = gCreditWeaponCostGrenadeGas mapname =   GasGrenadeThrower.kMapName
    end
    
-    if FirstCheckRulesHere(self, Client, Player, String, cost, false, isCredit ) == true then return end
+    if FirstCheckRulesHere(self, Client, Player, String, cost, false ) == true then return end
     
-     self:DeductCreditIfNotPregame(self, Player, cost, delayafter, isCredit)
+     self:DeductCreditIfNotPregame(self, Player, cost, delayafter)
 
  
   Player:GiveItem(mapname)
@@ -979,12 +961,11 @@ BuyWPCommand:AddParam{ Type = "string" }
 BuyWPCommand:AddParam{ Type = "string", Optional = true }
 
 
-local function BuyCustom(Client, String, StringTwo)
+local function BuyCustom(Client, String)
 local Player = Client:GetControllingPlayer()
 local cost = 40
 local delayafter = 8
-local isCredit = StringTwo == "credit"
- if FirstCheckRulesHere(self, Client, Player, String, cost, false, isCredit) == true then return end
+ if FirstCheckRulesHere(self, Client, Player, String, cost, false) == true then return end
       local exit, nearhive, count = FindPlayerTunnels(Player)
               if not exit then
               --  Print("No Exit Found!")
@@ -995,7 +976,7 @@ local isCredit = StringTwo == "credit"
              end
      if String == "TunnelEntrance" and Player:isa("Gorge") then
        GorgeWantsEasyEntrance(Player, exit, nearhive)
-       DeductBuy(self, Player, cost, delayafter, isCredit)
+       DeductBuy(self, Player, cost, delayafter)
      end
 end
 
@@ -1013,12 +994,11 @@ BuyCustomCommand:Help("sh_buycustom <custom function> because I want these fine 
 BuyCustomCommand:AddParam{ Type = "string" }
 BuyCustomCommand:AddParam{ Type = "string", Optional = true }
 
-local function BuyClass(Client, String, StringTwo, StringThree)
+local function BuyClass(Client, String, StringThree)
 
 local Player = Client:GetControllingPlayer()
 local delayafter = 8 
 local cost = 1
-local isCredit =  StringTwo == "credit"
 local isFast = StringThree == "fast"
 
 if not Player then return end
@@ -1035,8 +1015,8 @@ if not Player then return end
          
   end
     if isFast then cost = cost * 2 end
-    if FirstCheckRulesHere(self, Client, Player, String, cost, false, isCredit ) == true then return end
-    DeductBuy(self, Player, cost, delayafter, isCredit)
+    if FirstCheckRulesHere(self, Client, Player, String, cost, false ) == true then return end
+    DeductBuy(self, Player, cost, delayafter)
 
          if Player:GetTeamNumber() == 1 then --ugh... messy...
               if cost == gCreditClassCostJetPack   then  Player:GiveJetpack()
@@ -1048,22 +1028,22 @@ if not Player then return end
          elseif Player:GetTeamNumber() == 2 then
  
               if cost == gCreditClassCostGorge  then 
-                  if isCredit and isFast then LowBlow(Player, Gorge.kMapName)
+                  if  isFast then LowBlow(Player, Gorge.kMapName)
                  else
                   Player:CreditBuy(kTechId.Gorge)  
                   end
               elseif cost == gCreditClassCostLerk  then  
-                 if isCredit and isFast then LowBlow(Player, Lerk.kMapName) 
+                 if isFast then LowBlow(Player, Lerk.kMapName) 
                  else
                  Player:CreditBuy(kTechId.Lerk)
                  end
               elseif cost == gCreditClassCostFade  then
-                 if isCredit and isFast then LowBlow(Player, Fade.kMapName) 
+                 if isFast then LowBlow(Player, Fade.kMapName) 
                  else 
                  Player:CreditBuy(kTechId.Fade)
                  end
               elseif cost == gCreditClassCostOnos  then 
-               if isCredit and isFast then LowBlow(Player, Onos.kMapName) 
+               if isFast then LowBlow(Player, Onos.kMapName) 
                 else
                  Player:CreditBuy(kTechId.Onos) 
                  end
@@ -1083,13 +1063,12 @@ BuyClassCommand:AddParam{ Type = "string" }
 BuyClassCommand:AddParam{ Type = "string", Optional = true }
 BuyClassCommand:AddParam{ Type = "string", Optional = true }
 
-local function BuyGlow(Client, String, StringTwo)
+local function BuyGlow(Client, String)
 
 local Player = Client:GetControllingPlayer()
 local delayafter = 8 
 local cost = 5
 local color = 0
-local isCredit =  StringTwo == "Credit"
 if not Player then return end
 
 if Player:GetIsGlowing() then
@@ -1103,10 +1082,10 @@ end
   elseif String == "Red" then color = 4
   end
   
- if FirstCheckRulesHere(self, Client, Player, String, cost, false, isCredit ) == true then return end
+ if FirstCheckRulesHere(self, Client, Player, String, cost, false ) == true then return end
             if color == 0 then return end
             
-            DeductBuy(self, Player, cost, delayafter, isCredit)  
+            DeductBuy(self, Player, cost, delayafter)  
             Player:GlowColor(color, 300)
             self.GlowClientsTime[Player:GetClient()] = Shared.GetTime() + 300
             self.GlowClientsColor[Player:GetClient()] = color
@@ -1121,16 +1100,15 @@ BuyGlowCommand:AddParam{ Type = "string", Optional = true }
 
 /*
 
-local function BuyUpgrade(Client, String, StringTwo)
+local function BuyUpgrade(Client, String)
 
 local Player = Client:GetControllingPlayer()
 local delayafter = 1
 local cost = 5
 local color = 1
-local isCredit =  StringTwo == "Credit"
 if not Player then return end
 
- if FirstCheckRulesHere(self, Client, Player, String, cost, false, isCredit ) == true then return end
+ if FirstCheckRulesHere(self, Client, Player, String, cost, false ) == true then return end
   
  if String == "Resupply" then   Player.hasresupply = true
   elseif String == "HeavyArmor" then  Player.heavyarmor = true Player.lightarmor = false
@@ -1138,7 +1116,7 @@ if not Player then return end
   elseif String == "FireBullets" then  Player.hasfirebullets = true
   elseif String == "RegenArmor" then  Player.nanoarmor = true
   end
-  DeductBuy(self, Player, cost, delayafter, isCredit)
+  DeductBuy(self, Player, cost, delayafter)
    
 end
 
@@ -1150,7 +1128,7 @@ BuyUpgradeCommand:AddParam{ Type = "string", Optional = true }
 
 */
 
-local function Buy(Client, String, StringTwo)
+local function Buy(Client, String)
 
 local Player = Client:GetControllingPlayer()
 local mapnameof = nil
@@ -1161,19 +1139,17 @@ local reqground = true
 if not Player then return end
 local CreditCost = 10
 local techid = nil
-local isCredit =  StringTwo == "credit"
---Print("StringTwo is %s, isCredit is %s", StringTwo, isCredit)
 
 
 if Player:GetTeamNumber() == 1 then 
-  mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid = TeamOneBuyRules(self, Client, Player, String, isCredit)
+  mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid = TeamOneBuyRules(self, Client, Player, String)
 elseif Player:GetTeamNumber() == 2 then
 reqground = false
-  mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid  = TeamTwoBuyRules(self, Client, Player, String, isCredit)
+  mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid  = TeamTwoBuyRules(self, Client, Player, String)
 end // end of team numbers
 
-if mapnameof and ( not FirstCheckRulesHere(self, Client, Player, String, CreditCost, true, isCredit ) == true ) then
- PerformBuy(self, Client, String, Player, CreditCost, true, reqground,reqpathing, true, delay, mapnameof, limit, techid, isCredit) 
+if mapnameof and ( not FirstCheckRulesHere(self, Client, Player, String, CreditCost, true ) == true ) then
+ PerformBuy(self, Client, String, Player, CreditCost, true, reqground,reqpathing, true, delay, mapnameof, limit, techid) 
 end
 
 end

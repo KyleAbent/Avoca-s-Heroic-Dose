@@ -22,13 +22,6 @@ end
  end
  */
 function Conductor:FirePhaseCannons(powerpoint)
-             --  local powerdrains = 4 --not force and 4 or 2
-               --powerdrains = self:GetCanVape() and powerdrains * 2 or powerdrains
-            --     local origin = GetRandomBuildPosition( kTechId.Whip, powerpoint:GetOrigin(), 8 )
-            --     local braindrain = CreateEntity(PowerDrainer.kMapName, origin, 2)
-            --      braindrain:SetConstructionComplete()
-            --      braindrain:ActivateSelfDestruct()
-             --     braindrain:SetMature()
              
              local origin = FindFreeSpace(powerpoint:GetOrigin())
              CreateEntity(Contamination.kMapName, FindFreeSpace(origin, 1, 8), 2)
@@ -43,7 +36,14 @@ function Conductor:FirePhaseCannons(powerpoint)
              crag:SetConstructionComplete()
              end
              
-             --Every 30s, 6 entities spawning without limit. Hm?
+      if GetConductor():GetIsPhaseTwoBoolean() then
+           if math.random(1,2) == 1 then
+           --chance or phase three or phase four if too much movement from hives during marine rushing hives
+             local structBeacon = CreateEntity(StructureBeacon.kMapName, FindFreeSpace(origin, 1, 8), 2)
+           else
+             local eggBeacon = CreateEntity(EggBeacon.kMapName, FindFreeSpace(origin, 1, 8), 2)
+           end
+      end    
     
 end
 

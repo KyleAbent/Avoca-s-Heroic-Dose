@@ -29,7 +29,13 @@ function Whip:OnInitialized()
 end
 
   function  Whip:GetInfestationRadius()
+     if  GetConductor():GetIsPhaseTwoBoolean() then
      return kInfestationRadius
+     elseif  GetConductor():GetIsPhaseOneBoolean() then
+     return kInfestationRadius/3
+     else
+     return kInfestationRadius /4
+     end
    end
    
 if Server then
@@ -38,6 +44,7 @@ local origupdate = Whip.OnUpdate
 function Whip:OnUpdate(deltaTime)
         origupdate(self, deltaTime)
         Whip.kDamage = kWhipSlapDamage * Clamp(self:GetHealthScalar(), .3, 1)
+        Whip.kRange = 7 * Clamp(self:GetHealthScalar(), .3, 1)
 end
 
 function Whip:UpdateRootState()

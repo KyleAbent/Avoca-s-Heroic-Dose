@@ -1,3 +1,7 @@
+PrecacheAsset("Glow/green/GlowTP.surface_shader")
+local kAvocaWeedMaterial = PrecacheAsset("Glow/green/green.material")
+
+
 Script.Load("lua/Additions/LevelsMixin.lua")
 
 local networkVars = 
@@ -42,6 +46,7 @@ function ARC:OnInitialized()
      self.lastCheck = 0
      if  GetPayLoadArc() == nil then
            self.avoca = true 
+           ARC.kMoveSpeed = ARC.kMoveSpeed * 1.30
      else
      self.mainroom = true
         end
@@ -207,6 +212,7 @@ return  GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingl
 end
 local function ShouldStop(who)
 --if who.mainroom == true then return false end
+    /*
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
 
       for i = 1, #players do
@@ -216,6 +222,8 @@ local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
       end
       
 return not who.mainroom
+*/
+return false
 end
 
 local function FindNewParent(who)
@@ -406,7 +414,7 @@ end
     
         if doer == self then
          self:AddXP(self:GetAddXPAmount())
-         self:AddHealth(100)
+         self:AddHealth(100, false, true)
             
         end
         
@@ -416,6 +424,7 @@ end
 
 end//server
 
+/*
 function ARC:GetUnitNameOverride(viewer)
     local unitName = GetDisplayName(self)   
     if self.mainroom then
@@ -427,5 +436,41 @@ function ARC:GetUnitNameOverride(viewer)
    end
 return unitName
 end  
+*/
+
+
+if Client then
+
+    function ARC:OnUpdateRender()
+          local showMaterial = not GetAreEnemies(self, Client.GetLocalPlayer()) and self.avoca
+    
+        local model = self:GetRenderModel()
+        if model then
+
+            model:SetMaterialParameter("glowIntensity", 4)
+
+            if showMaterial then
+                
+                if not self.hallucinationMaterial then
+                    self.hallucinationMaterial = AddMaterial(model, kAvocaWeedMaterial)
+                end
+                
+                self:SetOpacity(0, "hallucination")
+            
+            else
+            
+                if self.hallucinationMaterial then
+                    RemoveMaterial(model, self.hallucinationMaterial)
+                    self.hallucinationMaterial = nil
+                end//
+                
+                self:SetOpacity(1, "hallucination")
+            
+            end //showma
+            
+        end//omodel
+end //up render
+end -- client
+
 
 Shared.LinkClassToMap("ARC", ARC.kMapName, networkVars)

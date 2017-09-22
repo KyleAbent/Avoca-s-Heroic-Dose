@@ -80,6 +80,7 @@ if Server then
                              if HasMixin(structure, "Obstacle") then
                                 if structure.obstacleId == -1 then structure:AddToMesh() end
                              end
+                             if structure:isa("Whip") then  structure. rooted = true structure:Root() end
                             if success then return self:GetIsAlive() end
                        end 
                        

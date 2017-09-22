@@ -15,7 +15,13 @@ InitMixin(self, InfestationMixin)
 end
 
   function Shift:GetInfestationRadius()
+     if  GetConductor():GetIsPhaseTwoBoolean() then
      return kInfestationRadius
+     elseif  GetConductor():GetIsPhaseOneBoolean() then
+     return kInfestationRadius/3
+     else
+     return kInfestationRadius /4
+     end
    end
 
 function Shift:GetMinRangeAC()

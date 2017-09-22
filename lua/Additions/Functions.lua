@@ -25,6 +25,16 @@ function GetConductor() --it washed away
     return nil
 end
 
+function GetGStartTime()
+    
+        for _, ginfo in ipairs(GetEntitiesWithinRange("GameInfo", where, 8)) do
+         if ginfo then return ginf:GetStartTime() end
+    end
+    
+    
+    return nil
+end
+
  function IsInRangeOfHive(who)
       local hives = GetEntitiesWithinRange("Hive", who:GetOrigin(), Shade.kCloakRadius)
    if #hives >=1 then return true end

@@ -6,6 +6,50 @@ local Plugin = Plugin
 Plugin.Version = "1.0"
 
 
+
+local OldSmashNearbyEggs
+
+local function HeroicSmash(self)
+
+    assert(Server)
+    
+    if not GetIsVortexed(self) then
+    
+        local nearbyEggs = GetEntitiesWithinRange("Egg", self:GetOrigin(), kSmashEggRange)
+        for e = 1, #nearbyEggs do
+            nearbyEggs[e]:Kill(self, self, self:GetOrigin(), Vector(0, -1, 0))
+        end
+        
+        local nearbyEmbryos = GetEntitiesWithinRange("Embryo", self:GetOrigin(), kSmashEggRange)
+        for e = 1, #nearbyEmbryos do
+            nearbyEmbryos[e]:Kill(self, self, self:GetOrigin(), Vector(0, -1, 0))
+        end
+    if GetConductor():GetIsPhaseTwoBoolean() then
+        local nearbySpurs = GetEntitiesWithinRange("Spur", self:GetOrigin(), kSmashEggRange)
+        for e = 1, #nearbySpurs do
+            nearbySpurs[e]:Kill(self, self, self:GetOrigin(), Vector(0, -1, 0))
+        end
+        
+        local nearbyVeils = GetEntitiesWithinRange("Veil", self:GetOrigin(), kSmashEggRange)
+        for e = 1, #nearbyVeils do
+            nearbyVeils[e]:Kill(self, self, self:GetOrigin(), Vector(0, -1, 0))
+        end
+        
+        local nearbyShells = GetEntitiesWithinRange("Shell", self:GetOrigin(), kSmashEggRange)
+        for e = 1, #nearbyShells do
+            nearbyShells[e]:Kill(self, self, self:GetOrigin(), Vector(0, -1, 0))
+        end
+        
+     end // p2  
+    end
+    
+    -- Keep on killing those nasty eggs forever.
+    return true
+    
+end
+
+OldSmashNearbyEggs = Shine.Hook.ReplaceLocalFunction( Exo.OnCreate, "SmashNearbyEggs", HeroicSmash )
+
 Shine.Hook.SetupClassHook( "PlayingTeam", "GetCommander", "OnGetCommander", "Replace" )
 
 Shine.Hook.SetupClassHook( "Conductor", "TriggerPhaseTwo", "OnTriggerPhaseTwo", "PassivePost" )

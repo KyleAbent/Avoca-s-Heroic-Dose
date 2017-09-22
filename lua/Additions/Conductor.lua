@@ -25,25 +25,24 @@ local networkVars =
    
    
    payLoadTime = "float",
-   phaseCannonTime = "float"
+   phaseCannonTime = "float",
+   
+   gameStartTime = "time"
 }
 
 function Conductor:TimerValues()
-   if kPhaseOneTimer == nil then kPhaseOneTimer = 300 end
-   if kPhaseTwoTimer == nil then kPhaseTwoTimer = 600 end
-   if kPhaseThreeTimer == nil then kPhaseThreeTimer = 900 end
-   if kPhaseFourTimer == nil then kPhaseFourTimer = 1200 end
   
   
-   self.PhaseOneTimer = kPhaseOneTimer
-   self.PhaseTwoTimer = kPhaseTwoTimer
-   self.PhaseThreeTimer = kPhaseThreeTimer
-   self.PhaseFourTimer = kPhaseFourTimer
+   self.PhaseOneTimer = 300
+   self.PhaseTwoTimer = 600
+   self.PhaseThreeTimer = 900
+   self.PhaseFourTimer = 1200
    
    self.isPhaseTwo = false
    self.isPhaseOne = false
    self.isPhaseThree = false
    self.isPhaseFour = false
+   
    
 end
 function Conductor:OnReset() 
@@ -345,7 +344,8 @@ end
 */
 
 function Conductor:OnRoundStart() 
-
+            self.gameStartTime = Shared.GetTime()
+           self:TimerValues()
            if Server then
               BuildAllNodes(self)
               DeleteResNodes(self)
@@ -354,12 +354,13 @@ function Conductor:OnRoundStart()
               
               ----------------Make these onUpdate
             --  self:AddTimedCallback(Conductor.PickMainRoom, 16)
-              self:AddTimedCallback(Conductor.Automations, 8)
-              self:AddTimedCallback(Conductor.PayloadTimer, 1)
-              self:AddTimedCallback(Conductor.PCTimer, 1)
+           --   self:AddTimedCallback(Conductor.Automations, 8)
+            --  self:AddTimedCallback(Conductor.PayloadTimer, 1)
+             -- self:AddTimedCallback(Conductor.PCTimer, 1)
             end
 end
-function Conductor:OnCreate() 
+function Conductor:OnCreate()  
+   self.gameStartTime = 0 
    if Server then
    self.payLoadTime = 45
    self.phaseCannonTime = 30
@@ -386,19 +387,23 @@ end
 
 
 function Conductor:GetIsPhaseOneBoolean()
+       Print(" Conductor:GetIsPhaseOneBoolean() is %s", self.isPhaseOne)
         return  self.isPhaseOne 
 end
 function Conductor:GetIsPhaseTwoBoolean()
+       Print(" Conductor:GetIsPhaseTwoBoolean() is %s", self.isPhaseTwo)
         return  self.isPhaseTwo
 end
 function Conductor:GetIsPhaseTwo()
-           local gamestarttime = GetGameInfoEntity():GetStartTime()
+           local gamestarttime =   self.gameStartTime
            local gameLength = Shared.GetTime() - gamestarttime
+           --Print(" GetIsPhaseTwo gameLength is %s, PhaseTwoTimer is %s", gameLength, self.PhaseTwoTimer)
            return  gameLength >= self.PhaseTwoTimer
 end
 function Conductor:GetIsPhaseOne()
-           local gamestarttime = GetGameInfoEntity():GetStartTime()
+           local gamestarttime = self.gameStartTime
            local gameLength = Shared.GetTime() - gamestarttime
+           --Print(" GetIsPhaseOne gameLength is %s, PhaseOneTimer is %s", gameLength, self.PhaseOneTimer)
            return  gameLength >= self.PhaseOneTimer
 end
  
@@ -420,6 +425,7 @@ end
 
 
 function Conductor:CountPhaseOneTimer()
+  -- Print("Conductor:CountPhaseOneTimer()")
        if  self:GetIsPhaseOne() then   
         self.isPhaseOne = true
        self.isPhaseTwo = false
@@ -431,6 +437,7 @@ end
  
    
 function Conductor:CountPhaseTwoTimer()
+   --Print("Conductor:CountPhaseTwoTimer()")
        if  self:GetIsPhaseTwo() then
             Print("Conductor CountPhaseTwoTimer GetIsPhaseTwo true")
            self.isPhaseOne = false
@@ -466,14 +473,19 @@ end
 
 
 function Conductor:OnUpdate(deltatime)
+
+           --   self:AddTimedCallback(Conductor.Automations, 8)
+            --  self:AddTimedCallback(Conductor.PayloadTimer, 1)
+             -- self:AddTimedCallback(Conductor.PCTimer, 1)
+             
 if Server then
   
  
     local gamestarted = GetGamerules():GetGameStarted()
      if gamestarted then 
        if not self.timelasttimerup or self.timelasttimerup + 1 <= Shared.GetTime() then
-       if not self.isPhaseOne then self:CountPhaseOneTimer() end
-           if self.isPhaseOne then
+       if self.isPhaseOne == false then self:CountPhaseOneTimer() end
+           if self.isPhaseOne == true then
            self:CountPhaseTwoTimer() 
         --   elseif self.SiegeTimer == 0 and not self.isSuddenDeath  then
           -- self:CountSDTimer() 
@@ -481,8 +493,17 @@ if Server then
         --      if not self.isPhaseThree then self:CountPhaseThreeTimer() end
         --      self:CountPhaseFourTimer()
            end
+           self:PayloadTimer()
+           self:PCTimer()
         self.timeLastAutomations = Shared.GetTime()
          end
+         
+             if not self.timeLastAutomations or self.timeLastAutomations + 8 <= Shared.GetTime() then
+                   self:Automations()
+                 self.timeLastAutomations = Shared.GetTime()
+           end   
+         
+         
   end
   
   
