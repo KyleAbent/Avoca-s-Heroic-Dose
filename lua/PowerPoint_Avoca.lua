@@ -45,7 +45,7 @@ local orig_PowerPoint_StopDamagedSound = PowerPoint.StopDamagedSound
        -- local nearestHarvester = GetNearest(self:GetOrigin(), "Harvester", 2, function(ent) return LocationsMatch(self,ent)  end)
       -- if nearestHarvester then nearestHarvester:Kill() end
    end
-   
+   /*
 local orig_PowerPoint_OnKill = PowerPoint.OnKill
     function PowerPoint:OnKill(attacker, doer, point, direction)
     orig_PowerPoint_OnKill(self)
@@ -58,3 +58,4 @@ local orig_PowerPoint_OnKill = PowerPoint.OnKill
        --end
        
     end
+    */
