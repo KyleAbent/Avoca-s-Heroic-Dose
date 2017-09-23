@@ -14,6 +14,7 @@ Script.Load("lua/Additions/ExoWelder.lua")
 Script.Load("lua/Additions/StunWall.lua") 
 Script.Load("lua/Additions/EggBeacon.lua") 
 Script.Load("lua/Additions/StructureBeacon.lua") 
+Script.Load("lua/Additions/CommVortex.lua")
     
    
     

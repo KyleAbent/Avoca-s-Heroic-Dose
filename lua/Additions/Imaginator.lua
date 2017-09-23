@@ -875,7 +875,7 @@ local canafford = {}
       end 
       
       local  Shade = GetEntitiesForTeam( "Shade", 2 )
-      if #Shade <= 8 then
+      if #Shade <= 12 then
       table.insert(tospawn, kTechId.Shade)
       end 
       

@@ -38,6 +38,10 @@ function Conductor:FirePhaseCannons(powerpoint)
              crag:SetConstructionComplete()
              end
              
+             if math.random(1,2) == 1 then
+              CreateEntity(NutrientMist.kMapName, FindFreeSpace(origin, 1, 8), 2)
+             end
+             
       if GetConductor():GetIsPhaseTwoBoolean() then
            if math.random(1,2) == 1 then
            --chance or phase three or phase four if too much movement from hives during marine rushing hives

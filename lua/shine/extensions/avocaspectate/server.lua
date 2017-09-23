@@ -7,6 +7,13 @@ Shine.Hook.SetupClassHook( "AvocaSpectator", "ChangeView", "OnChangeView", "Pass
 
 Plugin.Version = "1.0"
 
+
+local function AutoSpectate(self, client)
+
+    Shine.Timer.Create( "AutoSpectate", 8, -1, function() if client and client:isa("AvocaSpectator") then self:OnChangeView(client) else Shine.Timer.Destroy("AutoSpectate") end  end )
+end
+
+
 function Plugin:Initialise()
 self.Enabled = true
 self:CreateCommands()
@@ -309,6 +316,7 @@ end
 
 
 
+
 function Plugin:CreateCommands()
 
 
@@ -317,6 +325,7 @@ local function Direct( Client, Targets )
     for i = 1, #Targets do
     local Player = Targets[ i ]:GetControllingPlayer()
           Player:Replace(AvocaSpectator.kMapName)
+          AutoSpectate(self, Client)
      end
 end
 

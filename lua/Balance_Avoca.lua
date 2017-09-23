@@ -1,3 +1,6 @@
+kBileBombEnergyCost = 10
+
+
 kSentryDamage = 10
 
 kTeamResourcePerTick = 4

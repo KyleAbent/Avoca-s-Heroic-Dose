@@ -1,3 +1,6 @@
+
+ModLoader.SetupFileHook( "lua/CommAbilities/Alien/Contamination.lua", "lua/CommAbilities/Alien/Contamination_Avoca.lua", "post" )
+
 ModLoader.SetupFileHook( "lua/Marine.lua", "lua/Marine_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Alien.lua", "lua/Alien_Avoca.lua", "post" )
@@ -32,10 +35,6 @@ ModLoader.SetupFileHook( "lua/BalanceHealth.lua", "lua/BalanceHealth_Avoca.lua",
 ModLoader.SetupFileHook( "lua/Shade.lua", "lua/Shade_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Shift.lua", "lua/Shift_Avoca.lua", "post" )
-
-ModLoader.SetupFileHook( "lua/Onos.lua", "lua/Onos_Avoca.lua", "post" )
-
-ModLoader.SetupFileHook( "lua/Fade.lua", "lua/Fade_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/ARC.lua", "lua/ARC_Avoca.lua", "post" )
 
@@ -78,6 +77,8 @@ ModLoader.SetupFileHook( "lua/InfantryPortal.lua", "lua/InfantryPortal_Avoca.lua
 ModLoader.SetupFileHook( "lua/CommandStructure.lua", "lua/CommandStructure_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Spectator.lua", "lua/Spectator_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Onos.lua", "lua/Onos_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Weapons/Marine/Flamethrower.lua", "lua/Weapons/Marine/Flamethrower_Avoca.lua", "post" )
 

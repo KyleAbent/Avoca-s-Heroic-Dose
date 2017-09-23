@@ -9,6 +9,7 @@ local networkVars =
  avoca = "boolean",
  mainroom = "boolean",
  lastCheck = "time",
+  vortexCheck = "boolean",
 }
 
 AddMixinNetworkVars(LevelsMixin, networkVars)
@@ -51,6 +52,7 @@ function ARC:OnInitialized()
      self.mainroom = true
         end
      InitMixin(self, LevelsMixin)
+     self.vortexCheck = false
 end
 
 
@@ -141,7 +143,7 @@ local count = 0
               count = count + 1
           end
           
-          return count<=3
+          return count>=3
 end
 /*
 local function CheckHivesForScan(who)
@@ -166,7 +168,7 @@ local function CheckForAndActAccordingly(who)
 local stopanddeploy = false
           for _, enemy in ipairs(GetEntitiesWithMixinForTeamWithinRange("Live", 2, who:GetOrigin(), kARCRange)) do
               local distToTarget = (enemy:GetOrigin() - who:GetOrigin()):GetLengthXZ()
-                  if who.avoca == true and  (distToTarget < 4) and not hasFire(who) then
+                  if who.avoca == true and  (distToTarget <= 8) and not hasFire(who) then
                    CreateEntity(FireFlameCloud.kMapName, enemy:GetOrigin() , 1) 
                    --Set parent nearby player
                     end
@@ -233,12 +235,38 @@ local function FindNewParent(who)
     who:SetOwner(player)
     end
 end
+function ARC:CheckVortex()
+    local vortex =  GetNearest(self:GetOrigin(), "Vortex", 2)
+     if not vortex then
+          CreateEntity(CommVortex.kMapName, self:GetOrigin() , 2) 
+     end
+end
+
+/*
+
+function ARC:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil and self:GetIsVortexed() then
+        damageTable.damage = damageTable.damage * 1.3
+    end
+
+end
+
+*/
+
 function ARC:GiveScan()
+
+   if self.vortexCheck == true then 
+    self.vortexCheck = false
+    self:CheckVortex()
+   end
+   
     local where = GetNearestEligable(self):GetOrigin()
     
     for _, shade in ipairs(GetEntitiesWithinRange("Shade", where, 20)) do
        if shade:GetIsBuilt() then
          shade.shouldInk = true
+         self.vortexCheck = true
          end
     end
     

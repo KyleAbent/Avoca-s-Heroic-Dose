@@ -3,6 +3,11 @@ Script.Load("lua/Modifications/Remixes.lua")
 Script.Load("lua/Modifications/Criticisms.lua")
 Script.Load("lua/Modifications/GameStart.lua")
 
+
+function BotTeamController:RemoveBot(teamIndex)
+   return /// OnConsoleRemoveBots(nil, 1, teamIndex)
+end
+
 /*
 kMarineHealth = 200
 kJetpackHealth = 200
@@ -235,6 +240,12 @@ end
 
     
 
+function LeapMixin:GetHasSecondary(player)
+    return GetHasTech(player, kTechId.Leap)
+end
+function StompMixin:GetHasSecondary(player)
+    return  GetHasTech(player, kTechId.Stomp)
+end
 
 
 /*

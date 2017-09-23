@@ -8,3 +8,13 @@
    
     return coords
 end
+
+function CommandStation:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil and doer ~= nil then
+       if GetConductor():GetIsPhaseTwoBoolean() then
+        damageTable.damage = damageTable.damage * 2
+        end
+    end
+
+end

@@ -28,6 +28,12 @@ function Alien:OnCreate()
 end
 
 
+function Alien:GetRebirthLength()
+return 5
+end
+function Alien:GetRedemptionCoolDown()
+return 25
+end
 
 
 

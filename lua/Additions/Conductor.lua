@@ -585,14 +585,14 @@ function Conductor:CollectResources()
    
        for _, player in ipairs(GetEntitiesForTeam("Player", 1)) do
         if not player:isa("Commander") then
-            player:AddResources(builtpower / 10 ) 
+            player:AddResources(builtpower  ) 
             if not marineteam then marineteam = player:GetTeam() end
         end
     end
     
         for _, player in ipairs(GetEntitiesForTeam("Player", 2)) do
         if not player:isa("Commander") then
-            player:AddResources(disabledpower / 10) 
+            player:AddResources(disabledpower ) 
              if not alienteam then alienteam = player:GetTeam() end
         end
     end

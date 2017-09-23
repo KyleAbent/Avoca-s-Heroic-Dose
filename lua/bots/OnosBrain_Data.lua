@@ -4,11 +4,7 @@ Script.Load("lua/bots/BrainSenses.lua")
 
 
     local function CertainRules(who)
-      if HasMixin(who, "PowerConsumer") then
-         return who:GetIsPowered()
-      else
-       return true
-      end  
+         return who:isa("CommandStation") or who:isa("ARC") or ( who:isa("PowerPoint") and not who:GetIsDisabled() )
     end
     
     

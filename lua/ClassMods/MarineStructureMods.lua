@@ -32,7 +32,7 @@ function ConstructMixin:AdjustHPArmor()
 else
   self:DeductHealth(100)  
  end
-  return self:GetIsBuilt()
+  return true//self:GetIsBuilt()
 end
 
 local orig consOn = ConstructMixin.OnConstructionComplete

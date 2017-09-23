@@ -1,6 +1,12 @@
 if Server then
 
 
+local orig_Egg_OnResearchComplete = Egg.OnResearchComplete
+function Egg:OnResearchComplete(researchId)
+    self:AddTimedCallback(Egg.ResearchSpecifics, 4 )
+  return orig_Egg_OnResearchComplete(self, researchId) 
+end
+
 local origInit = Egg.OnInitialized
 function Egg:OnInitialized()
    origInit(self)

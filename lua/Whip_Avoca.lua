@@ -25,9 +25,35 @@ local orig_Whip_OnInit = Whip.OnInitialized
 function Whip:OnInitialized()
     orig_Whip_OnInit(self)
   InitMixin(self, InfestationMixin)
+end
+
+
+   
+function Whip:GetWhipsInRange()
+      local whip = GetEntitiesWithinRange("Whip", self:GetOrigin(), Whip.kBombardRange)
+      return Clamp(#whip - 1, 0.1, 7)
+end
+
+function Whip:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
+
+    if hitPoint ~= nil and doer ~= nil then
+        damageTable.damage = damageTable.damage - (self:GetWhipsInRange()*10/100) * damageTable.damage
+    end
 
 end
 
+function Whip:GetDmgResAmt()
+return (self:GetWhipsInRange()/7)
+end
+
+function Whip:GetUnitNameOverride(viewer) --Triggerhappy stoner
+    local unitName = GetDisplayName(self)   
+    --unitName = string.format(Locale.ResolveString("Crag (+%sS 0%)"), self:GetCragsInRange()) --, self:GetBonusAmt() )
+    unitName = "Whip (+"..self:GetWhipsInRange().."0% dmgres)" --, self:GetBonusAmt() )
+return unitName
+end
+
+ 
   function  Whip:GetInfestationRadius()
      if  GetConductor():GetIsPhaseTwoBoolean() then
      return kInfestationRadius
@@ -40,6 +66,8 @@ end
    
 if Server then
 
+
+    
 local origupdate = Whip.OnUpdate
 function Whip:OnUpdate(deltaTime)
         origupdate(self, deltaTime)

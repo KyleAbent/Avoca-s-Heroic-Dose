@@ -1,6 +1,14 @@
 --Kyle 'Avoca' Abent 
 //Well I am copying everything, you know. But I like my name cause it's a good one.
-local networkVars = {lastswitch = "private time", nextangle = "private integer (0 to 8)", lockedId = "entityid"} 
+local networkVars = 
+
+{
+lastswitch = "private time", 
+
+nextangle = "private integer (0 to 8)", 
+
+lockedId = "entityid"
+} 
 class 'AvocaSpectator' (Spectator)
 AvocaSpectator.kMapName = "Spectator"
 
