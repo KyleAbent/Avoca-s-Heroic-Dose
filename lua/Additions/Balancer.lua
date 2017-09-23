@@ -28,6 +28,8 @@ function Conductor:FirePhaseCannons(powerpoint)
              
              for i = 1, math.random(1,4) do
                local whip = CreateEntity(Whip.kMapName, FindFreeSpace(origin, 1, 8), 2)
+               whip.rooted = true
+               whip:Root() 
                whip:SetConstructionComplete()
              end
              

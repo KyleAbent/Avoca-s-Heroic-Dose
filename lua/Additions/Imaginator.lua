@@ -732,7 +732,7 @@ function Imaginator:ManageMarineBeacons()
             local chair = nil
           --  Print(" umm 1 ")
                 for _, entity in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do
-               if entity:GetIsBuilt() and entity:GetHealthScalar() <= 0.3 then chair = entity   Print(" umm 2 ") break end
+               if entity:GetIsBuilt() and entity:GetHealthScalar() <= 0.3 then chair = entity  break end --Print(" umm 2 ") break end
                end
                 -- Print(" umm 3 ")
                if not chair then return end

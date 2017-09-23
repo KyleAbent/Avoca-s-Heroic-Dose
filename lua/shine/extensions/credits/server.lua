@@ -171,28 +171,9 @@ function Plugin:HasLimitOf(Player, mapname, teamnumbber, limit, Client)
 local entitycount = 0
 local entities = {}
         for index, entity in ipairs(GetEntitiesWithMixinForTeam("Live", teamnumbber)) do
-        if entity:GetMapName() == mapname and entity:GetOwner() == Player then entitycount = entitycount + 1 table.insert(entities, entity) end 
+        if entity:GetMapName() == mapname then entitycount = entitycount + 1 table.insert(entities, entity) end 
     end
     
-
-   local delete = true --GetSetupConcluded()
-      if delete then
-            if #entities >= limit then
-            local entity = table.random(entities)
-             if mapname == Sentry.kMapName or entity:GetMapName() == Observatory.kMapName or entity:GetMapName() == ARC.kMapName  then return true end
-                DestroyEntity(entity)
-                 self:NotifyCredit( Client, "(Logic Fallacy, Limit Reached):Deleted your old %s so you can spawn a new one.", true, mapname)
-                 return false  
-            end
-      end
-      /*
-      if mapname == Sentry.kMapName then
-          if not GetCheckSentryLimit(techId, Player:GetOrigin(), normal, commander) then
-                 self:NotifyCredit( Client, "(Logic Fallacy):%s Sentrys are allowed per location.", true, Credit)
-                 return  false
-          end
-      end
-      */
      return entitycount >= limit
 end
 function Plugin:PregameLimit(teamnum)
@@ -506,7 +487,7 @@ function Plugin:SetGameState( Gamerules, State, OldState )
                   if Player then
                  // self:SaveCredits(Player:GetClient())
                      if Player:GetTeamNumber() == 1 or Player:GetTeamNumber() == 2 then
-                    Shine.ScreenText.Add( 80, {X = 0.40, Y = 0.15,Text = "Total Credit Mined:".. math.round((Player:GetScore() /10  + ConditionalValue(Player:GetTeamNumber() == 1, self.marinebonus, self.alienbonus)), 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,}, Player )
+                    Shine.ScreenText.Add( 80, {X = 0.40, Y = 0.15,Text = "Total Credit Earned:".. math.round((Player:GetScore() / 10 ), 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,}, Player )
                     Shine.ScreenText.Add( 81, {X = 0.40, Y = 0.20,Text = "Total Credit Spent:".. self.PlayerSpentAmount[Player:GetClient()], Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,}, Player )
                      end
                   end
@@ -575,32 +556,13 @@ self:NotifyCredit(who, "Empty hudslot 5 please.", true)
 return
 end
 
- 
-if whoagain:isa("Alien") and mapname == Crag.kMapName then 
-
-
-   if  GetIsOriginInHiveRoom( whoagain:GetOrigin() ) then
-     limitof = 5 
-if self:HasLimitOfCragInHive(whoagain, mapname, whoagain:GetTeamNumber(), limitof, who) then 
-self:NotifyCredit(who, "Limit of %s %s inside hive room.", true, limitof, mapname)
-return
-end
-    end
-limitof = 8
-
-if self:HasLimitOfCragOutHive(whoagain, mapname, whoagain:GetTeamNumber(), limitof, who) then 
-self:NotifyCredit(who, "Limit of %s %s outside hive room.", true, limitof, mapname)
-return
-end
-
-else
+limitof = 24 
 
 if self:HasLimitOf(whoagain, mapname, whoagain:GetTeamNumber(), limitof, who) then 
-self:NotifyCredit(who, "Limit of %s per %s per player ya noob", true, limitof, mapname)
+self:NotifyCredit(who, "Global limit of entity reached", true, limitof, mapname)
 return
 end
 
-end
 
 if reqground then
 

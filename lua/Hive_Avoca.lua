@@ -27,11 +27,21 @@ end
 if Server then
 
 
-function Hive:UpdateAliensWeaponsManually() ///Seriously this makes more sense than spamming some complicated formula every 0.5 seconds no?
- for _, alien in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do 
-        alien:HiveCompleteSoRefreshTechsManually() 
+
+local orig_Hive_OnResearchComplete = Hive.OnResearchComplete
+function Hive:OnResearchComplete(researchId)
+--Print("HiveOnResearchComplete")
+  UpdateAliensWeaponsManually() 
+    if researchId == kTechId.UpgradeToCragHive or researchId == kTechId.UpgradeToShadeHive or researchId ==  kTechId.UpgradeToShiftHive then
+        self:AddTimedCallback(Hive.CheckForDoubleUpG, 4) 
+      --  Print("Started Callback Hive CheckForDoubleUpG")
+     end   
+   --for now just updtate alien hp on all research completes b/c i dont feel like filtering the biomass -.-
+      -- IfBioMassThenAdjustHp(self)
+  return orig_Hive_OnResearchComplete(self, researchId) 
 end
-end
+
+
 
 local function LocationsMatch(who,whom)
    
@@ -181,7 +191,7 @@ end
 local orig_Hive_OnDestroy = Hive.OnDestroy
 function Hive:OnDEstroy()
 orig_Hive_OnDestroy(self)
-self:UpdateAliensWeaponsManually()
+UpdateAliensWeaponsManually()
 end
 
 function Hive:OnConstructionComplete()

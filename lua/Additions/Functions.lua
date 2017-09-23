@@ -1,3 +1,9 @@
+function UpdateAliensWeaponsManually() 
+ for _, alien in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do 
+        alien:UpdateWeapons() 
+end
+end
+
 function GetNearestMixin(origin, mixinType, teamNumber, filterFunc)
     assert(type(mixinType) == "string")
     local nearest = nil
@@ -174,7 +180,7 @@ end
 function GetRandomDisabledPower()
   local powers = {}
   for _, power in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-        if power:GetIsDisabled() then table.insert(powers,power) end
+        if power:GetIsDisabled() and not GetPowerPointRecentlyDestroyed(power) then table.insert(powers,power) end
     end
     if #powers == 0 then return nil end
     local power = table.random(powers)
@@ -268,14 +274,6 @@ function GetIsTimeUp(timeof, timelimitof)
  return boolean
 end
 
-function AddPayLoadTime(seconds)
-    local entityList = Shared.GetEntitiesWithClassname("Conductor")
-    if entityList:GetSize() > 0 then
-                 local conductor = entityList:GetEntityAtIndex(0) 
-                conductor:SendNotification(seconds)
-                conductor:AddTime(seconds) 
-    end    
-end
 function GetPayLoadArc()
            for _, arc in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
                  if arc:GetIsPL() then return arc end

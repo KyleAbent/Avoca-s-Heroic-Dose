@@ -25,8 +25,10 @@ if Server then
 
 
 function ConstructMixin:AdjustHPArmor()
- if GetIsRoomPowerUp(self) then --if phase 1?
-  if not self:GetIsInCombat() then self:AddHealth(100) self:AddArmor(25) end
+  if GetIsRoomPowerUp(self) then --if phase 1?
+   local amthp =  self:isa("PowerPoint") and 25 or 100
+   local amtarmor =  self:isa("PowerPoint") and 5 or 25
+  if not self:GetIsInCombat() then self:AddHealth(amthp) self:AddArmor(amtarmor) end
 else
   self:DeductHealth(100)  
  end

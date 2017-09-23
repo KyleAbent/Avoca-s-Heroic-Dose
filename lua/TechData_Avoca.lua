@@ -17,7 +17,23 @@ local kAvoca_TechData =
 {   
 
 
-         
+                  { [kTechDataId] = kTechId.Rebirth, 
+       [kTechDataCategory] = kTechId.CragHiveTwo,  
+        [kTechDataDisplayName] = "Rebirth", 
+      [kTechDataSponitorCode] = "A",  
+      [kTechDataCostKey] = kRebirthCost, 
+     [kTechDataTooltipInfo] = "Replaces death with gestation if cooldown is reached", },
+
+      // Lifeform purchases
+        { [kTechDataId] = kTechId.Redemption, 
+       [kTechDataCategory] = kTechId.CragHiveTwo,  
+        [kTechDataDisplayName] = "Redemption", 
+      [kTechDataSponitorCode] = "B",  
+      [kTechDataCostKey] = kRedemptionCost, 
+     [kTechDataTooltipInfo] = "a 3 second timer checks if your health is a random value less than or equal to 15-30% of your max hp. If so, then randomly tp to a egg spawn 1-4 seconds after.", },
+   
+
+   
      
          { [kTechDataId] = kTechId.DualWelderExosuit,    
  [kTechIDShowEnables] = false,     
@@ -81,21 +97,7 @@ local kAvoca_TechData =
 
           
      
-            { [kTechDataId] = kTechId.Rebirth, 
-       [kTechDataCategory] = kTechId.CragHiveTwo,  
-        [kTechDataDisplayName] = "Rebirth", 
-      [kTechDataSponitorCode] = "A",  
-      [kTechDataCostKey] = kRebirthCost, 
-     [kTechDataTooltipInfo] = "Replaces death with gestation if cooldown is reached", },
 
-      // Lifeform purchases
-        { [kTechDataId] = kTechId.Redemption, 
-       [kTechDataCategory] = kTechId.CragHiveTwo,  
-        [kTechDataDisplayName] = "Redemption", 
-      [kTechDataSponitorCode] = "B",  
-      [kTechDataCostKey] = kRedemptionCost, 
-     [kTechDataTooltipInfo] = "a 3 second timer checks if your health is a random value less than or equal to 15-30% of your max hp. If so, then randomly tp to a egg spawn 1-4 seconds after.", },
-   
 
 
 

@@ -12,9 +12,18 @@ ModLoader.SetupFileHook( "lua/Armory.lua", "lua/Armory_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Egg.lua", "lua/Egg_Avoca.lua", "post" )
 
+ModLoader.SetupFileHook( "lua/NS2Utility.lua", "lua/NS2Utility_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/AlienTeam.lua", "lua/AlienTeam_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Alien_Upgrade.lua", "lua/Alien_Upgrade_Avoca.lua", "post" )
+
 ModLoader.SetupFileHook( "lua/Location.lua", "lua/Location_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Cyst.lua", "lua/Cyst_Avoca.lua", "post" )
+
+
+ModLoader.SetupFileHook( "lua/TechTreeButtons.lua", "lua/TechTreeButtons_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Balance.lua", "lua/Balance_Avoca.lua", "post" )
 
@@ -23,6 +32,10 @@ ModLoader.SetupFileHook( "lua/BalanceHealth.lua", "lua/BalanceHealth_Avoca.lua",
 ModLoader.SetupFileHook( "lua/Shade.lua", "lua/Shade_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Shift.lua", "lua/Shift_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Onos.lua", "lua/Onos_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Fade.lua", "lua/Fade_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/ARC.lua", "lua/ARC_Avoca.lua", "post" )
 

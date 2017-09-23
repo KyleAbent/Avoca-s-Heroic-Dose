@@ -19,3 +19,6 @@ kARCMinRange = 0 -- why is this even a thing??????
 
 kEnzymeCloudDuration = 6
 kMucousShieldDuration = 6
+
+kMarineInitialIndivRes = 100
+kAlienInitialIndivRes = 100

@@ -83,6 +83,61 @@ end
 
 */
 
+
+local origkill = LiveMixin.Kill
+function LiveMixin:Kill(attacker, doer, point, direction)
+  if self:GetIsAlive() and self:GetCanDie() then
+          ---Rebirth
+          
+         if self:isa("Alien") then
+         
+         /*
+          if GetHasRebirthUpgrade(self) and self:GetEligableForRebirth() then
+                if Server then 
+                    if attacker and attacker:isa("Player")  then 
+                      local points = self:GetPointValue()
+                       attacker:AddScore(points)
+                     end 
+                    end
+                self:TriggerRebirth()
+                return
+                end
+             */   
+             
+             if  self:isa("Skulk") and GetConductor():GetIsPhaseTwoBoolean() and Server then
+              CreateEntity(Rupture.kMapName, point, 2)
+             end
+             
+         end
+            
+            --Hunger
+            /*
+      if self:GetTeamNumber() == 1 then 
+         if self:isa("Player")  then
+              if attacker and attacker:isa("Alien") and attacker:isa("Player") and GetHasHungerUpgrade(attacker) then
+                  local duration = 6
+                     if attacker:isa("Onos") then
+                       duration = duration * .7
+                       end
+                    attacker:TriggerEnzyme(duration)
+
+          attacker:AddEnergy(attacker:GetMaxEnergy() * .10 )
+          attacker:AddHealth(attacker:GetHealth() * (10/100))
+        end
+      elseif ( HasMixin(self, "Construct") or self:isa("ARC") or self:isa("MAC") ) and attacker and attacker:isa("Player") then 
+              if GetHasHungerUpgrade(attacker) and attacker:isa("Gorge") and doer:isa("DotMarker") then 
+                        attacker:TriggerEnzyme(5)
+                        attacker:AddEnergy(attacker:GetMaxEnergy() * .10)
+               end
+          end
+     end 
+     */
+            
+            
+   end     
+return origkill(self, attacker, doer, point, direction)
+end
+
 if Server then
 
 
@@ -127,48 +182,7 @@ local function LockAbility(forAlien, techId)
     end    
     
 end
-function UpdateAvocaAvailability(forAlien, tierOneTechId, tierTwoTechId, tierThreeTechId)
-        
 
-        local team = forAlien:GetTeam()
-        if team and team.GetTechTree then
-        
-            local hasOneHiveNow = GetGamerules():GetAllTech() or (tierOneTechId ~= nil and tierOneTechId ~= kTechId.None and GetIsTechUnlocked(forAlien, tierOneTechId))
-            local oneHive = forAlien.oneHive
-            -- Don't lose abilities unless you die.
-            forAlien.oneHive = forAlien.oneHive or hasOneHiveNow
-
-            if forAlien.oneHive then
-                UnlockAbility(forAlien, tierOneTechId)
-            else
-                LockAbility(forAlien, tierOneTechId)
-            end
-            
-            local hasTwoHivesNow = GetGamerules():GetAllTech() or (tierTwoTechId ~= nil and tierTwoTechId ~= kTechId.None and GetIsTechUnlocked(forAlien, tierTwoTechId))
-            local hadTwoHives = forAlien.twoHives
-            -- Don't lose abilities unless you die.
-            forAlien.twoHives = forAlien.twoHives or hasTwoHivesNow
-
-            if forAlien.twoHives then
-                UnlockAbility(forAlien, tierTwoTechId)
-            else
-                LockAbility(forAlien, tierTwoTechId)
-            end
-            
-            local hasThreeHivesNow = GetGamerules():GetAllTech() or (tierThreeTechId ~= nil and tierThreeTechId ~= kTechId.None and GetIsTechUnlocked(forAlien, tierThreeTechId))
-            local hadThreeHives = forAlien.threeHives
-            -- Don't lose abilities unless you die.
-            forAlien.threeHives = forAlien.threeHives or hasThreeHivesNow
-
-            if forAlien.threeHives then
-                UnlockAbility(forAlien, tierThreeTechId)
-            else
-                LockAbility(forAlien, tierThreeTechId)
-            end
-            
-        end
-          return false
-end
 /*
 -- Find team start with team 0 or for specified team. Remove it from the list so other teams don't start there. Return nil if there are none.
 function NS2Gamerules:ChooseTechPoint(techPoints, teamNumber)
@@ -234,5 +248,158 @@ end
   */  
 end--server
 
+
+if Server then
+	
+	local function RewardAchievement(player, name)
+
+	end
+	
+	function AchievementReceiverMixin:CheckWeldedPowerNodes()
+
+	end
+
+	function AchievementReceiverMixin:CheckWeldedPlayers()
+
+	end
+
+	function AchievementReceiverMixin:CheckBuildResTowers()
+
+	end
+
+	function AchievementReceiverMixin:CheckKilledResTowers()
+
+	end
+
+	function AchievementReceiverMixin:CheckDefendedResTowers()
+
+	end
+
+	function AchievementReceiverMixin:CheckFollowedOrders()
+
+	end
+
+	function AchievementReceiverMixin:CheckParasitedPlayers()
+
+	end
+
+	function AchievementReceiverMixin:CheckStructureDamageDealt()
+
+	end
+
+	function AchievementReceiverMixin:CheckPlayerDamageDealt()
+
+	end
+
+	function AchievementReceiverMixin:CheckDestroyedRessources()
+
+	end
+
+	function AchievementReceiverMixin:OnPhaseGateEntry()
+		
+	end
+
+	function AchievementReceiverMixin:OnUseGorgeTunnel()
+
+	end
+
+	function AchievementReceiverMixin:AddWeldedPowerNodes()
+
+	end
+
+	function AchievementReceiverMixin:AddWeldedPlayers()
+
+	end
+
+	function AchievementReceiverMixin:AddBuildResTowers()
+
+	end
+
+	function AchievementReceiverMixin:AddKilledResTowers()
+
+	end
+
+	function AchievementReceiverMixin:AddDefendedResTowers()
+
+	end
+
+	function AchievementReceiverMixin:AddParsitedPlayers()
+	end
+
+	function AchievementReceiverMixin:AddStructureDamageDealt(amount)
+	end
+
+	function AchievementReceiverMixin:AddPlayerDamageDealt(amount)
+	end
+
+	function AchievementReceiverMixin:AddDestroyedRessources(amount)
+	end
+
+	function AchievementReceiverMixin:CompletedCurrentOrder()
+	end
+
+	function AchievementReceiverMixin:ResetScores()
+
+	end
+
+	function AchievementReceiverMixin:CopyPlayerDataFrom(player)
+	end
+
+end
+
+if Client then
+
+	function AchievementReceiverMixin:GetMaxPlayer()
+	end
+
+	function AchievementReceiverMixin:OnUpdatePlayer(deltaTime)
+    end
+end
+
+if Server then
+
+	function AchievementGiverMixin:PreUpdateMove(input, runningPrediction)
+
+	end
+
+	function AchievementGiverMixin:OnTaunt()
+
+	end
+
+	function AchievementGiverMixin:OnAddHealth()
+
+	end
+
+	function AchievementGiverMixin:OnCommanderStructureLogout(hive)
+	
+	end
+
+	function AchievementGiverMixin:SetGestationData(techIds, previousTechId, healthScalar, armorScalar)
+
+	end
+
+	function AchievementGiverMixin:SetParasited(fromPlayer)
+
+	end
+
+	function AchievementGiverMixin:OnWeldTarget(target)
+
+	end
+
+	function AchievementGiverMixin:OnConstruct(builder, newFraction, oldFraction)
+
+	end
+
+	function AchievementGiverMixin:OnConstructionComplete(builder)
+
+	end
+
+	function AchievementGiverMixin:OnTakeDamage(damage, attacker, doer, point, direction, damageType, preventAlert)
+
+	end
+
+	function AchievementGiverMixin:PreOnKill(attacker, doer, point, direction)
+     end
+end
 
 

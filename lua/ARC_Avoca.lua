@@ -402,13 +402,6 @@ local function DestroPanicAttackInRadius(where)
     end
 end
 
-function ARC:PreOnKill(attacker, doer, point, direction)
- if self.avoca then
-AddPayLoadTime(16) 
-DestroPanicAttackInRadius(self:GetOrigin())
-end
-
-end 
 
     function ARC:OnDamageDone(doer, target)
     

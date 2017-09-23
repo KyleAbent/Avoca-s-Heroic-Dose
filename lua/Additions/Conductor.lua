@@ -17,11 +17,7 @@ local networkVars =
    PhaseOneTimer = "float",
    PhaseThreeTimer = "float",
    PhaseFourTimer = "float",
-   
-   isPhaseOne = "boolean",
-   isPhaseTwo = "boolean",
-   isPhaseThree = "boolean",
-   isPhaseFour = "boolean",
+  
    
    
    payLoadTime = "float",
@@ -387,12 +383,12 @@ end
 
 
 function Conductor:GetIsPhaseOneBoolean()
-       Print(" Conductor:GetIsPhaseOneBoolean() is %s", self.isPhaseOne)
-        return  self.isPhaseOne 
+    --   Print(" Conductor:GetIsPhaseOneBoolean() is %s", self:GetIsPhaseOne())
+        return  self:GetIsPhaseOne()
 end
 function Conductor:GetIsPhaseTwoBoolean()
-       Print(" Conductor:GetIsPhaseTwoBoolean() is %s", self.isPhaseTwo)
-        return  self.isPhaseTwo
+       --Print(" Conductor:GetIsPhaseTwoBoolean() is %s", self:GetIsPhaseTwo())
+        return  self:GetIsPhaseTwo()
 end
 function Conductor:GetIsPhaseTwo()
            local gamestarttime =   self.gameStartTime
@@ -403,7 +399,7 @@ end
 function Conductor:GetIsPhaseOne()
            local gamestarttime = self.gameStartTime
            local gameLength = Shared.GetTime() - gamestarttime
-           --Print(" GetIsPhaseOne gameLength is %s, PhaseOneTimer is %s", gameLength, self.PhaseOneTimer)
+           Print(" GetIsPhaseOne (%s) gameLength is %s, PhaseOneTimer is %s", gameLength >= self.PhaseOneTimer, gameLength, self.PhaseOneTimer)
            return  gameLength >= self.PhaseOneTimer
 end
  
@@ -424,52 +420,6 @@ function Conductor:TriggerPhaseTwo()
 end 
 
 
-function Conductor:CountPhaseOneTimer()
-  -- Print("Conductor:CountPhaseOneTimer()")
-       if  self:GetIsPhaseOne() then   
-        self.isPhaseOne = true
-       self.isPhaseTwo = false
-       self.isPhaseOne = false
-      self.isPhaseThree = false
-      self.isPhaseFour = false
-       end 
-end
- 
-   
-function Conductor:CountPhaseTwoTimer()
-   --Print("Conductor:CountPhaseTwoTimer()")
-       if  self:GetIsPhaseTwo() then
-            Print("Conductor CountPhaseTwoTimer GetIsPhaseTwo true")
-           self.isPhaseOne = false
-           self.isPhaseTwo = true
-           self.isPhaseOne = false
-           self.isPhaseThree = false
-           self.isPhaseFour = false
-            self:TriggerPhaseTwo()
-       end 
-end
-
- 
-function Conductor:CountPhaseThreeTimer()
-       if  self:GetIsPhaseThree() then
-           self.isPhaseOne = false
-           self.isPhaseTwo = true
-           self.isPhaseOne = false
-           self.isPhaseThree = true
-           self.isPhaseFour = false
-       end 
-end
-
-
-function Conductor:CountPhaseFourTimer()
-       if  self:GetIsPhaseFour() then
-           self.isPhaseOne = false
-           self.isPhaseTwo = true
-           self.isPhaseOne = false
-           self.isPhaseThree = true
-           self.isPhaseFour = true
-       end 
-end
 
 
 function Conductor:OnUpdate(deltatime)
@@ -480,21 +430,6 @@ function Conductor:OnUpdate(deltatime)
              
 if Server then
   
- 
-    local gamestarted = GetGamerules():GetGameStarted()
-     if gamestarted then 
-       if not self.timelasttimerup or self.timelasttimerup + 1 <= Shared.GetTime() then
-       if self.isPhaseOne == false then self:CountPhaseOneTimer() end
-           if self.isPhaseOne == true then
-           self:CountPhaseTwoTimer() 
-        --   elseif self.SiegeTimer == 0 and not self.isSuddenDeath  then
-          -- self:CountSDTimer() 
-        --  elseif self.isPhaseTwo and not self.isPhaseFour  then
-        --      if not self.isPhaseThree then self:CountPhaseThreeTimer() end
-        --      self:CountPhaseFourTimer()
-           end
-        self.timelasttimerup = Shared.GetTime()
-         end
          
              if not self.timeLastAutomations or self.timeLastAutomations + 8 <= Shared.GetTime() then
                    self:Automations()
@@ -508,12 +443,10 @@ if Server then
             
             if not self.payLoadTime or self.payLoadTime + 60 <= Shared.GetTime()  then
               self:PayloadTimer()
+              self.payLoadTime = Shared.GetTime()
             end
            
          
-         
-  end
-  
   
   end
   
@@ -588,14 +521,20 @@ local function DisableVaporizer()
 end
 */
 
-local function EnableRandomPower()
+function Conductor:EnableRandomPower()
    local success = false
    
    for i = 1, 4 do
       local power = GetRandomDisabledPower()
        if power then
          power:OnConstructionComplete()
+         
+         if self:GetIsPhaseOneBoolean() then
           power:SpawnSurgeForEach(power:GetOrigin(), power)
+         else
+          power:SetArmor(0)
+          end
+          
           local locationName = ""
            local Location = GetLocationForPoint(power:GetOrigin())
             locationName = Location.name
@@ -605,13 +544,10 @@ local function EnableRandomPower()
    end
 end
 function Conductor:PayloadTimer()
-                EnableRandomPower()  
+                self:EnableRandomPower()  
 end
 function Conductor:PCTimer()
          FirePCAllBuiltRooms(self)
-end
-function Conductor:AddTime(seconds)
-  if not self:CounterComplete() then self.payLoadTime = self.payLoadTime + seconds end
 end
 function Conductor:SendNotification(who, seconds)
 --replace with shine plugin avocagamerules

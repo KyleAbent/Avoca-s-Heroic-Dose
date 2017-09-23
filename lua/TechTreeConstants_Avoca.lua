@@ -47,7 +47,9 @@ local kAvoca_TechIds =
    -- 'Resupply',
     'StructureBeacon',
     'EggBeacon',
-
+    'Redemption',
+    'Rebirth',
+    'CragHiveTwo',
     
 }
 

@@ -13,9 +13,10 @@ Script.Load("lua/bots/BrainSenses.lua")
     
     
 local kUpgrades = {
-  --  kTechId.Rebirth,
+    kTechId.Rebirth,
         
   ----  kTechId.Hunger,
+  kTechId.Redemption,
    -- kTechId.ThickenedSkin,
     
     kTechId.Vampirism,
