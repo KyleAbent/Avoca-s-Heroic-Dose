@@ -874,6 +874,11 @@ local canafford = {}
       table.insert(tospawn, kTechId.Crag)
       end 
       
+      local  Shade = GetEntitiesForTeam( "Shade", 2 )
+      if #Shade <= 8 then
+      table.insert(tospawn, kTechId.Shade)
+      end 
+      
       
        if not GetHasSixHives() then
       table.insert(tospawn, kTechId.Hive)
