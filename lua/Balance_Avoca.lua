@@ -1,4 +1,4 @@
-kBileBombEnergyCost = 10
+kBileBombEnergyCost = 17
 
 
 kSentryDamage = 10

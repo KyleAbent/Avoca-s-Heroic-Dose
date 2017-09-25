@@ -23,6 +23,16 @@ function RoboticsFactory:OnAdjustModelCoords(coords)
     return coords
     
 end
+function ARC:OnAdjustModelCoords(coords)
+    
+    	local scale = not self:GetInAttackMode() and 0.5 or 1
+        coords.xAxis = coords.xAxis * scale
+        coords.yAxis = coords.yAxis * scale
+        coords.zAxis = coords.zAxis * scale
+        
+    return coords
+    
+end
 function PrototypeLab:OnAdjustModelCoords(coords)
     
     	local scale = 0.5

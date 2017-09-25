@@ -20,7 +20,7 @@ local networkVars =
   
    
    
-   payLoadTime = "float",
+   //payLoadTime = "float",
    phaseCannonTime = "float",
    
    gameStartTime = "time"
@@ -358,7 +358,7 @@ end
 function Conductor:OnCreate()  
    self.gameStartTime = 0 
    if Server then
-   self.payLoadTime = 45
+   //self.payLoadTime = 45
    self.phaseCannonTime = 30
    self.powerlighth = nil
    end
@@ -399,7 +399,7 @@ end
 function Conductor:GetIsPhaseOne()
            local gamestarttime = self.gameStartTime
            local gameLength = Shared.GetTime() - gamestarttime
-           Print(" GetIsPhaseOne (%s) gameLength is %s, PhaseOneTimer is %s", gameLength >= self.PhaseOneTimer, gameLength, self.PhaseOneTimer)
+          // Print(" GetIsPhaseOne (%s) gameLength is %s, PhaseOneTimer is %s", gameLength >= self.PhaseOneTimer, gameLength, self.PhaseOneTimer)
            return  gameLength >= self.PhaseOneTimer
 end
  
@@ -440,11 +440,12 @@ if Server then
              self:PCTimer()
             self.phaseCannonTime = Shared.GetTime()
             end
-            
+            /*
             if not self.payLoadTime or self.payLoadTime + 60 <= Shared.GetTime()  then
               self:PayloadTimer()
               self.payLoadTime = Shared.GetTime()
             end
+           */
            
          
   
@@ -521,6 +522,8 @@ local function DisableVaporizer()
 end
 */
 
+/*
+
 function Conductor:EnableRandomPower()
    local success = false
    
@@ -543,9 +546,15 @@ function Conductor:EnableRandomPower()
        end
    end
 end
+
+
+
 function Conductor:PayloadTimer()
                 self:EnableRandomPower()  
 end
+
+*/
+
 function Conductor:PCTimer()
          FirePCAllBuiltRooms(self)
 end
@@ -585,14 +594,14 @@ function Conductor:CollectResources()
    
        for _, player in ipairs(GetEntitiesForTeam("Player", 1)) do
         if not player:isa("Commander") then
-            player:AddResources(builtpower  ) 
+            player:AddResources(builtpower / 10 ) 
             if not marineteam then marineteam = player:GetTeam() end
         end
     end
     
         for _, player in ipairs(GetEntitiesForTeam("Player", 2)) do
         if not player:isa("Commander") then
-            player:AddResources(disabledpower ) 
+            player:AddResources(disabledpower / 10) 
              if not alienteam then alienteam = player:GetTeam() end
         end
     end

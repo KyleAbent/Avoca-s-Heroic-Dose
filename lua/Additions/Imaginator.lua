@@ -615,9 +615,18 @@ local function FindPosition(location, searchEnt, teamnum)
 
 end
 
-local function GiveConstructOrder(who, where)
+local function ManagePower(who, where)
+   local power = GetRandomDisabledPower()
+    if power then
+                    local target = power
+                    local orderType = kTechId.Weld
+                    local where = target:GetOrigin()
+                      who:SetOrigin(FindFreeSpace(where))
+                   return who:GiveOrder(orderType, target:GetId(), where, nil, false, false)   
+    end
+//local random = {}
 
-local random = {}
+ /*
     for _, ent in ipairs(GetEntitiesWithMixinForTeamWithinRange("Construct",1, where, 999999)) do
       if  not ent:GetIsBuilt() and ent:GetCanConstruct(who) and who:CheckTarget(ent:GetOrigin()) then
         table.insert(random, ent)
@@ -632,11 +641,20 @@ local random = {}
                     local where = target:GetOrigin()
                    return who:GiveOrder(orderType, target:GetId(), where, nil, false, false)   
                 end
+   */
 end
+
+
+local function ManageArcs()
+
+   for index, arc in ipairs(GetEntitiesForTeam("ARC", 1)) do
+     arc:Instruct()
+   end
+end
+local function ManageMacs()
 
 /*
 
-local function ManageMacs()
 local cc = nil
 
    for index, chair in ipairs(GetEntitiesForTeam("CommandStation", 1)) do
@@ -650,23 +668,23 @@ local cc = nil
            if not #MACS or #MACS <=3 then
             CreateEntity(MAC.kMapName, FindFreeSpace(where), 1)
            end
+  */ 
+   local mac = GetAvocaMac()
+   if  mac then
    
-   if #MACS >= 1 then
-   
-     for i = 1, #MACS do
-        local mac = MACS[i]
-           if not mac:GetHasOrder() then
-          GiveConstructOrder(mac, mac:GetOrigin())
+          if not mac:GetHasOrder() then
+          ManagePower(mac, mac:GetOrigin())
           end
-     end
-   
+   else
+    local where = GetRandomCC() and  GetRandomCC():GetOrigin()
+    CreateEntity(MAC.kMapName, FindFreeSpace(where), 1)
    end
    
-   end
+
    
 end
 
-*/
+
 
 local function OrganizedIPCheck(who, self)
 if not who:GetIsBuilt() then return end 
@@ -752,7 +770,8 @@ function Imaginator:ManageMarineBeacons()
 end
 
 function Imaginator:ActualFormulaMarine()
- --ManageMacs() 
+ ManageMacs() 
+ ManageArcs()
 local randomspawn = nil
 local tospawn, cost, gamestarted = GetMarineSpawnList(self)
 if  GetIsTimeUp(self.lastMarineBeacon, 30) then self:ManageMarineBeacons() end

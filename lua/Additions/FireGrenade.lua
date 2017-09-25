@@ -223,6 +223,7 @@ function FireFlameCloud:DoSetOnFire()
              if HasMixin(entity, "Construct") then damage = damage * 4 end 
             self:DoDamage( damage, entity, entity:GetOrigin(), GetNormalizedVector(self:GetOrigin() - entity:GetOrigin()), "none")
             SetRecentlyDamaged(entity:GetId())
+            if HasMixin(ent, "Fire") then ent:SetOnFire(entity, self) end
             
         end
     

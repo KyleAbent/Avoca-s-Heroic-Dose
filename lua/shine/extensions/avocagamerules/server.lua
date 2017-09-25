@@ -229,7 +229,7 @@ local function AddPhaseTwoTimer(who)
     local Client = who
     local NowToTwo = GetConductor():GetPhaseTwoLength() - (Shared.GetTime() - GetGamerules():GetGameStartTime())
     local TwoLength =  math.ceil( Shared.GetTime() + NowToTwo - Shared.GetTime() )
-    local ycoord = ConditionalValue(who:isa("Spectator"), 0.85, 0.95)
+    local ycoord = 0.95 //ConditionalValue(who:isa("Spectator"), 0.85, 0.95)
     Shine.ScreenText.Add( 2, {X = 0.40, Y = ycoord,Text = "Phase Two: %s",Duration = TwoLength,R = 255, G = 255, B = 255,Alignment = 0,Size = 3,FadeIn = 0,}, Client )
 end
 
@@ -246,7 +246,7 @@ local function AddPhaseFourTimer(who)
     local Client = who
     local NowToFour = GetConductor():GetPhaseFourLength() - (Shared.GetTime() - GetGamerules():GetGameStartTime())
     local FourLength =  math.ceil( Shared.GetTime() + NowToFour - Shared.GetTime() )
-    local ycoord = ConditionalValue(who:isa("Spectator"), 0.85, 0.95)
+    local ycoord = 0.95 //ConditionalValue(who:isa("Spectator"), 0.85, 0.95)
     Shine.ScreenText.Add( 2, {X = 0.40, Y = ycoord,Text = "Phase Four: %s",Duration = NowToFour,R = 255, G = 255, B = 255,Alignment = 0,Size = 3,FadeIn = 0,}, Client )
 end
 

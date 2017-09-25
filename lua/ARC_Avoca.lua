@@ -43,7 +43,7 @@ local origInit = ARC.OnInitialized
 
 function ARC:OnInitialized()
     origInit(self)
-     self:AddTimedCallback(ARC.Instruct, 2.5)
+    // self:AddTimedCallback(ARC.Instruct, 2.5)
      self.lastCheck = 0
      if  GetPayLoadArc() == nil then
            self.avoca = true 
@@ -242,8 +242,6 @@ function ARC:CheckVortex()
      end
 end
 
-/*
-
 function ARC:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
     if hitPoint ~= nil and self:GetIsVortexed() then
@@ -252,21 +250,19 @@ function ARC:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint
 
 end
 
-*/
-
 function ARC:GiveScan()
 
-   if self.vortexCheck == true then 
-    self.vortexCheck = false
-    self:CheckVortex()
-   end
+ --  if self.vortexCheck == true then 
+ --   self.vortexCheck = false
+ --   self:CheckVortex()
+ --  end
    
     local where = GetNearestEligable(self):GetOrigin()
     
     for _, shade in ipairs(GetEntitiesWithinRange("Shade", where, 20)) do
        if shade:GetIsBuilt() then
          shade.shouldInk = true
-         self.vortexCheck = true
+       --  self.vortexCheck = true
          end
     end
     
@@ -436,6 +432,7 @@ end
         if doer == self then
          self:AddXP(self:GetAddXPAmount())
          self:AddHealth(100, false, true)
+         self:SetArmor(0) -- ugh
             
         end
         
@@ -463,7 +460,7 @@ end
 if Client then
 
     function ARC:OnUpdateRender()
-          local showMaterial = not GetAreEnemies(self, Client.GetLocalPlayer()) and self.avoca
+          local showMaterial = self.avoca
     
         local model = self:GetRenderModel()
         if model then

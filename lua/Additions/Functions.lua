@@ -180,7 +180,7 @@ end
 function GetRandomDisabledPower()
   local powers = {}
   for _, power in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-        if power:GetIsDisabled() and not GetPowerPointRecentlyDestroyed(power) then table.insert(powers,power) end
+        if not GetIsOriginInHiveRoom(power:GetOrigin()) and power:GetIsDisabled() and not GetPowerPointRecentlyDestroyed(power) then table.insert(powers,power) end
     end
     if #powers == 0 then return nil end
     local power = table.random(powers)
@@ -188,6 +188,13 @@ function GetRandomDisabledPower()
             locationName = Location.name
             Print(" EnableRandomPower %s", locationName)
     return  power
+end
+function GetRandomCC()
+  local ccs = {}
+  for _, cc in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do
+        if cc and cc:GetIsBuilt() then table.insert(ccs,cc) end
+    end
+    return table.random(ccs)
 end
 function GetRandomActivePower()
   local powers = {}
@@ -272,6 +279,12 @@ function GetIsTimeUp(timeof, timelimitof)
  --Print("timeof is %s, timelimitof is %s, time is %s", timeof, timelimitof, time)
  -- if boolean == true then Print("GetTimeIsUp boolean is %s, timelimitof is %s", boolean, timelimitof) end
  return boolean
+end
+function GetAvocaMac()
+           for _, arc in ientitylist(Shared.GetEntitiesWithClassname("MAC")) do
+                 if arc:GetIsAvoca() then return arc end
+          end
+    return nil
 end
 
 function GetPayLoadArc()

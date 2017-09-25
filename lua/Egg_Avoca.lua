@@ -47,9 +47,9 @@ function Egg:ResearchSpecifics()
        table.insert(techIds, kTechId.GorgeEgg )
        elseif self:GetTechId() == kTechId.GorgeEgg then
                table.insert(techIds, kTechId.LerkEgg )
-        elseif self:GetTechId() == kTechId.LerkEgg and  GetHasTech(self, kTechId.BioMassNine) then
+        elseif self:GetTechId() == kTechId.LerkEgg  then --and  GetHasTech(self, kTechId.BioMassNine) then
                table.insert(techIds, kTechId.FadeEgg )
-         elseif  self:GetTechId() == kTechId.FadeEgg   and GetHasTech(self, kTechId.BioMassNine) then
+         elseif  self:GetTechId() == kTechId.FadeEgg   then -- and GetHasTech(self, kTechId.BioMassNine) then
                table.insert(techIds, kTechId.OnosEgg )
              end
                
