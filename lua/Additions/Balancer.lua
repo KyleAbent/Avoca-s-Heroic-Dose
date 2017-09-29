@@ -26,23 +26,32 @@ function Conductor:FirePhaseCannons(powerpoint)
              local origin = FindFreeSpace(powerpoint:GetOrigin())
              CreateEntity(Contamination.kMapName, FindFreeSpace(origin, 1, 8), 2)
           
-      local  Whip = GetEntitiesForTeam( "Whip", 2 )   
-      if #Whip < 18 then
+      local  WhipCount = GetEntitiesForTeam( "Whip", 2 )   
+      if #WhipCount < 18 then
              for i = 1, math.random(1,4) do
                local whip = CreateEntity(Whip.kMapName, FindFreeSpace(origin, 1, 8), 2)
+               whip:SetConstructionComplete()
                whip.rooted = true
                whip:Root() 
-               whip:SetConstructionComplete()
              end
       end
             
-      local  Crag = GetEntitiesForTeam( "Crag", 2 )
-      if #Crag < 18 then 
+      local  CragCount = GetEntitiesForTeam( "Crag", 2 )
+      if #CragCount < 18 then 
              for i = 1 , math.random(1,2) do
              local crag = CreateEntity(Crag.kMapName, FindFreeSpace(origin, 1, 8), 2)
              crag:SetConstructionComplete()
              end
       end     
+      
+      local  ShadeCount = GetEntitiesForTeam( "Whip", 2 )   
+      if #ShadeCount < 8 then
+             for i = 1, math.random(1,4) do
+               local shade = CreateEntity(Shade.kMapName, FindFreeSpace(origin, 1, 8), 2)
+               --shade:SetConstructionComplete()
+             end
+      end
+      
              if math.random(1,2) == 1 then
               CreateEntity(NutrientMist.kMapName, FindFreeSpace(origin, 1, 8), 2)
              end

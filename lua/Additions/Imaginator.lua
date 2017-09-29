@@ -350,7 +350,7 @@ local gamestarted = false
       
       if pgcount <= 3 then
       table.insert(tospawn, kTechId.PhaseGate)
-      end
+      end --phaseavoca init 
     
      
       local  Armory = GetEntitiesForTeam( "Armory", 1 )

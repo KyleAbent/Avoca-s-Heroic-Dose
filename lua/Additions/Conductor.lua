@@ -514,7 +514,7 @@ local function FirePCAllBuiltRooms(self)
 
  if self:GetIsPhaseTwoBoolean() then
        local cc = GetRandomCC()
-       if cc then  self:FirePhaseCannons(cc) end
+       if cc then  self:FirePhaseCannons(cc) return end
  end
  
 local built = {}
@@ -599,6 +599,7 @@ function Conductor:CollectResources()
    local disabledpower = 0
    local marineteam = nil
    local alienteam = nil
+
    
           for index, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
             if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
@@ -607,6 +608,11 @@ function Conductor:CollectResources()
                disabledpower = disabledpower + 1
             end
         end
+   
+      if self:GetIsPhaseOneBoolean() then
+       disabledpower = disabledpower * 2
+       builtpower = builtpower * 2
+      end
    
        for _, player in ipairs(GetEntitiesForTeam("Player", 1)) do
         if not player:isa("Commander") then

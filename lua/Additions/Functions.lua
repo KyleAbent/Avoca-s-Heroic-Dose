@@ -300,17 +300,20 @@ function GetDeployedPayLoadArc()
     return nil
 end
 function GetIsPointInMarineBase(where)    
-    local cclocation = nil
+    
            for _, cc in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do
-        cclocation = GetLocationForPoint(cc:GetOrigin())
-        cclocation = cclocation.name
-             break
+              local cclocation = nil
+              cclocation = GetLocationForPoint(cc:GetOrigin())
+              cclocation = cclocation and cclocation.name or nil
+              local pointlocation = GetLocationForPoint(where)
+               pointlocation = pointlocation and pointlocation.name or nil
+              if pointlocation == cclocation then return true end
           end
     
-    local pointlocation = GetLocationForPoint(where)
-          pointlocation = pointlocation and pointlocation.name or nil
+
+
           
-          return pointlocation == cclocation
+          return false
     
 end
 function FindFreeSpace(where, mindistance, maxdistance, infestreq)    
