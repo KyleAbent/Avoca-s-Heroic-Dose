@@ -6,7 +6,6 @@
 --Script.Load("lua/Weapons/Alien/AcidRocket.lua")
 --Script.Load("lua/Additions/LerkBileBomb.lua")
 --Script.Load("lua/Additions/LayStructures.lua")
-Script.Load("lua/Additions/ExoWelder.lua")
 Script.Load("lua/Additions/ExoFlamer.lua")
 Script.Load("lua/Additions/EggBeacon.lua")
 Script.Load("lua/Additions/StructureBeacon.lua")
@@ -35,14 +34,6 @@ local kAvoca_TechData =
 
    
      
-         { [kTechDataId] = kTechId.DualWelderExosuit,    
- [kTechIDShowEnables] = false,     
-  [kTechDataDisplayName] = "Dual Exo Welders", 
-[kTechDataMapName] = "exo",         
-      [kTechDataCostKey] = kDualExosuitCost - 10, 
-[kTechDataHotkey] = Move.E,
- [kTechDataTooltipInfo] = "Dual Welders yo", 
-[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
 
 
          { [kTechDataId] = kTechId.DualFlamerExosuit,    

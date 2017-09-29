@@ -4,7 +4,7 @@ Script.Load("lua/bots/BrainSenses.lua")
 
 
     local function CertainRules(who)
-         return who:isa("CommandStation") or who:isa("ARC") or ( who:isa("PowerPoint") and not who:GetIsDisabled() )
+         return who:GetIsAlive() and who:isa("CommandStation") or who:isa("ARC") or ( who:isa("PowerPoint") and not who:GetIsDisabled() )
     end
     
     
@@ -253,7 +253,7 @@ kOnosBrainActions =
         local eyePos = skulk:GetEyePos()
         
        local nearestnonMarine = GetNearestMixin(skulk:GetOrigin(), "Live", 1,  function(ent) return CertainRules(ent) and not ent:isa("Weapon") and not ent:isa("Player") and ent:GetCanTakeDamage() and GetLocationForPoint(skulk:GetOrigin()) ==  GetLocationForPoint(ent:GetOrigin())  end )
-       local nearestMarine = GetNearest(skulk:GetOrigin(), "Player", 1,  function(ent) return GetLocationForPoint(skulk:GetOrigin()) ==  GetLocationForPoint(ent:GetOrigin())  end )        
+       local nearestMarine = GetNearest(skulk:GetOrigin(), "Player", 1,  function(ent) return ent:GetIsAlive()  end )        
               local bestMem =  nil
               
         if not nearestMarine and nearestnonMarine then bestMem = nearestnonMarine end

@@ -28,6 +28,18 @@ function ARC:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint
 
 end
 
+
+    function ARC:OnDamageDone(doer, target)
+    
+        if doer == self then
+         self:AddXP(self:GetAddXPAmount())
+       --  self:AddHealth(100, false, true)
+       --  self:SetArmor(0) -- ugh
+            
+        end
+        
+    end
+    
 if Server then
 
 
@@ -44,10 +56,12 @@ local origInit = ARC.OnInitialized
 function ARC:OnInitialized()
     origInit(self)
     // self:AddTimedCallback(ARC.Instruct, 2.5)
+    if  GetConductor():GetIsPhaseTwoBoolean() and ARC.kMoveSpeed < 8 then 
+       ARC.kMoveSpeed = ARC.kMoveSpeed + 0.5
+    end
      self.lastCheck = 0
      if  GetPayLoadArc() == nil then
            self.avoca = true 
-           ARC.kMoveSpeed = ARC.kMoveSpeed * 1.30
      else
      self.mainroom = true
         end
@@ -427,16 +441,6 @@ local function DestroPanicAttackInRadius(where)
 end
 
 
-    function ARC:OnDamageDone(doer, target)
-    
-        if doer == self then
-         self:AddXP(self:GetAddXPAmount())
-         self:AddHealth(100, false, true)
-         self:SetArmor(0) -- ugh
-            
-        end
-        
-    end
     
 
 

@@ -915,7 +915,7 @@ kMarineBrainActions =
 }
 
     local function CertainRules(who)
-         return true //not cloaked? getissighted? //who:isa("CommandStation") or who:isa("ARC") or ( who:isa("PowerPoint") and not who:GetIsDisabled() )
+         return who:GetIsAlive() --true //not cloaked? getissighted? //who:isa("CommandStation") or who:isa("ARC") or ( who:isa("PowerPoint") and not who:GetIsDisabled() )
     end
     
 ------------------------------------------

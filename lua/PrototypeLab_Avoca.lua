@@ -7,7 +7,7 @@ end
 local oldfunc = PrototypeLab.GetItemList
 function PrototypeLab:GetItemList(forPlayer)
         local  otherbuttons = { kTechId.Jetpack, kTechId.DualMinigunExosuit, kTechId.DualRailgunExosuit, 
-                                kTechId.DualWelderExosuit, kTechId.DualFlamerExosuit}
+                                kTechId.DualFlamerExosuit}
         
                
            return otherbuttons

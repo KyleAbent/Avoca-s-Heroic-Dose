@@ -1,7 +1,6 @@
 Script.Load("lua/StunMixin.lua")
 Script.Load("lua/PhaseGateUserMixin.lua")
 Script.Load("lua/Mixins/LadderMoveMixin.lua")
-Script.Load("lua/Additions/ExoWelder.lua")
 Script.Load("lua/Additions/StunWall.lua")
 
 local networkVars = {   
@@ -132,7 +131,8 @@ end
 function Exo:GetCanStep()
     return not self:GetIsWallWalking()
 end
-*/
+
+
 
 
 local function HealSelf(self)
@@ -147,6 +147,8 @@ local function HealSelf(self)
     end
     return true
 end
+
+*/
 
 local kPhaseDelay = 2
 
@@ -165,7 +167,7 @@ function Exo:OnInitialized()
 oninit(self)
     InitMixin(self, StunMixin)
    self:SetTechId(kTechId.Exo)
-   self:AddTimedCallback(function() HealSelf(self) return true end, 1) 
+  -- self:AddTimedCallback(function() HealSelf(self) return true end, 1) 
   --  self.currentWallWalkingAngles = Angles(0.0, 0.0, 0.0)
  --   self.timeLastWallJump = 0
 end
@@ -173,20 +175,20 @@ local origmodel = Exo.InitExoModel
 
 function Exo:InitExoModel()
 
-    local hasWelders = false
+    local hasFlame = false
     local modelName = kDualWelderModelName
     local graphName = kDualWelderAnimationGraph
     
-  if self.layout == "WelderWelder" or self.layout == "FlamerFlamer" then
+  if self.layout == "FlamerFlamer" then
          modelName = kDualWelderModelName
         graphName = kDualWelderAnimationGraph
         self.hasDualGuns = true
-        hasWelders = true
+        hasFlame = true
         self:SetModel(modelName, graphName)
     end
     
     
-    if hasWelders then 
+    if hasFlame then 
     else
     origmodel(self)
     end

@@ -9,6 +9,14 @@ function PowerPoint:OnAdjustModelCoords(modelCoords)
 end
 
 */
+
+local kDestructionBuildDelay = 4
+
+function GetPowerPointRecentlyDestroyed(self)
+    return (self.timeOfDestruction + kDestructionBuildDelay) > Shared.GetTime()
+end
+
+
 local function FindNewParent(who)
     local where = who:GetOrigin()
     local player =  GetNearest(where, "Player", 1, function(ent) return ent:GetIsAlive() end)
@@ -62,3 +70,16 @@ local orig_PowerPoint_OnKill = PowerPoint.OnKill
     end
     
     */
+    
+    
+    function PowerPoint:GetCanBeUsedConstructed(byPlayer)
+    return false
+end
+
+function PowerPoint:GetCanBeUsed(player, useSuccessTable)
+
+
+        useSuccessTable.useSuccess = false
+
+    
+end

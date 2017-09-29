@@ -306,7 +306,7 @@ local CommandStations = #GetEntitiesForTeam( "CommandStation", 1 )
 
 if CommandStations >= 3 then return true end
 
-return false
+return GetConductor():GetIsPhaseFourBoolean()
 
 end
 
@@ -315,7 +315,7 @@ local Hives = #GetEntitiesForTeam( "Hive", 2 )
 
 if Hives >= 6 then return true end
 
-return false
+return GetConductor():GetIsPhaseFourBoolean()
 
 end
 
@@ -334,7 +334,7 @@ local cost = 1
 local gamestarted = false
 --Horrible for performance, right? Not precaching ++ local variables ++ table && for loops !!! 
 
-  /*
+  
  local  PhaseGates = GetEntitiesForTeam( "PhaseGate", 1 )
  local pgcount = #PhaseGates
  
@@ -348,10 +348,10 @@ local gamestarted = false
       
       end
       
-      if pgcount <= 7 then
+      if pgcount <= 3 then
       table.insert(tospawn, kTechId.PhaseGate)
       end
-    */ 
+    
      
       local  Armory = GetEntitiesForTeam( "Armory", 1 )
       local acount = #Armory
@@ -384,7 +384,7 @@ local gamestarted = false
       
       end
       
-      if rcount <= 11 then
+      if rcount <= 3 then
       table.insert(tospawn, kTechId.RoboticsFactory)
       end
       
@@ -429,7 +429,7 @@ local gamestarted = false
       --table.insert(tospawn, kTechId.Scan)
       
      
-          if GetHasAdvancedArmory()  and pcount < 9 then
+          if GetHasAdvancedArmory()  and pcount < 6 then
            table.insert(tospawn, kTechId.PrototypeLab)
          end
       
@@ -446,7 +446,7 @@ local gamestarted = false
       
       end
       
-      if sentrycount <= 18 then
+      if sentrycount <= 11 then
       table.insert(tospawn, kTechId.Sentry)
       end
 
@@ -614,15 +614,37 @@ local function FindPosition(location, searchEnt, teamnum)
   return actualWhere
 
 end
+local function ManagePlayerWeld(who, where)
+local eligable = {}
+      for _, entity in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
+       if  entity:GetTeamNumber() == 1 and entity:GetIsAlive() and entity:GetCanBeWelded(who) then
+          table.insert(eligable, entity )
+       end
+     end
+  
+     if #eligable == 0 then 
+           for _, entity in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
+               if entity:GetIsAlive() and entity:GetCanBeWelded(who) then
+               table.insert(eligable, entity )
+              end
+          end
+     end
+     
+      if #eligable == 0 then return end 
+      
+     local whoTo = table.random(eligable)
+     local where = whoTo:GetOrigin()
+     who:SetOrigin(FindFreeSpace(where))
+     who:GiveOrder(kTechId.Weld, whoTo:GetId(), where, nil, false, false)  
 
+end
 local function ManagePower(who, where)
    local power = GetRandomDisabledPower()
     if power then
                     local target = power
-                    local orderType = kTechId.Weld
                     local where = target:GetOrigin()
                       who:SetOrigin(FindFreeSpace(where))
-                   return who:GiveOrder(orderType, target:GetId(), where, nil, false, false)   
+                   return who:GiveOrder(kTechId.Weld, target:GetId(), where, nil, false, false)   
     end
 //local random = {}
 
@@ -653,33 +675,26 @@ local function ManageArcs()
 end
 local function ManageMacs()
 
-/*
+local cc = GetRandomCC()
+local  macs = GetEntitiesForTeam( "MAC", 1 )  
 
-local cc = nil
-
-   for index, chair in ipairs(GetEntitiesForTeam("CommandStation", 1)) do
-       cc = chair 
-       break
-   end
-   
    if cc then
      local where = cc:GetOrigin()
-     local MACS = GetEntitiesForTeamWithinRange("MAC", 1, where, 9999)
-           if not #MACS or #MACS <=3 then
+           if not #macs or #macs <4 then
             CreateEntity(MAC.kMapName, FindFreeSpace(where), 1)
            end
-  */ 
-   local mac = GetAvocaMac()
-   if  mac then
-   
-          if not mac:GetHasOrder() then
-          ManagePower(mac, mac:GetOrigin())
-          end
-   else
-    local where = GetRandomCC() and  GetRandomCC():GetOrigin()
-    CreateEntity(MAC.kMapName, FindFreeSpace(where), 1)
    end
    
+              for i = 1, #macs do
+            local mac = macs[i]
+             if not mac:GetHasOrder() then
+                if mac:GetIsAvoca() then
+                    ManagePower(mac, mac:GetOrigin())
+                  else
+                   ManagePlayerWeld(mac, mac:GetOrigin())
+                end
+             end
+           end
 
    
 end
@@ -879,22 +894,22 @@ local canafford = {}
    
       local  Shift = #GetEntitiesForTeam( "Shift", 2 )
       
-      if Shift <= 14 then
+      if Shift < 14 then
       table.insert(tospawn, kTechId.Shift)
       end 
       
       local  Whip = #GetEntitiesForTeam( "Whip", 2 )
-      if Whip <= 18 then
+      if Whip < 18 then
       table.insert(tospawn, kTechId.Whip)
       end 
       
       local  Crag = GetEntitiesForTeam( "Crag", 2 )
-      if #Crag <= 18 then
+      if #Crag < 18 then
       table.insert(tospawn, kTechId.Crag)
       end 
       
       local  Shade = GetEntitiesForTeam( "Shade", 2 )
-      if #Shade <= 12 then
+      if #Shade < 12 then
       table.insert(tospawn, kTechId.Shade)
       end 
       

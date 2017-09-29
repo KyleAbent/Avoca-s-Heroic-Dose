@@ -34,11 +34,13 @@ function Conductor:TimerValues()
    self.PhaseThreeTimer = 900
    self.PhaseFourTimer = 1200
    
+   /*
+     if I want specific round things to happen between time else will help after said time 
    self.isPhaseTwo = false
    self.isPhaseOne = false
    self.isPhaseThree = false
    self.isPhaseFour = false
-   
+   */
    
 end
 function Conductor:OnReset() 
@@ -390,6 +392,14 @@ function Conductor:GetIsPhaseTwoBoolean()
        --Print(" Conductor:GetIsPhaseTwoBoolean() is %s", self:GetIsPhaseTwo())
         return  self:GetIsPhaseTwo()
 end
+function Conductor:GetIsPhaseThreeBoolean()
+    --   Print(" Conductor:GetIsPhaseOneBoolean() is %s", self:GetIsPhaseOne())
+        return  self:GetIsPhaseThree()
+end
+function Conductor:GetIsPhaseFourBoolean()
+       --Print(" Conductor:GetIsPhaseTwoBoolean() is %s", self:GetIsPhaseTwo())
+        return  self:GetIsPhaseFour()
+end
 function Conductor:GetIsPhaseTwo()
            local gamestarttime =   self.gameStartTime
            local gameLength = Shared.GetTime() - gamestarttime
@@ -501,9 +511,15 @@ end
 
 
 local function FirePCAllBuiltRooms(self)
+
+ if self:GetIsPhaseTwoBoolean() then
+       local cc = GetRandomCC()
+       if cc then  self:FirePhaseCannons(cc) end
+ end
+ 
 local built = {}
                  for index, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-                   if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
+                   if not GetIsPointInMarineBase(powerpoint:GetOrigin()) and powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
                       table.insert(built, powerpoint)
                     end
                 end

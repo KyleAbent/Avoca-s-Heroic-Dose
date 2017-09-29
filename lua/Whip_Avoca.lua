@@ -71,8 +71,8 @@ if Server then
 local origupdate = Whip.OnUpdate
 function Whip:OnUpdate(deltaTime)
         origupdate(self, deltaTime)
-        Whip.kDamage = kWhipSlapDamage * Clamp(self:GetHealthScalar(), .3, 1)
-        Whip.kRange = 7 * Clamp(self:GetHealthScalar(), .3, 1)
+        self.kDamage = kWhipSlapDamage * Clamp(self:GetHealthScalar(), .3, 1)
+        self.kRange = 7 * Clamp(self:GetHealthScalar(), .3, 1)
 end
 
 function Whip:UpdateRootState()

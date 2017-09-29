@@ -108,8 +108,7 @@ Shine.VoteMenu:AddPage ("SpendClassesCredit", function( self )
     if player:GetTeamNumber() == 1 then 
     self:AddSideButton("JetPack: "..gCreditClassCostJetPack, function() Shared.ConsoleCommand ("sh_buyclass JetPack credit") end) 
     self:AddSideButton("MiniGunExo: "..gCreditClassCostMiniGunExo, function() Shared.ConsoleCommand ("sh_buyclass MiniGun credit") end) 
-    self:AddSideButton("RailGunExo: "..gCreditClassCostRailGunExo, function() Shared.ConsoleCommand ("sh_buyclass RailGun credit") end) 
-    self:AddSideButton("WelderExo: "..gCreditClassCostWelderExo, function() Shared.ConsoleCommand ("sh_buyclass Welder credit") end) 
+    self:AddSideButton("RailGunExo: "..gCreditClassCostRailGunExo, function() Shared.ConsoleCommand ("sh_buyclass RailGun credit") end)  
     self:AddSideButton("FlamerExo: "..gCreditClassCostFlamerExo, function() Shared.ConsoleCommand ("sh_buyclass Flamer credit") end) 
     elseif player:GetTeamNumber() == 2 then
         self:AddSideButton( "FastGestation", function()self:SetPage("FastGestation")end)

@@ -13,7 +13,9 @@ ModLoader.SetupFileHook( "lua/Hive.lua", "lua/Hive_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Armory.lua", "lua/Armory_Avoca.lua", "post" )
 
-ModLoader.SetupFileHook( "lua/Egg.lua", "lua/Egg_Avoca.lua", "post" )
+--ModLoader.SetupFileHook( "lua/Egg.lua", "lua/Egg_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Embryo.lua", "lua/Embryo_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/NS2Utility.lua", "lua/NS2Utility_Avoca.lua", "post" )
 

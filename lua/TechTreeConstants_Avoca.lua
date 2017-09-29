@@ -39,7 +39,6 @@ local kAvoca_TechIds =
   --  'ShiftHiveTwo',
   --  'LayStructures',
   --  'Onocide',
-    'DualWelderExosuit',
     'DualFlamerExosuit',
  --   'LerkBileBomb',
   --  'ElectrifyStructure',

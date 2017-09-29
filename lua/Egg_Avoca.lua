@@ -57,7 +57,11 @@ function Egg:ResearchSpecifics()
                 local techNode = tree:GetTechNode(random)
            
            if techNode then
+               if GetConductor():GetIsPhaseTwoBoolean() then
+                 self:UpgradeToTechId(random)
+               else
                 self:SetResearching(techNode, self)
+                end
                 self.Auto = false
           end
           

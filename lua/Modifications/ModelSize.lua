@@ -64,6 +64,8 @@ function InfantryPortal:OnAdjustModelCoords(coords)
     return coords
     
 end
+
+/*
  function LiveMixin:OnAdjustModelCoords(modelCoords)
          local coords = modelCoords
     if self:GetTeamNumber() == 2 and not self:isa("PowerDrainer") and not self:isa("Hive") then
@@ -77,5 +79,6 @@ end
    
     return coords
 end
+*/
 
 

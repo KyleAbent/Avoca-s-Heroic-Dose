@@ -11,7 +11,7 @@ function MAC:OnInitialized()
     origInit(self)
      if  GetAvocaMac() == nil then
            self.avoca = true 
-           MAC.kRepairHealthPerSecond = 250
+           MAC.kRepairHealthPerSecond = 125
      else
         end
 end

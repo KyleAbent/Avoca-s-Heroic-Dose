@@ -96,7 +96,7 @@ function LiveMixin:Kill(attacker, doer, point, direction)
           
          if self:isa("Alien") then
          
-         /*
+      
           if GetHasRebirthUpgrade(self) and self:GetEligableForRebirth() then
                 if Server then 
                     if attacker and attacker:isa("Player")  then 
@@ -107,12 +107,17 @@ function LiveMixin:Kill(attacker, doer, point, direction)
                 self:TriggerRebirth()
                 return
                 end
-             */   
-             
-             if  self:isa("Skulk") and GetConductor():GetIsPhaseTwoBoolean() and Server then
+            
+            if Server and GetConductor():GetIsPhaseTwoBoolean() then  
+             if  self:isa("Skulk")  then
               CreateEntity(Rupture.kMapName, point, 2)
+              elseif self:isa("Gorge") then
+              CreateEntity(Babbler.kMapName, point, 2)
+               CreateEntity(Babbler.kMapName, point, 2)
+              CreateEntity(Babbler.kMapName, point, 2)
+              CreateEntity(Babbler.kMapName, point, 2)
              end
-             
+            end
          end
             
             --Hunger
@@ -137,7 +142,7 @@ function LiveMixin:Kill(attacker, doer, point, direction)
               //if GetHasHungerUpgrade(attacker) and attacker:isa("Gorge") and doer:isa("DotMarker") then 
                 if attacker:isa("Gorge") and doer:isa("DotMarker") then 
                         attacker:TriggerEnzyme(5)
-                        attacker:AddEnergy(attacker:GetMaxEnergy() * .10)
+                        attacker:AddEnergy(30)
                end
           end
      end 

@@ -221,7 +221,7 @@ local function AddPhaseOneTimer(who)
     local Client = who
     local NowToOne = GetConductor():GetPhaseOneLength() - (Shared.GetTime() - GetGamerules():GetGameStartTime())
     local OneLength =  math.ceil( Shared.GetTime() + NowToOne - Shared.GetTime() )
-    Shine.ScreenText.Add( 1, {X = 0.40, Y = 0.85,Text = "Phase One: %s",Duration = OneLength,R = 255, G = 255, B = 255,Alignment = 0,Size = 3,FadeIn = 0,}, Client )
+    Shine.ScreenText.Add( 1, {X = 0.01, Y = 0.39,Text = "Phase One: %s",Duration = OneLength,R = 255, G = 255, B = 255,Alignment = 0,Size = 1,FadeIn = 0,}, Client )
 end
 
 
@@ -229,8 +229,7 @@ local function AddPhaseTwoTimer(who)
     local Client = who
     local NowToTwo = GetConductor():GetPhaseTwoLength() - (Shared.GetTime() - GetGamerules():GetGameStartTime())
     local TwoLength =  math.ceil( Shared.GetTime() + NowToTwo - Shared.GetTime() )
-    local ycoord = 0.95 //ConditionalValue(who:isa("Spectator"), 0.85, 0.95)
-    Shine.ScreenText.Add( 2, {X = 0.40, Y = ycoord,Text = "Phase Two: %s",Duration = TwoLength,R = 255, G = 255, B = 255,Alignment = 0,Size = 3,FadeIn = 0,}, Client )
+    Shine.ScreenText.Add( 2, {X = 0.01, Y = 0.44,Text = "Phase Two: %s",Duration = TwoLength,R = 255, G = 255, B = 255,Alignment = 0,Size = 1,FadeIn = 0,}, Client )
 end
 
 
@@ -238,7 +237,7 @@ local function AddPhaseThreeTimer(who)
     local Client = who
     local NowToThree = GetConductor():GetPhaseThreeLength() - (Shared.GetTime() - GetGamerules():GetGameStartTime())
     local ThreeLength =  math.ceil( Shared.GetTime() + NowToThree - Shared.GetTime() )
-    Shine.ScreenText.Add( 1, {X = 0.40, Y = 0.85,Text = "Phase Three: %s",Duration = ThreeLength,R = 255, G = 255, B = 255,Alignment = 0,Size = 3,FadeIn = 0,}, Client )
+    Shine.ScreenText.Add( 3, {X = 0.01, Y = 0.49,Text = "Phase Three: %s",Duration = ThreeLength,R = 255, G = 255, B = 255,Alignment = 0,Size = 1,FadeIn = 0,}, Client )
 end
 
 
@@ -246,8 +245,7 @@ local function AddPhaseFourTimer(who)
     local Client = who
     local NowToFour = GetConductor():GetPhaseFourLength() - (Shared.GetTime() - GetGamerules():GetGameStartTime())
     local FourLength =  math.ceil( Shared.GetTime() + NowToFour - Shared.GetTime() )
-    local ycoord = 0.95 //ConditionalValue(who:isa("Spectator"), 0.85, 0.95)
-    Shine.ScreenText.Add( 2, {X = 0.40, Y = ycoord,Text = "Phase Four: %s",Duration = NowToFour,R = 255, G = 255, B = 255,Alignment = 0,Size = 3,FadeIn = 0,}, Client )
+    Shine.ScreenText.Add( 4, {X = 0.01, Y = 0.54,Text = "Phase Four: %s",Duration = NowToFour,R = 255, G = 255, B = 255,Alignment = 0,Size = 1,FadeIn = 0,}, Client )
 end
 
 
@@ -258,6 +256,8 @@ local function GiveTimersToAll()
                   if Player then
                   AddPhaseOneTimer(Player)
                   AddPhaseTwoTimer(Player)
+                  AddPhaseThreeTimer(Player)
+                  AddPhaseFourTimer(Player)
                   end
               end
 end

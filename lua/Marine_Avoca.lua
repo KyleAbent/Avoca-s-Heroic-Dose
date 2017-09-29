@@ -15,6 +15,7 @@ function Marine:OnCreate()
     orig_Marine_OnCreate(self)
 end
 
+/*
 local orig_Marine_InitWeapons = Marine.InitWeapons
 function Marine:InitWeapons()
     orig_Marine_InitWeapons(self)
@@ -22,7 +23,7 @@ function Marine:InitWeapons()
     self:SetQuickSwitchTarget(Pistol.kMapName)
     self:SetActiveWeapon(Rifle.kMapName)
 end
-
+*/
 
 function Marine:ModifyGravityForce(gravityTable)
       if self:GetIsOnGround() then
@@ -99,12 +100,6 @@ function Marine:GiveDualExo(spawnPoint)
     return exo
     
 end
-function Marine:GiveDualWelder(spawnPoint)
-
-    local exo = self:Replace(Exo.kMapName, self:GetTeamNumber(), false, spawnPoint, { layout = "WelderWelder", storedWeaponsIds = self:GetWeaponsToStore() })
-    return exo
-    
-end
 function Marine:GiveDualFlamer(spawnPoint)
 
     local exo = self:Replace(Exo.kMapName, self:GetTeamNumber(), false, spawnPoint, { layout = "FlamerFlamer", storedWeaponsIds = self:GetWeaponsToStore() })
@@ -125,7 +120,7 @@ function Marine:GiveDualRailgunExo(spawnPoint)
     
 end
 kIsExoTechId = { [kTechId.DualFlamerExosuit] = true, [kTechId.DualMinigunExosuit] = true,
-                 [kTechId.DualWelderExosuit] = true, [kTechId.DualRailgunExosuit] = true }
+                 [kTechId.DualRailgunExosuit] = true }
                  
 local function BuyExo(self, techId)
 
