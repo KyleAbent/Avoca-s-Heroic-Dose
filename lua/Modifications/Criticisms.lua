@@ -1,5 +1,3 @@
-function ResourceTower:OnUpdate(deltaTime)
-
---- Not Necessary
-
+function PowerPoint:CanBeCompletedByScriptActor(player)
+  return true
 end
