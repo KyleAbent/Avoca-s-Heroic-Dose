@@ -1,3 +1,57 @@
+local function UnlockAbility(forAlien, techId)
+
+    local mapName = LookupTechData(techId, kTechDataMapName)
+    if mapName and forAlien:GetIsAlive() then
+    
+        local activeWeapon = forAlien:GetActiveWeapon()
+
+        local tierWeapon = forAlien:GetWeapon(mapName)
+        if not tierWeapon then
+        
+            forAlien:GiveItem(mapName)
+            
+            if activeWeapon then
+                forAlien:SetActiveWeapon(activeWeapon:GetMapName())
+            end
+            
+        end
+    
+    end
+
+end
+function UpdateSiegeAbility(forAlien, tierThreeTechId, tierFourTechId, tierFiveTechId)
+        
+
+        local team = forAlien:GetTeam()
+        if team and team.GetTechTree then
+
+   local t3 = false
+   local t4 = false
+   local t5 = false
+     
+            t3 = GetGamerules():GetAllTech() or (tierThreeTechId ~= nil and tierThreeTechId ~= kTechId.None and GetHasTech(forAlien, tierThreeTechId))
+            t4 = GetGamerules():GetAllTech() or (tierFourTechId ~= nil and tierFourTechId ~= kTechId.None and t3)
+             t5 = GetGamerules():GetAllTech() or (tierFiveTechId ~= nil and tierFiveTechId ~= kTechId.None and t3)
+
+            
+            
+               if t4 then
+               UnlockAbility(forAlien,  tierFourTechId)
+            end
+            
+            if t5 then
+               UnlockAbility(forAlien, tierFiveTechId)
+            end
+            
+            
+    --Print("t1 is %s", t1)
+    --Print("t2 is %s", t2)
+    --Print("t3 is %s", t3)
+  --  Print("t4 is %s", t4)
+            
+    end
+          return false
+end
 function UpdateAliensWeaponsManually() 
  for _, alien in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do 
         alien:UpdateWeapons() 
@@ -177,16 +231,22 @@ function GetUnpoweredLocationWithoutArc()
 end
 
 */
-function GetRandomDisabledPower()
+function GetRandomDisabledPowerNotHive()
   local powers = {}
   for _, power in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-        if not GetIsOriginInHiveRoom(power:GetOrigin()) and power:GetIsDisabled() and not GetPowerPointRecentlyDestroyed(power) then table.insert(powers,power) end
+        if not GetIsOriginInHiveRoom(power:GetOrigin()) and power:GetIsBuilt() and power:GetIsDisabled() then  table.insert(powers,power)  end
     end
     if #powers == 0 then return nil end
     local power = table.random(powers)
-           local Location = GetLocationForPoint(power:GetOrigin())
-            locationName = Location.name
-            Print(" EnableRandomPower %s", locationName)
+    return  power
+end
+function GetRandomDisabledPower()
+  local powers = {}
+  for _, power in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
+        if  power:GetIsBuilt() and power:GetIsDisabled() then  table.insert(powers,power)  end
+    end
+    if #powers == 0 then return nil end
+    local power = table.random(powers)
     return  power
 end
 function GetRandomCC()

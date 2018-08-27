@@ -7,8 +7,12 @@ function PowerPoint:OnAdjustModelCoords(modelCoords)
         coords.zAxis = coords.zAxis * 2
     return coords
 end
-
 */
+
+function PowerPoint:OnAddHealth()
+   self:AddArmor(1)
+end
+
 
 local kDestructionBuildDelay = 4
 
@@ -49,6 +53,7 @@ local orig_PowerPoint_StopDamagedSound = PowerPoint.StopDamagedSound
     orig_PowerPoint_StopDamagedSound(self)
         if self:GetHealthScalar() ~= 1 then return end
          self:SpawnSurgeForEach(self:GetOrigin(), self)
+          --self:SetArmor(kPowerPointArmor) -- macs dont weld armor. Hm.
         -- AddPayLoadTime(kTimeAddPowerBuilt)
        -- local nearestHarvester = GetNearest(self:GetOrigin(), "Harvester", 2, function(ent) return LocationsMatch(self,ent)  end)
       -- if nearestHarvester then nearestHarvester:Kill() end

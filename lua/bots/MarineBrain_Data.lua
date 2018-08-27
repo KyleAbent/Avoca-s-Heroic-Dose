@@ -485,7 +485,7 @@ kMarineBrainActions =
         local s = brain:GetSenses()
         local weight = 0.0
         local hasFlamethrower = marine:GetWeapon( Flamethrower.kMapName ) ~= nil
-        local range = ConditionalValue(hasFlamethrower, 8, 10)
+        local range = ConditionalValue(hasFlamethrower, 7, 10)
 
         if weapon ~= nil and weapon:isa("ClipWeapon") and s:Get("ammoFraction") > 0.0 then
 

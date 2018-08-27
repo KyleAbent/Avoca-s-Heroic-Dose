@@ -49,7 +49,9 @@ local kAvoca_TechIds =
     'Redemption',
     'Rebirth',
     'CragHiveTwo',
-    
+    'WeldFlamerExosuit',
+    'DualWelderExosuit',
+    'PrimalScream',
 }
 
 for i = 1, #kAvoca_TechIds do

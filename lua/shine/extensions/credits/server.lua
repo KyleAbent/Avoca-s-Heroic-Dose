@@ -35,24 +35,6 @@ Shine.Hook.SetupClassHook( "NS2Gamerules", "ResetGame", "OnReset", "PassivePost"
 
 Shine.Hook.SetupClassHook( "DoConcedeSequence", "OnConcede", "SaveAllCredits", "pre" )
 
-Shine.Hook.SetupClassHook( "Player", "CopyPlayerDataFrom", "EnsureBeteenSpawn", "PassivePost" )
-
-function Plugin:EnsureBeteenSpawn(player, origin, angles, mapName)
- --if not player:isa("Marine") or not player:isa("Alien") then return end
- local client = player:GetClient()
- if not client then return end
- local controlling = client:GetControllingPlayer()
- --local size = self.playersize[controlling:GetClient()]
- local Time = Shared.GetTime()
- local Glow = self.GlowClientsTime[controlling:GetClient()]
-
-           if Glow and Glow > Time then   
-           local color = self.GlowClientsColor[controlling:GetClient()]
-                 color = Clamp(tonumber(color), 1, 4)
-                  player:GlowColor(color, Glow - Time)    
-                end
-
-end
 function Plugin:OnoEggFilled(player)
   self:NotifyCredit( player:GetClient(), "You farted.", true )
 end
@@ -970,6 +952,8 @@ if not Player then return end
   elseif String == "MiniGun" and not Player:isa("Exo") then  cost = gCreditClassCostMiniGunExo  delayafter = gCreditClassDelayRailGun 
   elseif String == "Welder" and not Player:isa("Exo") then  cost = gCreditClassCostWelderExo  delayafter = gCreditClassDelayRailGun 
    elseif String == "Flamer" and not Player:isa("Exo") then  cost = gCreditClassCostFlamerExo delayafter = gCreditClassDelayRailGun 
+   elseif String == "Welder" and not Player:isa("Exo") then  cost = gCreditClassCostFlamerExo+1 delayafter = gCreditClassDelayRailGun 
+   elseif String == "WeldFlame" and not Player:isa("Exo") then  cost = gCreditClassCostFlamerExo+2 delayafter = gCreditClassDelayRailGun 
   elseif String == "Gorge" then cost = gCreditClassCostGorge delayafter = gCreditClassDelayGorge delayafter = 8 
   elseif String == "Lerk" then   cost = gCreditClassCostLerk delayafter = gCreditClassDelayLerk delayafter = 8 
  elseif String == "Fade" then  cost = gCreditClassCostFade delayafter = gCreditClassDelayFade delayafter = 8 
@@ -986,6 +970,8 @@ if not Player then return end
              elseif cost == gCreditClassCostRailGunExo   then  Player:GiveDualRailgunExo(Player:GetOrigin())
              elseif cost == gCreditClassCostWelderExo   then  Player:GiveDualWelder(Player:GetOrigin())
              elseif cost == gCreditClassCostFlamerExo  then Player:GiveDualFlamer(Player:GetOrigin())
+             elseif cost == gCreditClassCostFlamerExo+1  then Player:GiveDualWelder(Player:GetOrigin())
+             elseif cost == gCreditClassCostFlamerExo+2  then Player:GiveWelderFlamer(Player:GetOrigin())
              end 
          elseif Player:GetTeamNumber() == 2 then
  

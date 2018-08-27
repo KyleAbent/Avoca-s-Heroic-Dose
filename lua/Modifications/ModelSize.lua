@@ -13,6 +13,7 @@ function Embryo:OnAdjustModelCoords(coords)
     return coords
     
 end
+/*
 function RoboticsFactory:OnAdjustModelCoords(coords)
     
     	local scale = 0.5
@@ -64,6 +65,8 @@ function InfantryPortal:OnAdjustModelCoords(coords)
     return coords
     
 end
+
+*/
 
 /*
  function LiveMixin:OnAdjustModelCoords(modelCoords)

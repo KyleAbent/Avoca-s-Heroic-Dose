@@ -5,12 +5,13 @@ Script.Load("lua/InfestationMixin.lua")
 local networkVars = 
 
 {   
+    damageRes = "integer (0 to 30)",
 }
 
 AddMixinNetworkVars(InfestationMixin, networkVars)
 
 function Whip:GetMinRangeAC()
-return 14/3       
+return 14/5    
 end
 
 
@@ -25,6 +26,23 @@ local orig_Whip_OnInit = Whip.OnInitialized
 function Whip:OnInitialized()
     orig_Whip_OnInit(self)
   InitMixin(self, InfestationMixin)
+  
+
+
+
+    if  GetConductor():GetIsPhaseFourBoolean()  then 
+        self.damageRes = 30
+       
+    elseif  GetConductor():GetIsPhaseThreeBoolean()  then 
+       self.damageRes = 20
+      
+    elseif GetConductor():GetIsPhaseTwoBoolean()  then 
+       self.damageRes = 10
+       
+    else
+        self.damageRes = 1
+    end
+    
 end
 
 
@@ -32,33 +50,29 @@ end
    
    if I do dmgres then do it as a networkvar amt gradually increased by the current phase
      or just gradually increase maxhp on init based on round
-     
+   
 function Whip:GetWhipsInRange()
       local whip = GetEntitiesWithinRange("Whip", self:GetOrigin(), Whip.kBombardRange)
       return Clamp(#whip - 1, 0.1, 7)
 end
-*/
-/*
+  */
+
 function Whip:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
     if hitPoint ~= nil and doer ~= nil then
-        damageTable.damage = damageTable.damage - (self:GetWhipsInRange()*10/100) * damageTable.damage
+        damageTable.damage = damageTable.damage - (self.damageRes/100) * damageTable.damage
     end
 
-end
-
-function Whip:GetDmgResAmt()
-return (self:GetWhipsInRange()/7)
 end
 
 
 function Whip:GetUnitNameOverride(viewer) --Triggerhappy stoner
     local unitName = GetDisplayName(self)   
     --unitName = string.format(Locale.ResolveString("Crag (+%sS 0%)"), self:GetCragsInRange()) --, self:GetBonusAmt() )
-    unitName = "Whip (+"..self:GetDmgResAmt().."0% dmgres)" --, self:GetBonusAmt() )
+    unitName = "Whip (+"..self.damageRes.."% dmgres)" --, self:GetBonusAmt() )
 return unitName
 end
-*/
+
  
   function  Whip:GetInfestationRadius()
      if  GetConductor():GetIsPhaseTwoBoolean() then

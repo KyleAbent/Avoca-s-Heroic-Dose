@@ -9,6 +9,8 @@
 Script.Load("lua/Additions/ExoFlamer.lua")
 Script.Load("lua/Additions/EggBeacon.lua")
 Script.Load("lua/Additions/StructureBeacon.lua")
+Script.Load("lua/Additions/ExoWelder.lua")
+Script.Load("lua/Weapons/Alien/PrimalScream.lua")
 
 
 
@@ -45,6 +47,35 @@ local kAvoca_TechData =
  [kTechDataTooltipInfo] = "Dual Welders yo", 
 [kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
 
+
+         { [kTechDataId] = kTechId.DualWelderExosuit,    
+ [kTechIDShowEnables] = false,     
+  [kTechDataDisplayName] = "Dual Exo Welders", 
+[kTechDataMapName] = "exo",         
+      [kTechDataCostKey] = kDualExosuitCost - 10, 
+[kTechDataHotkey] = Move.E,
+ [kTechDataTooltipInfo] = "Dual Welders yo", 
+[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
+
+
+         { [kTechDataId] = kTechId.WeldFlamerExosuit,    
+ [kTechIDShowEnables] = false,     
+  [kTechDataDisplayName] = "Welder Flamer Exo", 
+[kTechDataMapName] = "exo",         
+      [kTechDataCostKey] = kDualExosuitCost - 5, 
+[kTechDataHotkey] = Move.E,
+ [kTechDataTooltipInfo] = "Welder Flamer Exo Yo", 
+[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
+
+
+                  --Thanks dragon ns2c
+       { [kTechDataId] = kTechId.PrimalScream,  
+         [kTechDataCategory] = kTechId.Lerk,
+       [kTechDataDisplayName] = "Primal Scream",
+        [kTechDataMapName] =  Primal.kMapName,
+         --[kTechDataCostKey] = kPrimalScreamCostKey, 
+       -- [kTechDataResearchTimeKey] = kPrimalScreamTimeKey, 
+ [kTechDataTooltipInfo] = "+Energy to teammates, enzyme cloud"},
  
         /*
                 { [kTechDataId] = kTechId.DamageResistance, 

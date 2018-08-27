@@ -21,8 +21,19 @@ end
  
  end
  */
+  local function GetHasThreeHives() --gethastech biomass 9?
+  local count = 0
+            for _, hv in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
+                if hv:GetIsBuilt()  then 
+                 count = count + 1
+                end
+             end
+
+ return count >=3 --return a hive has tech biomass9 
+end
+
 function Conductor:FirePhaseCannons(powerpoint)
-             
+              if not GetHasThreeHives() then return end -- although not requiring biomass. Maybe later.
              local origin = FindFreeSpace(powerpoint:GetOrigin())
              CreateEntity(Contamination.kMapName, FindFreeSpace(origin, 1, 8), 2)
           
@@ -30,7 +41,7 @@ function Conductor:FirePhaseCannons(powerpoint)
       if #WhipCount < 18 then
              for i = 1, math.random(1,4) do
                local whip = CreateEntity(Whip.kMapName, FindFreeSpace(origin, 1, 8), 2)
-               whip:SetConstructionComplete() -- chance < 100% ?
+               --whip:SetConstructionComplete() -- chance < 100% ?
                whip.rooted = true
                whip:Root() 
              end
@@ -40,28 +51,32 @@ function Conductor:FirePhaseCannons(powerpoint)
       if #CragCount < 18 then 
              for i = 1 , math.random(1,2) do
              local crag = CreateEntity(Crag.kMapName, FindFreeSpace(origin, 1, 8), 2)
-             crag:SetConstructionComplete()-- chance < 100% ?
+             --crag:SetConstructionComplete()-- chance < 100% ?
              end
       end     
       
-      local  ShadeCount = GetEntitiesForTeam( "Whip", 2 )   
+      local  ShadeCount = GetEntitiesForTeam( "Shade", 2 )   --withinradius?
       if #ShadeCount < 8 then
-             for i = 1, math.random(1,4) do
+             for i = 1, math.random(1,2) do
                local shade = CreateEntity(Shade.kMapName, FindFreeSpace(origin, 1, 8), 2)
                --shade:SetConstructionComplete()-- chance < 100% ?
              end
       end
       
-             if math.random(1,2) == 1 then
-              CreateEntity(NutrientMist.kMapName, FindFreeSpace(origin, 1, 8), 2)
-             end
+       --local drifter = CreateEntity(Drifter.kMapName, FindFreeSpace(origin, 1, 8), 2)
+      
+             -- if math.random(1,2) == 1 then
+            --  CreateEntity(NutrientMist.kMapName, FindFreeSpace(origin, 1, 8), 2)
+           --  end
              
-      if GetConductor():GetIsPhaseTwoBoolean() then
+      if GetConductor():GetIsPhaseTwoBoolean() then  --two? hm
            if math.random(1,2) == 1 then
            --chance or phase three or phase four if too much movement from hives during marine rushing hives
              local structBeacon = CreateEntity(StructureBeacon.kMapName, FindFreeSpace(origin, 1, 8), 2)
+             --CreateEntity(NutrientMist.kMapName, structBeacon:GetOrigin(), 2)
            else
              local eggBeacon = CreateEntity(EggBeacon.kMapName, FindFreeSpace(origin, 1, 8), 2)
+           --  CreateEntity(NutrientMist.kMapName, eggBeacon:GetOrigin(), 2)
            end
       end    
     

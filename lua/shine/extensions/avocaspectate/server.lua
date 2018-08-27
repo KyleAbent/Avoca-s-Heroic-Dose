@@ -233,7 +233,7 @@ local function SwitchToOverHead(client, self, where)
         client.overheadModeHeight =  height
 
 end
-local function overHeadandNear(self, client, vip)
+local function lockTarget(self, client, vip)
           client:SetDesiredCameraDistance(0)
         -- Print("vip is %s", vip:GetClassName())
           if client:GetSpectatorMode() ~= kSpectatorMode.FreeLook then client:SetSpectatorMode(kSpectatorMode.FreeLook)  end
@@ -288,17 +288,17 @@ end
            vip = GetViewTwo()
         elseif random == 3 then
            vip = GetViewThree()
-        else 
-            firstPersonScoreBased(self, client)
+     -- --  else 
+         --   firstPersonScoreBased(self, client)
         end
    
         if vip ~= nil then 
-              local roll = math.random(1,2)
-             if roll == 1 then
-              overHeadandNear(self, client, vip)
-             elseif roll == 2 then
-              firstPersonScoreBased(self, client)
-              end
+            --  local roll = math.random(1,2)
+            -- if roll == 1 then
+              lockTarget(self, client, vip)
+           --  elseif roll == 2 then
+            --  firstPersonScoreBased(self, client)
+             -- end
       else
         firstPersonScoreBased(self, client)
        end

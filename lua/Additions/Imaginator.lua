@@ -310,10 +310,10 @@ return GetConductor():GetIsPhaseFourBoolean()
 
 end
 
-local function GetHasSixHives()
+local function GetHasThreeHives()
 local Hives = #GetEntitiesForTeam( "Hive", 2 )
 
-if Hives >= 6 then return true end
+if Hives >= 3 then return true end
 
 return GetConductor():GetIsPhaseFourBoolean()
 
@@ -455,7 +455,7 @@ local gamestarted = false
       --if InfantryPortal < 4 then
       --table.insert(tospawn, kTechId.InfantryPortal)
       --end
-      local timecheck = ( Shared.GetTime() - GetGamerules():GetGameStartTime() ) >= 180
+      local timecheck = ( Shared.GetTime() - GetGamerules():GetGameStartTime() ) >= 120
       if timecheck and CommandStation < 3 and not GetConductor():GetIsPhaseFourBoolean() then
       table.insert(tospawn, kTechId.CommandStation)
       end
@@ -639,8 +639,17 @@ local eligable = {}
 
 end
 local function ManagePower(who, where)
-   local power = GetRandomDisabledPower()
-    if power then
+    local choice = math.random(1,100)
+      
+   local power = nil
+     -- why random and not nearest? well if its a lost cause then why repeat it and not spread. hm
+      if choice >= 70 then
+      power = GetNearest(where, "PowerPoint", 1,  function(ent) return ent:GetIsDisabled()  end ) 
+      else
+      power = GetRandomDisabledPowerNotHive() --was told not to go to hive. 
+      end
+      
+    if power then --while power 
                     local target = power
                     local where = target:GetOrigin()
                       who:SetOrigin(FindFreeSpace(where))
@@ -913,8 +922,8 @@ local canafford = {}
       table.insert(tospawn, kTechId.Shade)
       end 
       
-      
-       if not GetHasSixHives() then
+      local timecheck = ( Shared.GetTime() - GetGamerules():GetGameStartTime() ) >= 120
+       if timecheck and not GetHasThreeHives() then
       table.insert(tospawn, kTechId.Hive)
       end
   
@@ -1060,11 +1069,16 @@ return true
 end
 
 local function GetAlienSpawnNearEntity()
- local ents = {}
-  local location = nil
+
+     local power = GetRandomHive() --GetRandomDisabledPower() -- or where beyond radius of arc
+
+-- local ents = {}
+  --local location = nil
   --Fine tuned ;)
+     
+       /*
             for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-                    if powerpoint and not  powerpoint:GetCanTakeDamageOverride()  then
+                    if powerpoint and powerpoint:GetIsDisabled()  then
                     table.insert(ents, powerpoint)
                     end
              end
@@ -1081,6 +1095,8 @@ local function GetAlienSpawnNearEntity()
              end
          */
          
+         /*
+         
              for _, entity in ipairs( GetEntitiesWithMixinForTeam("Construct", 2 ) ) do
                 --  local location = GetLocationForPoint(entity:GetOrigin())
                 --  local powerpoint =  location and GetPowerPointForLocation(location.name)
@@ -1094,6 +1110,10 @@ local function GetAlienSpawnNearEntity()
         
  if #ents == 0 then return nil end
 return table.random(ents)
+
+  */
+  
+
 
 end
 
@@ -1178,33 +1198,56 @@ local hive = GetRandomHive()
    
 end
 
+local function ManageStructures()
+
+       --mindfuck would be getnearest built node that is beyond the arc radius of the closest arc to that node. HAH.
+       --local powerpoint = GetRandomActivePower() 
+       
+       --gonna affect contam whip etc
+       local random = math.random(1,4)
+       
+       --leave min around hive not all leave. hm.
+       
+       for i = 1, random do --maybe time delay ah
+           local hive = GetRandomHive()
+           local nearestof = GetNearestMixin(hive:GetOrigin(), "Construct", 2, function(ent) return ent:GetIsBuilt() and ent.GetIsInCombat and not ent:GetIsInCombat() and ent:isa("Whip") or ent:isa("Shift") or ent:isa("Shade") or ent:isa("Crag") end)
+            if nearestof then
+               local power = GetNearest(nearestof:GetOrigin(), "PowerPoint", 1,  function(ent) return ent:GetIsBuilt() and not ent:GetIsDisabled()  end ) 
+               if power then
+                 nearestof:GiveOrder(kTechId.Move, power:GetId(), FindFreeSpace(power:GetOrigin(), 4), nil, false, false)  
+               end
+            end 
+       end   
+
+end
 
 function Imaginator:ActualAlienFormula(cystonly)
  ManageDrifters() 
+ ManageStructures() --gonna affect Phase Cannon
 local randomspawn = nil
-local spawnNearEnt = GetAlienSpawnNearEntity() 
+local powerpoint  = GetRandomDisabledPower() --GetAlienSpawnNearEntity() 
 local tospawn, cost = GetAlienSpawnList(self) --, cost, gamestarted = GetAlienSpawnList(self, cystonly)
 local success = false
 local entity = nil
 
 if spawnNearEnt then
---Print("ActualAlienFormula cystonly %s, spawnNearEnt %s, tospawn %s", cystonly,  spawnNearEnt:GetMapName() or nil, LookupTechData(tospawn, kTechDataMapName)  )
+Print("ActualAlienFormula cystonly %s, spawnNearEnt %s, tospawn %s", cystonly,  powerpoint:GetMapName() or nil, LookupTechData(tospawn, kTechDataMapName)  )
 end
 
-     if spawnNearEnt and tospawn then     
-                 local potential = FindPosition(GetAllLocationsWithSameName(spawnNearEnt:GetOrigin()), spawnNearEnt, 2)
+     if powerpoint and tospawn then     
+                 local potential = FindPosition(GetAllLocationsWithSameName(powerpoint:GetOrigin()), powerpoint, 2)
                  if potential == nil then local roll = math.random(1,3) if roll == 3 then self:ActualAlienFormula() return else return end  end              
                  randomspawn = FindFreeSpace(potential, math.random(2.5, 4) , math.random(8, 16), not tospawn == kTechId.Cyst )
             if randomspawn then
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 2, function(ent) return ent:GetTechId() == tospawn end)
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
-                      --Print("ActualAlienFormula range is %s", range)
-                      --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
+                      Print("ActualAlienFormula range is %s", range)
+                      Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
                           local minrange =  nearestof.GetMinRangeAC and nearestof:GetMinRangeAC() or math.random(4,8) --nearestof:GetMinRangeAC()
                          -- if tospawn == kTechId.NutrientMist then minrange = NutrientMist.kSearchRange end
                           if range >=  minrange then
-                           --Print("ActualAlienFormula range range >=  minrange")
+                           Print("ActualAlienFormula range range >=  minrange")
                             entity = CreateEntityForTeam(tospawn, randomspawn, 2)
                            -- cost = GetAlienCostScalar(self, cost)
                           if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end

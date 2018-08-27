@@ -9,7 +9,9 @@ function MarineTeam:InitTechTree()
     orig_MarineTeam_InitTechTree(self)
     self.techTree.SetComplete = orig_TechTree_SetComplete
     
+    self.techTree:AddBuyNode(kTechId.DualWelderExosuit, kTechId.ExosuitTech, kTechId.None)
     self.techTree:AddBuyNode(kTechId.DualFlamerExosuit, kTechId.ExosuitTech, kTechId.None)
+    self.techTree:AddBuyNode(kTechId.WeldFlamerExosuit, kTechId.ExosuitTech, kTechId.None)
    -- self.techTree:AddResearchNode(kTechId.FlamethrowerRangeTech,          kTechId.None) 
     
     self.techTree:SetComplete()

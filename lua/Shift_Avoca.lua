@@ -25,7 +25,7 @@ end
    end
 
 function Shift:GetMinRangeAC()
-return 14    
+return 14/3    
 end
 
 Shared.LinkClassToMap("Shift", Shift.kMapName, networkVars)

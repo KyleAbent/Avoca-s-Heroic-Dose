@@ -31,7 +31,7 @@ end
    end
    
 function Shade:GetMinRangeAC()
-return 17     
+return 17/4     
 end
 
 if Server then

@@ -1,3 +1,13 @@
+
+kRedemptionCost = 2
+kRebirthCost = 2
+kRedemptionCooldown = 45
+kRedemptionCooldown = 45
+kRedemptionEHPThresholdMin = 15
+kRedemptionEHPThresholdMax = 30
+
+
+
 kBileBombEnergyCost = 17
 
 
@@ -23,5 +33,5 @@ kARCMinRange = 0 -- why is this even a thing??????
 kEnzymeCloudDuration = 6
 kMucousShieldDuration = 6
 
-kMarineInitialIndivRes = 100
-kAlienInitialIndivRes = 100
+--kMarineInitialIndivRes = 100
+--kAlienInitialIndivRes = 100

@@ -2,7 +2,7 @@ PrecacheAsset("Glow/green/GlowTP.surface_shader")
 local kAvocaWeedMaterial = PrecacheAsset("Glow/green/green.material")
 
 
-Script.Load("lua/Additions/LevelsMixin.lua")
+--Script.Load("lua/Additions/LevelsMixin.lua")
 
 local networkVars = 
 {
@@ -12,41 +12,15 @@ local networkVars =
   vortexCheck = "boolean",
 }
 
-AddMixinNetworkVars(LevelsMixin, networkVars)
+--AddMixinNetworkVars(LevelsMixin, networkVars)
 
 
 
-function ARC:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
-    -- webs can't be destroyed with bullet weapons
-    if doer ~= nil then 
-        if self.avoca == true then
-         damageTable.damage = damageTable.damage * 0.5
-        end
-        
-    end
-
-end
-
-
-    function ARC:OnDamageDone(doer, target)
-    
-        if doer == self then
-         self:AddXP(self:GetAddXPAmount())
-       --  self:AddHealth(100, false, true)
-       --  self:SetArmor(0) -- ugh
-            
-        end
-        
-    end
     
 if Server then
 
 
-function ARC:OnAddXp()
-  local dmg = kARCDamage
-  self.kAttackDamage = dmg * (self.level/100) + dmg
-end
 
 
     
@@ -56,14 +30,23 @@ local origInit = ARC.OnInitialized
 function ARC:OnInitialized()
     origInit(self)
     // self:AddTimedCallback(ARC.Instruct, 2.5)
-     if  GetConductor():GetIsPhaseOneBoolean()  then
-         ARC.kMoveSpeed = 3
-    elseif  GetConductor():GetIsPhaseTwoBoolean()  then 
-       ARC.kMoveSpeed = 4
+    
+    
+
+
+
+    if  GetConductor():GetIsPhaseFourBoolean()  then 
+     --  ARC.kMoveSpeed = 4
+        ARC.kAttackDamage = kARCDamage*1.3
     elseif  GetConductor():GetIsPhaseThreeBoolean()  then 
-       ARC.kMoveSpeed = 5
-    elseif  GetConductor():GetIsPhaseFourBoolean()  then 
-       ARC.kMoveSpeed = 6
+       --ARC.kMoveSpeed = 3.5
+        ARC.kAttackDamage = kARCDamage*1.2
+    elseif  GetConductor():GetIsPhaseTwoBoolean()  then 
+       --ARC.kMoveSpeed = 3
+         ARC.kAttackDamage = kARCDamage*1.1
+    elseif GetConductor():GetIsPhaseOneBoolean()  then
+         --ARC.kMoveSpeed = 2.5
+          ARC.kAttackDamage = kARCDamage*1.05
     end
      self.lastCheck = 0
      if  GetPayLoadArc() == nil then
@@ -71,17 +54,10 @@ function ARC:OnInitialized()
      else
      self.mainroom = true
         end
-     InitMixin(self, LevelsMixin)
      self.vortexCheck = false
 end
 
 
-    function ARC:GetMaxLevel()
-    return 30
-    end
-    function ARC:GetAddXPAmount()
-    return 0.25
-    end
     
 
 function ARC:GetDamageType()
@@ -89,7 +65,7 @@ return kDamageType.StructuresOnly
 end
 
 function ARC:GetIsPL()
- if self. avoca then 
+ if self.avoca then 
   return true
   else
   return false
@@ -188,10 +164,10 @@ local function CheckForAndActAccordingly(who)
 local stopanddeploy = false
           for _, enemy in ipairs(GetEntitiesWithMixinForTeamWithinRange("Live", 2, who:GetOrigin(), kARCRange)) do
               local distToTarget = (enemy:GetOrigin() - who:GetOrigin()):GetLengthXZ()
-                  if who.avoca == true and  (distToTarget <= 8) and not hasFire(who) then
-                   CreateEntity(FireFlameCloud.kMapName, enemy:GetOrigin() , 1) 
+                --  if who.avoca == true and  (distToTarget <= 8) and not hasFire(who) then
+                 --  CreateEntity(FireFlameCloud.kMapName, enemy:GetOrigin() , 1) 
                    --Set parent nearby player
-                    end
+                  --  end
              if who:GetCanFireAtTarget(enemy, enemy:GetOrigin()) then
              stopanddeploy = true
              break
@@ -262,13 +238,6 @@ function ARC:CheckVortex()
      end
 end
 
-function ARC:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
-
-    if hitPoint ~= nil  then
-        damageTable.damage = damageTable.damage * 1.3
-    end
-
-end
 
 function ARC:GiveScan()
 

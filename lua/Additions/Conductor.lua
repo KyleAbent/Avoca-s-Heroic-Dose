@@ -446,7 +446,7 @@ if Server then
                  self.timeLastAutomations = Shared.GetTime()
            end   
            
-            if not self.phaseCannonTime or self.phaseCannonTime + 23 <= Shared.GetTime() then
+            if not self.phaseCannonTime or self.phaseCannonTime + math.random(23,69) <= Shared.GetTime() then
              self:PCTimer()
             self.phaseCannonTime = Shared.GetTime()
             end
@@ -490,15 +490,18 @@ function Conductor:PickMainRoom()
        -- end
        return true
 end
+*/
 
 
 function Conductor:SetMainRoom(where, which)
       --  if Server then MoveArcs(where) end 
         self:CoordinateWithPowerNode(which.name)
-        CreateAlienMarker(where) 
-        SendMarineOrders(where)
+        --CreateAlienMarker(where) 
+        --SendMarineOrders(where)
        -- FindOrCreateKingCyst(where, which, opcyst)
 end
+
+/*
 local function SuddenDeathConditionsCheck(self)
           local arc = GetPayLoadArc()
           
@@ -512,9 +515,20 @@ end
 
 local function FirePCAllBuiltRooms(self)
 
- if self:GetIsPhaseTwoBoolean() then
-       local cc = GetRandomCC()
-       if cc then  self:FirePhaseCannons(cc) return end
+ if self:GetIsPhaseFourBoolean() then
+      local chance = math.random(1,100)
+      if chance >= 70 then
+         local power = GetRandomActivePower()
+         if power then  self:FirePhaseCannons(power) return end --if not power then
+      else
+         local cc = GetRandomCC()
+         if cc then  self:FirePhaseCannons(cc) return end
+      end
+ elseif self:GetIsPhaseTwoBoolean() then
+      -- local cc = GetRandomCC()
+     --  if cc then  self:FirePhaseCannons(cc) return end
+      local power = GetRandomActivePower()
+      if power then  self:FirePhaseCannons(power) return end
  end
  
 local built = {}

@@ -6,6 +6,7 @@ local networkVars =
 {   
 
 lastCheck = "time",
+bonusHeal = "integer (0 to 30)",
 
 }
 
@@ -16,6 +17,19 @@ function Crag:OnInitialized()
 originit(self)
 InitMixin(self, InfestationMixin)
 self.lastCheck = 0
+
+
+
+    if  GetConductor():GetIsPhaseFourBoolean()  then 
+        self.bonusHeal = 30
+    elseif  GetConductor():GetIsPhaseThreeBoolean()  then 
+       self.bonusHeal = 20
+    elseif  GetConductor():GetIsPhaseTwoBoolean()  then 
+       self.bonusHeal = 10    
+    else
+        self.bonusHeal = 1
+    end
+    
 end
 
   function Crag:GetInfestationRadius()
@@ -31,7 +45,7 @@ end
 
 
 function Crag:GetMinRangeAC()
-return 14/3 
+return 14/5 
 end
 
 
@@ -51,7 +65,7 @@ end
 function Crag:GetUnitNameOverride(viewer) --Triggerhappy stoner
     local unitName = GetDisplayName(self)   
     --unitName = string.format(Locale.ResolveString("Crag (+%sS 0%)"), self:GetCragsInRange()) --, self:GetBonusAmt() )
-    unitName = "Crag (+"..self:GetCragsInRange().."0% heal)" --, self:GetBonusAmt() )
+    unitName = "Crag (+"..self.bonusHeal.."% heal)" --, self:GetBonusAmt() )
 return unitName
 end
 
@@ -67,7 +81,7 @@ function Crag:TryHeal(target)
     
     --heal = heal * self:GetCragsInRange()/3 + heal
     if self:GetCragsInRange() >= 1 then
-    heal = heal * self:GetBonusAmt() + heal
+    heal = heal * (self.bonusHeal/100) + heal
     end
     
    -- if self:GetIsSiege() and self:IsInRangeOfHive() and target:isa("Hive") or target:isa("Crag") then

@@ -1,4 +1,12 @@
+kPrimalScreamROFIncrease = .3
+kPrimalScreamEnergyCost = 25
+kPrimalScreamRange = 10
+kPrimalScreamDamageModifier = 1.3
+kPrimalScreamDuration = 4
+kPrimalScreamEnergyGain = 60
+kPrimalScreamROF = 3
 
+kHowManyArcsDoIWant = 13
 kEggBeaconBuildTime = 8
 kStructureBeaconBuildTime = 8
 

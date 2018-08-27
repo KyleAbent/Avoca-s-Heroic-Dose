@@ -25,6 +25,8 @@
                 exoPlayer = player:GiveDualWelder()
             elseif self.layout == "FlamerFlamer" then
                 exoPlayer = player:GiveDualFlamer()
+            elseif self.layout == "WelderFlamer" then
+                 exoPlayer = player:GiveWelderFlamer()
             else
                 exoPlayer = player:GiveExo()
             end  

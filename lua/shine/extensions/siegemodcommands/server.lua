@@ -7,10 +7,7 @@ local Plugin = Plugin
 
 Plugin.Version = "1.0"
 Shine.Hook.SetupClassHook( "PowerPoint", "UpdateMiniMap", "UpdateItMan", "Replace" )
-Shine.Hook.SetupClassHook( "MAC", "Notifyuse", "ReplaceUse", "Replace" )
-Shine.Hook.SetupClassHook( "Alien", "OnRedeem", "OnRedemedHook", "PassivePre" )
-Shine.Hook.SetupClassHook( "Alien", "TriggerRebirthCountDown", "TriggerRebirthCountDown", "PassivePre" )
-Shine.Hook.SetupClassHook( "Player", "CopyPlayerDataFrom", "HookModelSize", "PassivePost" )
+
 
 
 function Plugin:Initialise()
@@ -29,53 +26,23 @@ function Plugin:UpdateItMan()
          end
         end
 end
-function Plugin:ReplaceUse(player)
 
- local client = player:GetClient()
-local controlling = client:GetControllingPlayer()
-local Client = controlling:GetClient()
-self:NotifySiege( Client, "Wait until front doors open to use macs.", true)
-return
-end
 
-function Plugin:HookModelSize(player, origin, angles, mapName)
-//if not self.playersize{Player:GetClient()} then return end
- local client = player:GetClient()
- if not client then return end
- local controlling = client:GetControllingPlayer()
- local size = self.playersize[controlling:GetClient()]
- local Time = Shared.GetTime()
- local Glow = self.GlowClientsTime[controlling:GetClient()]
 
- //self:NotifyGeneric( nil, "Glow = %s, time = %s", true, Glow, Time)
-           //if Glow and Glow < Shared.GetTime() then controlling:GlowColor(Shared.GetTime() - 120) end
-           if Glow and Glow > Time then   
-           local color = self.GlowClientsColor[controlling:GetClient()]
-            //self:NotifyGeneric( nil, "color = %s", true, color)
-            //self:NotifyGeneric( nil, "Glow > Time", true)
-                  self:SimpleTimer( 4, function () player:GlowColor(color, Glow - Time) end )     
-                end
- //self:NotifyGeneric( nil, "playersize: %s", true,size)
-                if not size or size == 1 then return end
-                player.modelsize = size
-             //  local defaulthealth = LookupTechData(player:GetTechId(), kTechDataMaxHealth, 1)
-             //  player:AdjustMaxHealth(defaulthealth * size)
-             //   player:AdjustMaxArmor(player:GetMaxArmor() * size)
-    
-   // self:NotifyGeneric( nil, "2", true)
-   /*
-   if not GetGamerules():GetGameStarted() and player.minemode then
-   player.minemode = true
-   Player:ApplyDurationCatPack(999) 
-   end
-   */
-end
 
-   function Plugin:OnRedemedHook(player) 
-            Shine.ScreenText.Add( 50, {X = 0.20, Y = 0.90,Text = "Redemption Cooldown: %s",Duration = kRedemptionCooldown,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, player ) 
+Shine.Hook.SetupClassHook( "Alien", "TriggerRedeemCountDown", "OnRedemedHook", "PassivePre" )
+Shine.Hook.SetupClassHook( "Alien", "TriggerRebirthCountDown", "TriggerRebirthCountDown", "PassivePre" )
+
+  function Plugin:OnRedemedHook(player) 
+            local herp = player:GetClient()
+            local derp = herp:GetControllingPlayer()
+            Shine.ScreenText.Add( 50, {X = 0.20, Y = 0.90,Text = "Redemption Cooldown: %s",Duration = derp:GetRedemptionCoolDown() or 0,R = 255, G = 0, B = 0,Alignment = 0,Size = 1,FadeIn = 0,}, player ) 
  end
-function Plugin:TriggerRebirthCountDown(player)
- Shine.ScreenText.Add( 50, {X = 0.20, Y = 0.90,Text = "Rebirth Cooldown: %s",Duration = kRedemptionCooldown,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, player ) 
+
+ function Plugin:TriggerRebirthCountDown(player)
+            local herp = player:GetClient()
+            local derp = herp:GetControllingPlayer()
+            Shine.ScreenText.Add( 50, {X = 0.20, Y = 0.90,Text = "Rebirth Cooldown: %s",Duration = ( derp:GetRedemptionCoolDown() * 1.3 ) or 0,R = 255, G = 0, B = 0,Alignment = 0,Size = 1,FadeIn = 0,}, player ) 
 end
 
 function Plugin:NotifyGiveRes( Player, String, Format, ... )

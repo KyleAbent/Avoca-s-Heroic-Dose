@@ -2,6 +2,8 @@ Script.Load("lua/StunMixin.lua")
 Script.Load("lua/PhaseGateUserMixin.lua")
 Script.Load("lua/Mixins/LadderMoveMixin.lua")
 Script.Load("lua/Additions/StunWall.lua")
+Script.Load("lua/Additions/ExoWelder.lua")
+
 
 local networkVars = {   
 
@@ -175,24 +177,23 @@ local origmodel = Exo.InitExoModel
 
 function Exo:InitExoModel()
 
-    local hasFlame = false
+    local hasWelders = false
     local modelName = kDualWelderModelName
     local graphName = kDualWelderAnimationGraph
     
-  if self.layout == "FlamerFlamer" then
+  if self.layout == "WelderWelder" or self.layout == "FlamerFlamer" or self.layout == "WelderFlamer" then //!= Minigun, != Railgun
          modelName = kDualWelderModelName
         graphName = kDualWelderAnimationGraph
         self.hasDualGuns = true
-        hasFlame = true
+        hasWelders = true
         self:SetModel(modelName, graphName)
     end
     
     
-    if hasFlame then 
+    if hasWelders then 
     else
     origmodel(self)
     end
-
      
   
 
@@ -215,7 +216,12 @@ function Exo:InitWeapons()
         weaponHolder:SetFlamerWeapons()
         self:SetHUDSlotActive(1)
         return
+        elseif self.layout == "WelderFlamer" then
+        weaponHolder:SetWelderFlamer()
+        self:SetHUDSlotActive(1)
+        return
         end
+        
         
         
 
@@ -230,7 +236,7 @@ function Exo:GetIsStunAllowed()
     return not self.timeLastStun or self.timeLastStun + 8 < Shared.GetTime() 
 end
 
-function Exo:OnStun()
+function Exo:OnStun()    --so the stunwall places the exo in the air making him unable to shoot. not good. 
          if Server then
                 local stunwall = CreateEntity(StunWall.kMapName, self:GetOrigin(), 2)    
                 StartSoundEffectForPlayer(AlienCommander.kBoneWallSpawnSound, self)
@@ -264,14 +270,14 @@ end
     function Exo:OnKill(attacker, doer, point, direction)
         
             
-            local reuseWeapons = self.storedWeaponsIds ~= nil
-            local reuseWeapons = self.storedWeaponsIds ~= nil
+           local reuseWeapons = self.storedWeaponsIds ~= nil
         
             local marine = self:Replace(self.prevPlayerMapName or Marine.kMapName, self:GetTeamNumber(), false, self:GetOrigin() + Vector(0, 0.2, 0), { preventWeapons = reuseWeapons })
             marine:SetHealth(self.prevPlayerHealth or kMarineHealth)
             marine:SetMaxArmor(self.prevPlayerMaxArmor or kMarineArmor)
             marine:SetArmor(self.prevPlayerArmor or kMarineArmor)
             
+            --exosuit:SetOwner(marine) --explode lol
             
             marine.onGround = false
             local initialVelocity = self:GetViewCoords().zAxis
@@ -298,7 +304,7 @@ end
                 marine:SetFuel(0.25)
             end
         
-    
+
         return false
     
 end

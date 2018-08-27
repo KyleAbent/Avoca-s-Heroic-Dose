@@ -25,7 +25,7 @@ function RoboticsFactory:GetTechButtons(techId)
     if self:GetTechId() ~= kTechId.ARCRoboticsFactory then
         techButtons[5] = kTechId.UpgradeRoboticsFactory
     end           
-    if GetArcsAmount() <= 17 then
+    if GetArcsAmount() < kHowManyArcsDoIWant then
        techButtons[1] = kTechId.ARC
     end
     return techButtons
@@ -59,7 +59,7 @@ end
 if Server then
   function RoboticsFactory:OnUpdate()
    if self.timeOfLastMacCheck == nil or Shared.GetTime() > self.timeOfLastMacCheck + 8 then
-           if self:GetTechId() == kTechId.ARCRoboticsFactory  and  GetArcsAmount() <= 11 then
+           if self:GetIsBuilt() and self:GetIsPowered() and  self:GetTechId() == kTechId.ARCRoboticsFactory  and  GetArcsAmount() < kHowManyArcsDoIWant then
            self:OverrideCreateManufactureEntity(kTechId.ARC)
            --self:GetTeam():SetTeamResources(self:GetTeam():GetTeamResources() - cost)
            end

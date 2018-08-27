@@ -9,6 +9,14 @@ ModLoader.SetupFileHook( "lua/Exo.lua", "lua/Exo_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Whip.lua", "lua/Whip_Avoca.lua", "post" )
 
+ModLoader.SetupFileHook( "lua/AmmoPack.lua", "lua/AmmoPack_Skynet.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/LiveMixin.lua", "lua/LiveMixin_Skynet.lua", "post" ) 
+
+
+ModLoader.SetupFileHook( "lua/JetpackMarine.lua", "lua/JetpackMarine_Avoca.lua", "post" )
+
+
 ModLoader.SetupFileHook( "lua/Hive.lua", "lua/Hive_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Armory.lua", "lua/Armory_Avoca.lua", "post" )
@@ -37,6 +45,8 @@ ModLoader.SetupFileHook( "lua/Cyst.lua", "lua/Cyst_Avoca.lua", "post" )
 ModLoader.SetupFileHook( "lua/TechTreeButtons.lua", "lua/TechTreeButtons_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Balance.lua", "lua/Balance_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Balance.lua", "lua/Balance_Skynet.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/BalanceHealth.lua", "lua/BalanceHealth_Avoca.lua", "post" )
 
@@ -75,11 +85,20 @@ ModLoader.SetupFileHook( "lua/Sentry.lua", "lua/Sentry_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Exo.lua", "lua/Exo_Avoca.lua", "post" )
 
+ModLoader.SetupFileHook( "lua/Player.lua", "lua/Player_Skynet.lua", "post" )
+
 ModLoader.SetupFileHook( "lua/CommandStation.lua", "lua/CommandStation_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/PrototypeLab.lua", "lua/PrototypeLab_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Weapons/Marine/ExoWeaponHolder.lua", "lua/Weapons/Marine/ExoWeaponHolder_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Weapons/Marine/Welder.lua", "lua/Weapons/Marine/Welder_Avoca.lua", "post" )
+
+
+ModLoader.SetupFileHook( "lua/Weapons/Marine/GrenadeLauncher.lua", "lua/Weapons/Marine/GrenadeLauncher_Skynet.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Weapons/Marine/Grenade.lua", "lua/Weapons/Marine/Grenade_Skynet.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/TechData.lua", "lua/TechData_Avoca.lua", "post" )
 

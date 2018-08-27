@@ -15,15 +15,19 @@ function Marine:OnCreate()
     orig_Marine_OnCreate(self)
 end
 
-/*
-local orig_Marine_InitWeapons = Marine.InitWeapons
+local orig = Marine.InitWeapons
 function Marine:InitWeapons()
-    orig_Marine_InitWeapons(self)
-    self:GiveItem(Welder.kMapName)
-    self:SetQuickSwitchTarget(Pistol.kMapName)
-    self:SetActiveWeapon(Rifle.kMapName)
+      orig(self)
+      
+    // if not self:isa("JetpackMarine") and Server then 
+    //  self:GiveJetpack()
+   
+       self:GiveItem(Welder.kMapName)
+        self:SetActiveWeapon(Rifle.kMapName)
+
+    //end
+
 end
-*/
 
 function Marine:ModifyGravityForce(gravityTable)
       if self:GetIsOnGround() then
@@ -100,9 +104,22 @@ function Marine:GiveDualExo(spawnPoint)
     return exo
     
 end
+function Marine:GiveDualWelder(spawnPoint)
+
+    local exo = self:Replace(Exo.kMapName, self:GetTeamNumber(), false, spawnPoint, { layout = "WelderWelder" })
+    return exo
+    
+end
 function Marine:GiveDualFlamer(spawnPoint)
 
-    local exo = self:Replace(Exo.kMapName, self:GetTeamNumber(), false, spawnPoint, { layout = "FlamerFlamer", storedWeaponsIds = self:GetWeaponsToStore() })
+    local exo = self:Replace(Exo.kMapName, self:GetTeamNumber(), false, spawnPoint, { layout = "FlamerFlamer"  })
+    return exo
+    
+end
+
+function Marine:GiveWelderFlamer(spawnPoint)
+
+    local exo = self:Replace(Exo.kMapName, self:GetTeamNumber(), false, spawnPoint, { layout = "WelderFlamer"  })
     return exo
     
 end
@@ -119,7 +136,7 @@ function Marine:GiveDualRailgunExo(spawnPoint)
     return exo
     
 end
-kIsExoTechId = { [kTechId.DualFlamerExosuit] = true, [kTechId.DualMinigunExosuit] = true,
+kIsExoTechId = { [kTechId.DualFlamerExosuit] = true, [kTechId.DualMinigunExosuit] = true, [kTechId.DualWelderExosuit] = true, [kTechId.WeldFlamerExosuit] = true,
                  [kTechId.DualRailgunExosuit] = true }
                  
 local function BuyExo(self, techId)
@@ -154,6 +171,8 @@ local function BuyExo(self, techId)
                 exo = self:GiveDualExo(spawnPoint)
             elseif techId == kTechId.DualWelderExosuit then
                 exo = self:GiveDualWelder(spawnPoint)
+            elseif techId == kTechId.WeldFlamerExosuit then
+                exo = self:GiveWelderFlamer(spawnPoint)
             elseif techId == kTechId.DualRailgunExosuit then
                 exo = self:GiveDualRailgunExo(spawnPoint)
             end
