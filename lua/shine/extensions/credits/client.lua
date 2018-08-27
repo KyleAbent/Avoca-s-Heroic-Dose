@@ -8,22 +8,34 @@ return true
 end
 
 
-Shine.VoteMenu:AddPage ("SpendCredits", function( self )
+Script.Load("lua/shine/extensions/credits/client_Credit_menu.lua")
+Shine.VoteMenu:AddPage ("SpendCredit", function( self )
        local player = Client.GetLocalPlayer()
-    if player:GetTeamNumber() == 1 then 
+          self:AddSideButton( "CommAbilities", function() self:SetPage( "SpendCommAbilitiesCredit" ) end) 
+       
+       
+  if player:GetTeamNumber() == 1 then 
+        self:AddSideButton( "Weapons", function() self:SetPage( "SpendWeaponsCredit" ) end)
+      end  
 
 
-elseif player:GetTeamNumber() == 2 then
+    
 
-end    
-
-
-     
-     self:AddBottomButton( "Back", function()self:SetPage("Main")end)
+     self:AddSideButton( "Classes", function() self:SetPage( "SpendClassesCredit" ) end) 
+     self:AddSideButton( "Structures", function() self:SetPage( "SpendStructuresCredit" ) end)
+             --  self:AddSideButton( "Fun", function() self:SetPage( "SpendFun" ) end)
+               self:AddSideButton( "Expensive", function() self:SetPage( "SpendExpeniveCredit" ) end)
+               
+       if player:GetTeamNumber() == 1 then 
+        self:AddSideButton( "Upgrades", function() self:SetPage( "SpendUpgradesCredit" ) end)
+      end  
+        --self:AddSideButton( "Glow", function() self:SetPage( "SpendGlowCredit" ) end)
+        self:AddBottomButton( "Back", function()self:SetPage("Main")end)  
 end)
-
+     
+     
 Shine.VoteMenu:EditPage( "Main", function( self ) 
-self:AddSideButton( "Credits", function() self:SetPage( "SpendCredits" ) end)
+self:AddSideButton( "Credit", function()  self:SetPage( "SpendCredit" ) end)
 end)
 
 

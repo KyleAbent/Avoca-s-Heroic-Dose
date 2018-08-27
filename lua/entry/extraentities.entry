@@ -1,7 +1,0 @@
-modEntry = [[
-	Client: lua/SilkRoad/Client.lua,
-	Server: lua/SilkRoad/Server.lua,
-	Predict: lua/SilkRoad/Predict.lua,
-	Shared: lua/SilkRoad/Shared.lua,
-	Priority: 3
-]]
