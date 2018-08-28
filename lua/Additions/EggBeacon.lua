@@ -264,7 +264,7 @@ function EggBeacon:DoYourBusiness()
     return self:GetIsAlive()
 end
 
-end //ofserver
+end --ofserver
 
 
 function EggBeacon:GetCanBeUsed(player, useSuccessTable)

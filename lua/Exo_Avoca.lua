@@ -21,7 +21,7 @@ local kNormalWallWalkRange = 0.3
 local kJumpWallRange = 0.4
 local kJumpWallFeelerSize = 0.1
 local kWallJumpInterval = 0.4
-local kWallJumpForce = 5.2 // scales down the faster you are
+local kWallJumpForce = 5.2 -- scales down the faster you are
 local kMinWallJumpForce = 0.1
 local kVerticalWallJumpForce = 4.3
 */
@@ -97,8 +97,8 @@ function Exo:PreUpdateMove(input, runningPrediction)
 
     if self:GetIsWallWalking() then
 
-        // Most of the time, it returns a fraction of 0, which means
-        // trace started outside the world (and no normal is returned)           
+        -- Most of the time, it returns a fraction of 0, which means
+        -- trace started outside the world (and no normal is returned)           
         local goal = self:GetAverageWallWalkingNormal(kNormalWallWalkRange, kNormalWallWalkFeelerSize)
         if goal ~= nil then 
         
@@ -113,15 +113,15 @@ function Exo:PreUpdateMove(input, runningPrediction)
     end
     
     if not self:GetIsWallWalking() then
-        // When not wall walking, the goal is always directly up (running on ground).
+        -- When not wall walking, the goal is always directly up (running on ground).
         self.wallWalkingNormalGoal = Vector.yAxis
     end
     
    
 
-  //  if self.leaping and Shared.GetTime() > self.timeOfLeap + kLeapTime then
-  //      self.leaping = false
-  //  end
+  --  if self.leaping and Shared.GetTime() > self.timeOfLeap + kLeapTime then
+  --      self.leaping = false
+  --  end
     
     self.currentWallWalkingAngles = self:GetAnglesFromWallNormal(self.wallWalkingNormalGoal or Vector.yAxis) or self.currentWallWalkingAngles
 
@@ -181,7 +181,7 @@ function Exo:InitExoModel()
     local modelName = kDualWelderModelName
     local graphName = kDualWelderAnimationGraph
     
-  if self.layout == "WelderWelder" or self.layout == "FlamerFlamer" or self.layout == "WelderFlamer" then //!= Minigun, != Railgun
+  if self.layout == "WelderWelder" or self.layout == "FlamerFlamer" or self.layout == "WelderFlamer" then --!= Minigun, != Railgun
          modelName = kDualWelderModelName
         graphName = kDualWelderAnimationGraph
         self.hasDualGuns = true

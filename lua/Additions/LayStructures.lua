@@ -381,7 +381,7 @@ function LayStructures:GetPositionForStructure(player)
     end
 
     
-    // If it hits something, position on this surface (must be the world or another structure)
+    -- If it hits something, position on this surface (must be the world or another structure)
     if trace.fraction < 1 then
         
         foundPositionInRange = true

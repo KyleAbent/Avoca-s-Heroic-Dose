@@ -73,11 +73,11 @@ function Contamination:OnInitialized()
         self:SetCoords( coords )
         
         self:AddTimedCallback( TimeUp, GetLifeSpan(self) )
-       //  self:DoYourBusiness()
-     //  self:AddTimedCallback(Contamination.DoYourBusiness, GetLifeSpan(self) / 4 )
-     //   if not GetWhereIsInSiege(self:GetOrigin()) then 
+       --  self:DoYourBusiness()
+     --  self:AddTimedCallback(Contamination.DoYourBusiness, GetLifeSpan(self) / 4 )
+     --   if not GetWhereIsInSiege(self:GetOrigin()) then 
        -- self:AddTimedCallback( SpewBile, 1 ) 
-        //end
+        --end
         
     elseif Client then
     

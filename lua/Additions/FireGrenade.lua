@@ -72,9 +72,9 @@ function FireGrenade:ProcessNearMiss( targetHit, endPoint )
 end 
     function FireGrenade:ProcessHit(targetHit, surface, normal, endPoint )
 
-       //if self:GetVelocity():GetLength() > 2 then
+       --if self:GetVelocity():GetLength() > 2 then
            self:ReleaseGas()
-      //  end
+      --  end
         
     end
 if Client then
@@ -113,7 +113,7 @@ elseif Server then
         
         end
         
-        return false // one time
+        return false -- one time
     
     end
 end

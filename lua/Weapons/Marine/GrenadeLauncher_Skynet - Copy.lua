@@ -4,7 +4,7 @@
 --
 --    Created by:   Andreas Urwalek (andi@unknownworlds.com)
 --
--- ========= For more information, visit us at http://www.unknownworlds.com =====================
+-- ========= For more information, visit us at http:--www.unknownworlds.com =====================
 
 Script.Load("lua/Balance.lua")
 Script.Load("lua/Weapons/Marine/ClipWeapon.lua")

@@ -114,10 +114,10 @@ function Crag:OnUpdate(deltaTime)
             Print("Crag.kHealWaveAmount is %s", Crag.kHealRadius)
            Crag.kMaxTargets = 3 * bonus + 3
             Print("Crag.kMaxTargets is %s", Crag.kHealRadius)
-          // Crag.kThinkInterval = .25 
-          // Crag.kHealInterval = 2
-         //  Crag.kHealEffectInterval = 1
-          // Crag.kHealWaveDuration = 8
+          -- Crag.kThinkInterval = .25 
+          -- Crag.kHealInterval = 2
+         --  Crag.kHealEffectInterval = 1
+          -- Crag.kHealWaveDuration = 8
            Crag.kHealPercentage = 0.06 * bonus + 0.06
             Print("Crag.kHealPercentage is %s", Crag.kHealRadius)
            Crag.kMinHeal = 10 * bonus + 10

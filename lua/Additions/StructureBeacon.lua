@@ -96,5 +96,5 @@ return self:GetIsAlive()
          function StructureBeacon:OnDestroy()
         ScriptActor.OnDestroy(self)
          end 
-end //
+end --
 Shared.LinkClassToMap("StructureBeacon", StructureBeacon.kMapName, networkVars)

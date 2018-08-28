@@ -21,7 +21,7 @@ if Server then
     
         CommanderAbility.OnInitialized(self)
         
-        // never show for marine commander
+        -- never show for marine commander
         local mask = bit.bor(kRelevantToTeam1Unit, kRelevantToTeam2Unit, kRelevantToReadyRoom, kRelevantToTeam2Commander)
         self:SetExcludeRelevancyMask(mask)
         
@@ -34,9 +34,9 @@ end
 function CommVortex:Perform()
 
     self.success = false
-    local boolean = false //GetConductor():GetIsPhaseOneBoolean() //GetWhereIsInSiege(self:GetOrigin())
+    local boolean = false --GetConductor():GetIsPhaseOneBoolean() --GetWhereIsInSiege(self:GetOrigin())
     local range =  CommVortex.kSearchRange -- ConditionalValue(boolean, CommVortex.kSearchRange /2, CommVortex.kSearchRange )
-   // local entities = GetEntitiesWithMixinForTeamWithinRange("VortexAble", 1, self:GetOrigin(), range)
+   -- local entities = GetEntitiesWithMixinForTeamWithinRange("VortexAble", 1, self:GetOrigin(), range)
     local entities = GetEntitiesWithinRange("ARC", self:GetOrigin(), range)
     local duration = 6 --ConditionalValue(boolean, 3, 6)
     for index, entity in ipairs(entities) do    

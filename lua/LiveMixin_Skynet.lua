@@ -32,7 +32,7 @@ function LiveMixin:Kill(attacker, doer, point, direction)
             --Hunger
             
       if self:GetTeamNumber() == 1 then 
-      //   if self:isa("Player")  then
+      --   if self:isa("Player")  then
           /*
               if attacker and attacker:isa("Alien") and attacker:isa("Player") and GetHasHungerUpgrade(attacker) then
                   local duration = 6
@@ -44,11 +44,11 @@ function LiveMixin:Kill(attacker, doer, point, direction)
           attacker:AddEnergy(attacker:GetMaxEnergy() * .10 )
           attacker:AddHealth(attacker:GetHealth() * (10/100))
           */
-        //end
-     // elseif
-        //Default
+        --end
+     -- elseif
+        --Default
         if ( HasMixin(self, "Construct") or self:isa("ARC") or self:isa("MAC") ) and attacker and attacker:isa("Player") then 
-              //if GetHasHungerUpgrade(attacker) and attacker:isa("Gorge") and doer:isa("DotMarker") then 
+              --if GetHasHungerUpgrade(attacker) and attacker:isa("Gorge") and doer:isa("DotMarker") then 
                 if attacker:isa("Gorge") and doer:isa("DotMarker") then 
                         attacker:TriggerEnzyme(5)
                         attacker:AddEnergy(30)

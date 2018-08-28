@@ -1,5 +1,5 @@
 function Armory:GetMinRangeAC()
-return 16 
+return 16 /2
 end
 
 

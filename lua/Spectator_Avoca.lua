@@ -1,5 +1,5 @@
 --Kyle 'Avoca' Abent 
-//Well I am copying everything, you know. But I like my name cause it's a good one.
+--Well I am copying everything, you know. But I like my name cause it's a good one.
 local networkVars = 
 
 {
@@ -41,7 +41,7 @@ end
 function AvocaSpectator:BreakChains()
   self.lockedId = Entity.invalidI 
 end
-function AvocaSpectator:LockAngles()//if cam then look for lock
+function AvocaSpectator:LockAngles()--if cam then look for lock
   local playerOfLock = Shared.GetEntity( self.lockedId ) 
     if playerOfLock ~= nil then
             if (playerOfLock.GetIsAlive and playerOfLock:GetIsAlive())  then
@@ -90,14 +90,14 @@ end
 function AvocaSpectator:OverrideInput(input)
 
     ClampInputPitch(input)
-     //Attempts of Zooming in when outside radius
+     --Attempts of Zooming in when outside radius
           if  self.lockedId ~= Entity.invalidI then
             local target = Shared.GetEntity( self.lockedId ) 
               if target and  ( target.GetIsAlive and target:GetIsAlive() ) then
                  if  HasMixin(target, "Construct")  or target:isa("Contamination") then input.move.x = input.move.x + 0.15 end
                  local distance = self:GetDistance(target)
                  if distance >= GetCDistance(target) then
-                    //  Print("Distance %s lastzoom %s", distance, self.lastzoom) //debug my ass
+                    --  Print("Distance %s lastzoom %s", distance, self.lastzoom) --debug my ass
                       input.move.z = input.move.z + 0.5
                       local ymove = 0
                       local myY = self:GetOrigin().y
@@ -113,7 +113,7 @@ function AvocaSpectator:OverrideInput(input)
                        input.move.y = input.move.y + (ymove) 
                    elseif distance <= 1.8 then
                    input.move.z = input.move.z - 1
-                     // Print(" new distance is %s, new lastzoom is %s", distance, self.lastzoom)
+                     -- Print(" new distance is %s, new lastzoom is %s", distance, self.lastzoom)
                  end
               end
           
@@ -124,7 +124,7 @@ function AvocaSpectator:OverrideInput(input)
 end
 function AvocaSpectator:UpdateCamera()
          self:LockAngles()
-        //  Print(self.lastswitch,  " ", self.nextangle )
+        --  Print(self.lastswitch,  " ", self.nextangle )
          if GetIsTimeUp(self.lastswitch, self.nextangle ) then
              Print("AvocaSpectator ChangeView")
               self.nextangle = math.random(4,8)

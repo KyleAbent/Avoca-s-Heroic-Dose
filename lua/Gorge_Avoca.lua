@@ -16,7 +16,7 @@ local kNormalWallWalkRange = 0.3
 local kJumpWallRange = 0.4
 local kJumpWallFeelerSize = 0.1
 local kWallJumpInterval = 0.4
-local kWallJumpForce = 5.2 // scales down the faster you are
+local kWallJumpForce = 5.2 -- scales down the faster you are
 local kMinWallJumpForce = 0.1
 local kVerticalWallJumpForce = 4.3
 
@@ -82,7 +82,7 @@ local function PredictGoal(self, velocity)
 
 end
 
-// Handle transitions between starting-sliding, sliding, and ending-sliding
+-- Handle transitions between starting-sliding, sliding, and ending-sliding
 local function UpdateGorgeSliding(self, input)
 
     PROFILE("Gorge:UpdateGorgeSliding")
@@ -117,7 +117,7 @@ local function UpdateGorgeSliding(self, input)
     
     end
 
-    // Have Gorge lean into turns depending on input. He leans more at higher rates of speed.
+    -- Have Gorge lean into turns depending on input. He leans more at higher rates of speed.
     if self:GetIsBellySliding() then
 
         local desiredBellyYaw = 2 * (-input.move.x / kSlidingMoveInputScalar) * (self:GetVelocity():GetLength() / self:GetMaxSpeed())
@@ -147,7 +147,7 @@ function Gorge:ModifyJump(input, velocity, jumpVelocity)
     
         local direction = input.move.z == -1 and -1 or 1
     
-        // we add the bonus in the direction the move is going
+        -- we add the bonus in the direction the move is going
         local viewCoords = self:GetViewAngles():GetCoords()
         self.bonusVec = viewCoords.zAxis * direction
         self.bonusVec.y = 0
@@ -199,7 +199,7 @@ end
 function Gorge:GetHeadAngles()
 
     if self:GetIsWallWalking() then
-        // When wallwalking, the angle of the body and the angle of the head is very different
+        -- When wallwalking, the angle of the body and the angle of the head is very different
         return self:GetViewAngles()
     else
         return self:GetViewAngles()
@@ -251,8 +251,8 @@ function Gorge:PreUpdateMove(input, runningPrediction)
 
     if self.wallWalking then
 
-        // Most of the time, it returns a fraction of 0, which means
-        // trace started outside the world (and no normal is returned)           
+        -- Most of the time, it returns a fraction of 0, which means
+        -- trace started outside the world (and no normal is returned)           
         local goal = self:GetAverageWallWalkingNormal(kNormalWallWalkRange, kNormalWallWalkFeelerSize)
         if goal ~= nil then 
         
@@ -267,14 +267,14 @@ function Gorge:PreUpdateMove(input, runningPrediction)
     end
     
     if not self:GetIsWallWalking() then
-        // When not wall walking, the goal is always directly up (running on ground).
+        -- When not wall walking, the goal is always directly up (running on ground).
         self.wallWalkingNormalGoal = Vector.yAxis
     end
 
 
-  //  if self.leaping and Shared.GetTime() > self.timeOfLeap + kLeapTime then
-  //      self.leaping = false
-  //  end
+  --  if self.leaping and Shared.GetTime() > self.timeOfLeap + kLeapTime then
+  --      self.leaping = false
+  --  end
     
     self.currentWallWalkingAngles = self:GetAnglesFromWallNormal(self.wallWalkingNormalGoal or Vector.yAxis) or self.currentWallWalkingAngles
 

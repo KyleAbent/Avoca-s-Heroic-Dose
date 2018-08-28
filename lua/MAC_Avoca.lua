@@ -60,9 +60,9 @@ end
 function MAC:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
     if hitPoint ~= nil and doer ~= nil and self:GetIsAvoca() then
-      // if GetConductor():GetIsPhaseTwoBoolean() then
+      -- if GetConductor():GetIsPhaseTwoBoolean() then
         damageTable.damage = damageTable.damage * 0.25
-        //end
+        --end
     end
 
 end

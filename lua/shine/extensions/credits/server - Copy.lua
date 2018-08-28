@@ -21,10 +21,10 @@ Shine.LinkFile = {}
 Shine.BadgeFile = {}
 Plugin.Version = "911"
 
-local CreditsPath = "config://shine/plugins/credits.json"
-local URLPath = "config://shine/CreditsLink.json"
---local BadgeURLPath = "config://shine/BadgesLink.json"
-local BadgesPath = "config://shine/UserConfig.json"
+local CreditsPath = "config:--shine/plugins/credits.json"
+local URLPath = "config:--shine/CreditsLink.json"
+--local BadgeURLPath = "config:--shine/BadgesLink.json"
+local BadgesPath = "config:--shine/UserConfig.json"
 
 
 Shine.Hook.SetupClassHook( "ScoringMixin", "AddScore", "OnScore", "PassivePost" )
@@ -97,7 +97,7 @@ return
 end
 player:SetResources( player:GetResources() - CreditCost)
 --self.CreditUsers[ Client ] = self:GetPlayerSandInfo(Client) - CreditCost
-//self:NotifySand( nil, "%s purchased a %s with %s credit(s)", true, Player:GetName(), String, CreditCost)
+--self:NotifySand( nil, "%s purchased a %s with %s credit(s)", true, Player:GetName(), String, CreditCost)
 player:GiveItem(NutrientMist.kMapName)
   -- Shine.ScreenText.SetText("Sand", string.format( "%s Sand", self:GetPlayerSandInfo(Client) ), Client) 
    self.BuyUsersTimer[Client] = Shared.GetTime() + 3 
@@ -149,7 +149,7 @@ if limitMod == true then limit = 8 end
         if entity:GetMapName() == mapname and entity:GetOwner() == Player and GetIsOriginInHiveRoom( entity:GetOrigin() ) then entitycount = entitycount + 1 table.insert(entities, entity) end 
     end
     
-     //             <
+     --             <
     if entitycount ~= limit then return false end
      return true
 end
@@ -161,7 +161,7 @@ if limitMod == true then limit = 8 end
         if entity:GetMapName() == mapname and entity:GetOwner() == Player and not GetIsOriginInHiveRoom( entity:GetOrigin() )  then entitycount = entitycount + 1 table.insert(entities, entity) end 
     end
     
-     //             <
+     --             <
     if entitycount ~= limit then return false end
      return true
 end
@@ -333,7 +333,7 @@ function Plugin:JoinTeam( Gamerules, Player, NewTeam, Force )
 end
 
 function Plugin:DestroyAllSandStructFor(Client)
-//Intention: Kill Sand Structures if client f4s, otherwise 'limit' becomes nil and infinite 
+--Intention: Kill Sand Structures if client f4s, otherwise 'limit' becomes nil and infinite 
 local Player = Client:GetControllingPlayer()
         for index, entity in ipairs(GetEntitiesWithMixinForTeam("Sand", Player:GetTeamNumber())) do
         if entity:GetIsACreditStructure() and not entity:isa("Commander") and not entity:isa("AdvancedArmory") and not (entity.GetIsResearching and entity:GetIsResearching() ) and entity:GetOwner() == Player then entity:Kill() end 
@@ -357,7 +357,7 @@ function Plugin:GetPlayerSandInfo(Client)
 return math.round(Credits, 2)
 end
 local function GetIDFromClient( Client )
-	return Shine.IsType( Client, "number" ) and Client or ( Client.GetUserId and Client:GetUserId() ) // or nil //or nil was blocked but im testin
+	return Shine.IsType( Client, "number" ) and Client or ( Client.GetUserId and Client:GetUserId() ) -- or nil --or nil was blocked but im testin
  end
   function Plugin:GetBadgeData(Client)
   if not self.BadgeData then return nil end
@@ -435,7 +435,7 @@ function Plugin:SaveAllCredits()
                --  end)
                  
                  self:SimpleTimer( 14, function() 
-                 self:NotifySand( nil, "http://credits.ns2siege.com - credit ranking updated", true)
+                 self:NotifySand( nil, "http:--credits.ns2siege.com - credit ranking updated", true)
                  end)        
                  
 
@@ -487,7 +487,7 @@ function Plugin:SetGameState( Gamerules, State, OldState )
               local Player = Players[ i ]
                   if Player then
                   self.PlayerSpentAmount[Player:GetClient()] = 0
-                  //Shine.ScreenText.Add( "Credits", {X = 0.20, Y = 0.95,Text = "Loading Credits...",Duration = 1800,R = 255, G = 0, B = 0,Alignment = 0,Size = 3,FadeIn = 0,}, Player )
+                  --Shine.ScreenText.Add( "Credits", {X = 0.20, Y = 0.95,Text = "Loading Credits...",Duration = 1800,R = 255, G = 0, B = 0,Alignment = 0,Size = 3,FadeIn = 0,}, Player )
                   Shine.ScreenText.Add( "Sand", {X = 0.20, Y = 0.95,Text = string.format( "%s Sand", self:GetPlayerSandInfo(Player:GetClient()) ),Duration = 1800,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 3,FadeIn = 0,}, Player:GetClient() )
                   end
               end
@@ -504,7 +504,7 @@ function Plugin:SetGameState( Gamerules, State, OldState )
               for i = 1, #Players do
               local Player = Players[ i ]
                   if Player then
-                 // self:SaveCredits(Player:GetClient())
+                 -- self:SaveCredits(Player:GetClient())
                      if Player:GetTeamNumber() == 1 or Player:GetTeamNumber() == 2 then
                     Shine.ScreenText.Add( 80, {X = 0.40, Y = 0.15,Text = "Total Sand Mined:".. math.round((Player:GetScore()  + ConditionalValue(Player:GetTeamNumber() == 1, self.marinebonus, self.alienbonus)), 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,}, Player )
                     Shine.ScreenText.Add( 81, {X = 0.40, Y = 0.20,Text = "Total Sand Spent:".. self.PlayerSpentAmount[Player:GetClient()], Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,}, Player )
@@ -521,21 +521,21 @@ function Plugin:SetGameState( Gamerules, State, OldState )
             end)
             
             
-           //   local Time = Shared.GetTime()
-          //   if not Time > kMaxServerAgeBeforeMapChange then
+           --   local Time = Shared.GetTime()
+          --   if not Time > kMaxServerAgeBeforeMapChange then
                  self:SimpleTimer( 25, function() 
                --  self:LoadBadges()
                  end)
        
 
-    //  self:SimpleTimer(3, function ()    
-    //  Shine.ScreenText.Add( 82, {X = 0.40, Y = 0.10,Text = "End of round Stats:",Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
-    // Shine.ScreenText.Add( 83, {X = 0.40, Y = 0.25,Text = "(Server Wide)Total Credits Earned:".. math.round((self.marinecredits + self.aliencredits), 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
-    //  Shine.ScreenText.Add( 84, {X = 0.40, Y = 0.25,Text = "(Marine)Total Credits Earned:".. math.round(self.marinecredits, 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
-    //  Shine.ScreenText.Add( 85, {X = 0.40, Y = 0.30,Text = "(Alien)Total Credits Earned:".. math.round(self.aliencredits, 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
-    //  Shine.ScreenText.Add( 86, {X = 0.40, Y = 0.35,Text = "(Marine)Total Credits Spent:".. math.round(self.MarineTotalSpent, 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
-    //  Shine.ScreenText.Add( 87, {X = 0.40, Y = 0.40,Text = "(Alien)Total Credits Spent:".. math.round(self.AlienTotalSpent, 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
-  //    end)
+    --  self:SimpleTimer(3, function ()    
+    --  Shine.ScreenText.Add( 82, {X = 0.40, Y = 0.10,Text = "End of round Stats:",Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
+    -- Shine.ScreenText.Add( 83, {X = 0.40, Y = 0.25,Text = "(Server Wide)Total Credits Earned:".. math.round((self.marinecredits + self.aliencredits), 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
+    --  Shine.ScreenText.Add( 84, {X = 0.40, Y = 0.25,Text = "(Marine)Total Credits Earned:".. math.round(self.marinecredits, 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
+    --  Shine.ScreenText.Add( 85, {X = 0.40, Y = 0.30,Text = "(Alien)Total Credits Earned:".. math.round(self.aliencredits, 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
+    --  Shine.ScreenText.Add( 86, {X = 0.40, Y = 0.35,Text = "(Marine)Total Credits Spent:".. math.round(self.MarineTotalSpent, 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
+    --  Shine.ScreenText.Add( 87, {X = 0.40, Y = 0.40,Text = "(Alien)Total Credits Spent:".. math.round(self.AlienTotalSpent, 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,} )
+  --    end)
   end
      
 end
@@ -1029,7 +1029,7 @@ if Player:GetTeamNumber() == 1 then
 elseif Player:GetTeamNumber() == 2 then
 reqground = false
   mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid  = TeamTwoBuyRules(self, Client, Player, String, isSand)
-end // end of team numbers
+end -- end of team numbers
 
 if mapnameof and ( not FirstCheckRulesHere(self, Client, Player, String, CreditCost, true, isSand ) == true ) then
  PerformBuy(self, Client, String, Player, CreditCost, true, reqground,reqpathing, true, delay, mapnameof, limit, techid, isSand) 

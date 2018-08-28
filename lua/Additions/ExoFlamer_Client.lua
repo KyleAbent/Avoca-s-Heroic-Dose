@@ -88,7 +88,7 @@ local function UpdateSound(self)
             end
             
         else
-            //Print("Flamethrower:OnUpdate(): Couldn't find sound ent on client")
+            --Print("Flamethrower:OnUpdate(): Couldn't find sound ent on client")
         end
             
         self.lastYaw = yaw

@@ -8,7 +8,7 @@ self.Enabled = true
 return true
 end
 
-function Plugin:SetupAdminMenuCommands() // might not work
+function Plugin:SetupAdminMenuCommands() -- might not work
 local Category = "Siege Commands"
 self:AddAdminMenuCommand( Category, "Random RR", "sh_randomrr", false, nil, "randomize's the ready room" )
 self:AddAdminMenuCommand( Category, "Give",    "sh_give",    true, {
@@ -40,17 +40,17 @@ self:AddAdminMenuCommand( Category, "Construct", "sh_construct", false, nil, "Co
 self:AddAdminMenuCommand( Category, "DeConstruct", "sh_deconstruct", false, nil, "DeConstruct's any structure within small & close eye sight radius." )
 self:AddAdminMenuCommand( Category, "Respawn", "sh_respawn", true, nil, "Respawn's selected player(s)" )
 self:AddAdminMenuCommand( Category, "Stalemate", "sh_stalemate", false, nil, "Declares the round a draw." )
-//" 
+--" 
 end
 
-//Shine.VoteMenu:EditPage( "Main", function( self )
-    //self:AddSideButton( "Change Camera", ChangeCamera)
-    //end _
-  //  self:AddSideButton( "3rdperson", function(ThirdPerson)
-   // end)
-   // self:AddSideButton( "1stperson", function(FirstPerson)
-   // end) 
-//end) 
+--Shine.VoteMenu:EditPage( "Main", function( self )
+    --self:AddSideButton( "Change Camera", ChangeCamera)
+    --end _
+  --  self:AddSideButton( "3rdperson", function(ThirdPerson)
+   -- end)
+   -- self:AddSideButton( "1stperson", function(FirstPerson)
+   -- end) 
+--end) 
 
 
 Shine:RegisterExtension( "siegemodcommands", Plugin )

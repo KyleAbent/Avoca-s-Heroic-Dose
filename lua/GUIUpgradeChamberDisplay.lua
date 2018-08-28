@@ -6,7 +6,7 @@
 --
 -- Created by Andreas Urwalek (andi@unknownworlds.com)
 --
--- ========= For more information, visit us at http://www.unknownworlds.com =====================
+-- ========= For more information, visit us at http:--www.unknownworlds.com =====================
 
 Script.Load("lua/Globals.lua")
 Script.Load("lua/GUIScript.lua")

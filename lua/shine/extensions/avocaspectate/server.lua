@@ -75,7 +75,7 @@ local choices = {}
 --commandstructure if in combat
 --alive power node in combat
 --egg or structure beacon
-//local interesting = nil //GetLocationWithMostMixedPlayers()
+
 //if interesting ~= nil then table.insert(choices,interesting) end
            
                      for index, camera in ientitylist(Shared.GetEntitiesWithClassname("DirectorCamera")) do
@@ -122,8 +122,7 @@ end
  local function GetViewTwo()
 
 local choices = {}
-//local interesting = GetLocationWithMostMixedPlayers()
-//if interesting ~= nil then table.insert(choices,interesting) end
+
             
                                  for index, camera in ientitylist(Shared.GetEntitiesWithClassname("DirectorCamera")) do
                    table.insert(choices, camera) //should be random not first. always will go to same first. argh. NM no break lol

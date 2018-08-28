@@ -29,7 +29,7 @@ local origInit = ARC.OnInitialized
 
 function ARC:OnInitialized()
     origInit(self)
-    // self:AddTimedCallback(ARC.Instruct, 2.5)
+    -- self:AddTimedCallback(ARC.Instruct, 2.5)
     
     
 
@@ -419,7 +419,7 @@ end
     
 
 
-end//server
+end--server
 
 /*
 function ARC:GetUnitNameOverride(viewer)
@@ -459,14 +459,14 @@ if Client then
                 if self.hallucinationMaterial then
                     RemoveMaterial(model, self.hallucinationMaterial)
                     self.hallucinationMaterial = nil
-                end//
+                end--
                 
                 self:SetOpacity(1, "hallucination")
             
-            end //showma
+            end --showma
             
-        end//omodel
-end //up render
+        end--omodel
+end --up render
 end -- client
 
 

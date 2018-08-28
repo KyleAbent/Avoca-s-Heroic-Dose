@@ -1,5 +1,5 @@
 --Change grenade type by right clicking and display to player which is setting before primary clicking. 
---One day on the workshop by another author. Idea by TriggerHappy Stoner && Transcribed by Avoca // Siege Developer
+--One day on the workshop by another author. Idea by TriggerHappy Stoner && Transcribed by Avoca -- Siege Developer
 
 local networkVars = 
 
@@ -41,7 +41,7 @@ function Grenade:Detonate()
     end
 end
 
-end//server
+end--server
 
 
 Shared.LinkClassToMap("Grenade", Grenade.kMapName, networkVars)

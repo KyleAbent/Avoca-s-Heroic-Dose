@@ -115,7 +115,7 @@ local function Stalemate( Client )
 local Gamerules = GetGamerules()
 if not Gamerules then return end
 Gamerules:DrawGame()
-//Shine:Notify( Client, "end the game." )
+--Shine:Notify( Client, "end the game." )
 end 
 
 local StalemateCommand = self:BindCommand( "sh_stalemate", "stalemate", Stalemate )
@@ -145,7 +145,7 @@ OpenCommand:Help( "Opens <type> doors (Front/Side/Siege) (not case sensitive) - 
 local function ThirdPerson( Client )
 local Player = Client:GetControllingPlayer()
 if not Player or not HasMixin( Player, "CameraHolder" ) then return end
-Player:SetCameraDistance(3) //* ConditionalValue(not Player:isa("ReadyRoomPlayer") and Player.modelsize > 1, Player.modelsize * .5, 1))
+Player:SetCameraDistance(3) --* ConditionalValue(not Player:isa("ReadyRoomPlayer") and Player.modelsize > 1, Player.modelsize * .5, 1))
 end
 
 local ThirdPersonCommand = self:BindCommand( "sh_thirdperson", { "thirdperson", "3rdperson" }, ThirdPerson, true)
@@ -171,41 +171,41 @@ MainRoomCommand:Help( "selects main room" )
 local function GiveRes( Client, TargetClient, Number )
 local Giver = Client:GetControllingPlayer()
 local Reciever = TargetClient:GetControllingPlayer()
-//local TargetName = TargetClient:GetName()
- //Only apply this formula to pres non commanders // If trying to give a number beyond the amount currently owned in pres, do not continue. Or If the reciever already has 100 resources then do not bother taking resources from the giver
+--local TargetName = TargetClient:GetName()
+ --Only apply this formula to pres non commanders -- If trying to give a number beyond the amount currently owned in pres, do not continue. Or If the reciever already has 100 resources then do not bother taking resources from the giver
   if Giver:GetTeamNumber() ~= Reciever:GetTeamNumber() or Giver:isa("Commander") or Reciever:isa("Commander") or Number > Giver:GetResources() or Reciever:GetResources() == 100 then
   self:NotifyGiveRes( Giver, "Unable to donate any amount of resources to %s", true, Reciever:GetName())
  return end 
 
  
-            //If giving res to a person and that total amount exceeds 100. Only give what can fit before maxing to 100, and not waste the rest.
-            if Reciever:GetResources() + Number > 100 then // for example 80 + 30 = 110
-            local GiveBack = 0 //introduce x
-            GiveBack = Reciever:GetResources() + Number // x = 80 + 30 (110)
-            GiveBack = GiveBack - 100  // 110 = 110 - 100 (10)
-            Giver:SetResources(Giver:GetResources () - Number + GiveBack) // Sets resources to the value wanting to donate + the portion to give back that's above 100
+            --If giving res to a person and that total amount exceeds 100. Only give what can fit before maxing to 100, and not waste the rest.
+            if Reciever:GetResources() + Number > 100 then -- for example 80 + 30 = 110
+            local GiveBack = 0 --introduce x
+            GiveBack = Reciever:GetResources() + Number -- x = 80 + 30 (110)
+            GiveBack = GiveBack - 100  -- 110 = 110 - 100 (10)
+            Giver:SetResources(Giver:GetResources () - Number + GiveBack) -- Sets resources to the value wanting to donate + the portion to give back that's above 100
             local Show = Number - GiveBack
-            Reciever:SetResources(100) // Set res to 100 anyway because the check above says if getres + num > 100. Therefore it would be 100 anyway.
+            Reciever:SetResources(100) -- Set res to 100 anyway because the check above says if getres + num > 100. Therefore it would be 100 anyway.
               self:NotifyGiveRes( Giver, "%s has reached 100 res, therefore you've only donated %s resource(s)", true, Reciever:GetName(), Show)
               self:NotifyGiveRes( Reciever, "%s donated %s resource(s) to you", true, Giver:GetName(), Show)
-            return //prevent from going through the process of handing out res again down below(?)
+            return --prevent from going through the process of handing out res again down below(?)
             end
-            ////
- //Otherwise if the giver has the amount to give, and the reciever amount does not go beyond 100, complete the trade. (pres)     
- //Shine:Notify(Client, Number, TargetClient, "Successfully donated %s resource(s) to %s", nil)
+            ----
+ --Otherwise if the giver has the amount to give, and the reciever amount does not go beyond 100, complete the trade. (pres)     
+ --Shine:Notify(Client, Number, TargetClient, "Successfully donated %s resource(s) to %s", nil)
 Giver:SetResources(Giver:GetResources() - Number)
 Reciever:SetResources(Reciever:GetResources() + Number)
 self:NotifyGiveRes( Giver, "Succesfully donated %s resource(s) to %s", true, Number, Reciever:GetName())
 self:NotifyGiveRes( Reciever, "%s donated %s resource(s) to you", true, Giver:GetName(), Number)
-//Notify(StringFormat("[GiveRes] Succesfully donated %s resource(s) to %s.",  Number, TargetName) )
+--Notify(StringFormat("[GiveRes] Succesfully donated %s resource(s) to %s.",  Number, TargetName) )
 
 
-//Now for some fun and to expand on the potential of giveres within ns2 that ns1 did not reach?
-//In particular, team res and commanders. 
+--Now for some fun and to expand on the potential of giveres within ns2 that ns1 did not reach?
+--In particular, team res and commanders. 
 
-//If the giver is a commander to a recieving teammate then take the resources out of team resources rather than personal.
+--If the giver is a commander to a recieving teammate then take the resources out of team resources rather than personal.
 
-//if Giver:GetTeamNumber() == Reciever:GetTeamNumber() and Giver:isa(Commander) then
+--if Giver:GetTeamNumber() == Reciever:GetTeamNumber() and Giver:isa(Commander) then
 end
 
 local GiveResCommand = self:BindCommand( "sh_giveres", "giveres", GiveRes, true)
@@ -260,16 +260,16 @@ for i = 1, #Targets do
 local Derp = Targets[ i ]:GetControllingPlayer()
  local client = Derp:GetClient()
  local Player = client:GetControllingPlayer()
-      // local playervar = nil
-      // if Player.String then playervar = Player.String end
-         //  if playervar and Setting then
-          // playervar = Setting
+      -- local playervar = nil
+      -- if Player.String then playervar = Player.String end
+         --  if playervar and Setting then
+          -- playervar = Setting
           Player.String = Setting
            self:NotifyGeneric( nil, "Changed %s networkvar %s to value %s", true, Player:GetName(), String, Setting)
-         //  elseif playervar and Number then
-         //  playervar = Number
-       //    self:NotifyGeneric( nil, "Changed networkvar %s to value %s", true, playervar, Number)
-     //      end
+         --  elseif playervar and Number then
+         --  playervar = Number
+       --    self:NotifyGeneric( nil, "Changed networkvar %s to value %s", true, playervar, Number)
+     --      end
 end
 end
 
@@ -277,7 +277,7 @@ local NetworkVarCommand = self:BindCommand( "sh_nvar", "nvar", NetworkVar )
 NetworkVarCommand:AddParam{ Type = "clients" }
 NetworkVarCommand:AddParam{ Type = "string" }
 NetworkVarCommand:AddParam{ Type = "string" }
-//NetworkVarCommand:AddParam{ Type = "number", Optional = true }
+--NetworkVarCommand:AddParam{ Type = "number", Optional = true }
 NetworkVarCommand:Help( "<player> " )
 */
 local function Cyst( Client, Targets )
@@ -295,7 +295,7 @@ CystCommand:AddParam{ Type = "clients" }
 CystCommand:Help( "<player> Give cyst to player(s)" )
 
 local function SlapBomb( Client, Targets, Number )
-//local Giver = Client:GetControllingPlayer()
+--local Giver = Client:GetControllingPlayer()
 for i = 1, #Targets do
 local Player = Targets[ i ]:GetControllingPlayer()
        if Player and Player:GetIsAlive() and not Player:isa("Commander") then
@@ -342,9 +342,9 @@ ConstructCommand:Help ("Be close to the structure and use this to construct it")
 local function Destroy( Client, String, StringTwo  )
         local player = Client:GetControllingPlayer()
         for _, entity in ipairs( GetEntitiesWithMixin( "Live" ) ) do
-       // self:NotifyGeneric( Client, "Entities on map %s", true, entity:GetMapName())
+       -- self:NotifyGeneric( Client, "Entities on map %s", true, entity:GetMapName())
             if string.find(entity:GetMapName(), String) and entity.GetLocationName then
-         //   self:NotifyGeneric( Client, "Matching entities with string #1 and string#2(location name): %s, %s", true, entity:GetMapName(), String)
+         --   self:NotifyGeneric( Client, "Matching entities with string #1 and string#2(location name): %s, %s", true, entity:GetMapName(), String)
                 if string.find(entity:GetLocationName(), StringTwo) then
                   self:NotifyGeneric( nil, "destroyed %s in %s", true, entity:GetMapName(), entity:GetLocationName())
                   DestroyEntity(entity) 
@@ -379,7 +379,7 @@ local function PlayerGravity( Client, Targets, Number )
               self:NotifyGeneric( nil, "Adjusted %s players gravity to %s", true, Player:GetName(), Number)
               Player.gravity = Number
              end
-//Glitchy way. There's resistance in the first person camera, to this. Perhaps try hooking with shine and changing that way, instead.
+--Glitchy way. There's resistance in the first person camera, to this. Perhaps try hooking with shine and changing that way, instead.
      end
 end
 
@@ -391,7 +391,7 @@ PlayerGravityCommand:Help( "sh_playergravity <player> <number> works differently
 local function BuildSpeed( Client, Number )
 
 kDynamicBuildSpeed = Number
-//self:NotifySiege( nil, "Adjusted Marine Construct Speed to %s percent (1 - (marineplayercount/12) + 1)", true, Number * 100)
+--self:NotifySiege( nil, "Adjusted Marine Construct Speed to %s percent (1 - (marineplayercount/12) + 1)", true, Number * 100)
 end
 
 local BuildSpeedCommand = self:BindCommand( "sh_buildspeed", "buildspeed", BuildSpeed )
@@ -405,13 +405,13 @@ local function ModelSize( Client, Targets, Number )
     for i = 1, #Targets do
     local Player = Targets[ i ]:GetControllingPlayer()
             if not Player:isa("Commander") and not Player:isa("Spectator") and Player.modelsize and Player:GetIsAlive() then
-             //  if not ( Player:isa("Exo") or Player:isa("Onos") and Number >= 2 ) or Number ~= 1 then Player:SetCameraDistance(Number) end
+             --  if not ( Player:isa("Exo") or Player:isa("Onos") and Number >= 2 ) or Number ~= 1 then Player:SetCameraDistance(Number) end
                 Player.modelsize = Number
-             //  local defaulthealth = LookupTechData(Player:GetTechId(), kTechDataMaxHealth, 1)
-           //    Player:AdjustMaxHealth(defaulthealth * Number)
-           //     Player:AdjustMaxArmor(Player:GetMaxArmor() * Number)
+             --  local defaulthealth = LookupTechData(Player:GetTechId(), kTechDataMaxHealth, 1)
+           --    Player:AdjustMaxHealth(defaulthealth * Number)
+           --     Player:AdjustMaxArmor(Player:GetMaxArmor() * Number)
                 self.playersize[Player:GetClient()] = Number
-              //  self:NotifyGeneric( nil, "client modelsize set to %s", true, self.playersize[Player:GetClient()])
+              --  self:NotifyGeneric( nil, "client modelsize set to %s", true, self.playersize[Player:GetClient()])
              end
      end
 end
@@ -449,9 +449,9 @@ local function TeamSize( Client, Number, NumberTwo )
               local Player = Players[ i ]
                   if Player and Player:GetTeamNumber() == Number and not Player:isa("Commander") and not Player:isa("Spectator") and Player.modelsize then
                          Player.modelsize = NumberTwo
-                     //    local defaulthealth = LookupTechData(Player:GetTechId(), kTechDataMaxHealth, 1)
-                    //    Player:AdjustMaxHealth(defaulthealth * NumberTwo)
-                    //   Player:AdjustMaxArmor(Player:GetMaxArmor() * NumberTwo)
+                     --    local defaulthealth = LookupTechData(Player:GetTechId(), kTechDataMaxHealth, 1)
+                    --    Player:AdjustMaxHealth(defaulthealth * NumberTwo)
+                    --   Player:AdjustMaxArmor(Player:GetMaxArmor() * NumberTwo)
                        self.playersize[Player:GetClient()] = NumberTwo
                   end
               end
@@ -513,14 +513,14 @@ local function PlayerFriction( Client, Targets, Number )
     for i = 1, #Targets do
     local Player = Targets[ i ]:GetControllingPlayer()
             if not Player:isa("Commander") and Player:isa("Alien") or Player:isa("Marine") or Player:isa("ReadyRoomTeam") then
-               //Player:GetMixinConstants().kGravity = Number    
+               --Player:GetMixinConstants().kGravity = Number    
                function Player:GetFriction(input, velocity)
                local friction = Number
                local frictionScalar = 1
                return friction * frictionScalar
                end    
              end
-//Glitchy way. There's resistance in the first person camera, to this. Perhaps try hooking with shine and changing that way, instead.
+--Glitchy way. There's resistance in the first person camera, to this. Perhaps try hooking with shine and changing that way, instead.
      end
 end
 

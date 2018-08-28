@@ -1,19 +1,3 @@
-/*
-local orig = ConstructMixin.__initmixin
-function ConstructMixin:__initmixin() --Simple? -- Avoca -- Requires more in this formula. I love while more than onupdate or timedcallback or timer.
-   orig (self)
-   if self:isa("PowerPoint") or ( Server and GetGameRules() == nil or not GetGameRules():GetMapLoaded() ) then return end
-    if GetGameStarted() and  not GetSetupConcluded() then //and powered if marine or unpowered if alien
-           while(not GetSetupConcluded() and self.underConstruction == false and (self.timeLastConstruct == nil or self.timeLastConstruct > 4) and self.buildFraction < 0.9) do
-              self.timeLastConstruct = Shared.GetTime() //if is powered and marine then not ghost//
-              self:Construct(0.25, false) 
-              Print("HM")
-          end --while
-    end --setup
-end
-*/
-
-
 function ConstructMixin:SetIsACreditStructure(boolean)
     
 self.isacreditstructure = boolean
@@ -32,3 +16,36 @@ return self.isacreditstructure
  
 
 end
+
+
+if Server then
+
+
+function ConstructMixin:AdjustHPArmor()
+  if GetIsRoomPowerUp(self) then --if phase 1? or not phase 4?
+   local amthp =  self:isa("PowerPoint") and 25 or 100
+   local amtarmor =  self:isa("PowerPoint") and 5 or 25
+  if not self:GetIsInCombat() then self:AddHealth(amthp) self:AddArmor(amtarmor) end
+else
+  self:DeductHealth(100)  
+ end
+  return true//self:GetIsBuilt()
+end
+
+local orig consOn = ConstructMixin.OnConstructionComplete
+function ConstructMixin:OnConstructionComplete(builder)
+      consOn(self, builder)
+      if self:GetTeamNumber() == 1 then
+      self:AddTimedCallback(ConstructMixin.AdjustHPArmor, 4)
+      end
+end
+
+function ConstructMixin:OnUpdate(deltaTime)
+  if ( self.GetIsInCombat  ) and not self:GetIsInCombat() and not self:isa("PowerPoint") and self:GetTeamNumber() == 1 and not self:GetIsBuilt() and GetIsRoomPowerUp(self) then
+ -- Print("derp")
+  self:Construct(0.0125)
+  end
+end
+
+
+end//server

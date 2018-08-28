@@ -1,12 +1,12 @@
-// ======= Copyright (c) 2003-2012, Unknown Worlds Entertainment, Inc. All rights reserved. =====
-//
-// lua\GUIMinimap.lua
-//
-// Created by: Brian Cronin (brianc@unknownworlds.com)
-//
-// Manages displaying the minimap and icons on the minimap.
-//
-// ========= For more information, visit us at http://www.unknownworlds.com =====================
+-- ======= Copyright (c) 2003-2012, Unknown Worlds Entertainment, Inc. All rights reserved. =====
+--
+-- lua\GUIMinimap.lua
+--
+-- Created by: Brian Cronin (brianc@unknownworlds.com)
+--
+-- Manages displaying the minimap and icons on the minimap.
+--
+-- ========= For more information, visit us at http:--www.unknownworlds.com =====================
 
 Script.Load("lua/GUIMinimapConnection.lua")
 Script.Load("lua/MinimapMappableMixin.lua")
@@ -43,14 +43,14 @@ local kWaypointColor = Color(1, 1, 1, 1)
 local kEtherealGateColor = Color(0.8, 0.6, 1, 1)
 local kOverviewColor = Color(1, 1, 1, 0.85)
 
-// colors are defined in the dds
+-- colors are defined in the dds
 local kTeamColors = { }
 kTeamColors[kMinimapBlipTeam.Friendly] = Color(1, 1, 1, 1)
 kTeamColors[kMinimapBlipTeam.Enemy] = Color(1, 0, 0, 1)
 kTeamColors[kMinimapBlipTeam.Neutral] = Color(1, 1, 1, 1)
 kTeamColors[kMinimapBlipTeam.Alien] = Color(127/255, 255/255, 0/255, 1)
 kTeamColors[kMinimapBlipTeam.Marine] = Color(0, 216/255, 1, 1)
-// steam friend colors
+-- steam friend colors
 kTeamColors[kMinimapBlipTeam.FriendAlien] = Color(1, 189/255, 111/255, 1)
 kTeamColors[kMinimapBlipTeam.FriendMarine] = Color(164/255, 241/255, 1, 1)
 
@@ -187,8 +187,8 @@ function GUIMinimap:PlotToMap(posX, posZ)
     local plottedX = (posX + self.plotToMapConstX) * self.plotToMapLinX
     local plottedY = (posZ + self.plotToMapConstY) * self.plotToMapLinY
     
-    // The world space is oriented differently from the GUI space, adjust for that here.
-    // Return 0 as the third parameter so the results can easily be added to a Vector.
+    -- The world space is oriented differently from the GUI space, adjust for that here.
+    -- Return 0 as the third parameter so the results can easily be added to a Vector.
     return plottedY, -plottedX, 0
     
 end
@@ -201,8 +201,8 @@ end
 
 function GUIMinimap:Initialize()
     
-    // we update the minimap at full rate, but internally we spread out the
-    // actual load of updating the map so we only do a little bit of work each frame
+    -- we update the minimap at full rate, but internally we spread out the
+    -- actual load of updating the map so we only do a little bit of work each frame
     self.updateInterval = kUpdateIntervalFull
    
     self.nextMiscUpdateInterval = 0
@@ -251,12 +251,12 @@ function GUIMinimap:Initialize()
     self.playerNameItems = {}
     self.playerNameItemsLookup = {}
     
-    self:SetScale(1) // Compute plot to map transformation
-    self:SetBlipScale(1) // Compute blipSizeTable
+    self:SetScale(1) -- Compute plot to map transformation
+    self:SetBlipScale(1) -- Compute blipSizeTable
     self.blipSizeTable[kBlipSizeType.Scan] = self.scanSize
     self.blipSizeTable[kBlipSizeType.HighlightWorld] = self.highlightWorldSize
     
-    // Initialize blip info lookup table
+    -- Initialize blip info lookup table
     local blipInfoTable = {}
     for blipType, _ in ipairs(kMinimapBlipType) do
         local blipInfo = kBlipInfo[blipType]
@@ -270,7 +270,7 @@ function GUIMinimap:Initialize()
     end
     self.blipInfoTable = blipInfoTable
     
-    // Generate blip color lookup table
+    -- Generate blip color lookup table
     local blipColorTable = {}
     for blipTeam, _ in ipairs(kMinimapBlipTeam) do
         local colorTable = {}
@@ -299,12 +299,12 @@ function GUIMinimap:Initialize()
     self.minimap:SetColor(kOverviewColor)
     self.background:AddChild(self.minimap)
     
-    // Used for commander / spectator.
+    -- Used for commander / spectator.
     self:InitializeCameraLines()
-    // Used for normal players.
+    -- Used for normal players.
     self:InitializePlayerIcon()
     
-    // initialize commander ping
+    -- initialize commander ping
     self.commanderPing = GUICreateCommanderPing()
     self.commanderPing.Frame:SetAnchor(GUIItem.Middle, GUIItem.Center)
     self.commanderPing.Frame:SetLayer(kPingLayer)
@@ -321,7 +321,7 @@ function GUIMinimap:InitializeBackground()
     self.background:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.background:SetLayer(kGUILayerMinimap)
     
-    // Non-commander players assume the map isn't visible by default.
+    -- Non-commander players assume the map isn't visible by default.
     if not PlayerUI_IsACommander() then
         self.background:SetIsVisible(false)
     end
@@ -385,11 +385,11 @@ function OnCommandSetMapLocationColor()
         
         
     if gLocationItems ~= nil then
-    //Change Siege/Front names to Red, Blue for rooms with built powernode and Green for Rooms with unbuilt/killed node. 
+    --Change Siege/Front names to Red, Blue for rooms with built powernode and Green for Rooms with unbuilt/killed node. 
 
         for _, locationItem in ipairs(gLocationItems) do
         
-       //  locationItem.text:SetColor(Color(232/255, 129/255, 23/255, 1))
+       --  locationItem.text:SetColor(Color(232/255, 129/255, 23/255, 1))
              
              local powerpoint = GetPowerPointForLocation(locationItem.Name)
                 if powerpoint ~= nil then 
@@ -415,12 +415,12 @@ function GUIMinimap:InitializeLocationNames()
     self:UninitializeLocationNames()
     local locationData = PlayerUI_GetLocationData()
     
-    // Average the position of same named locations so they don't display
-    // multiple times.
+    -- Average the position of same named locations so they don't display
+    -- multiple times.
     local multipleLocationsData = { }
     for i, location in ipairs(locationData) do
     
-        // Filter out the ready room.
+        -- Filter out the ready room.
         if location.Name ~= "Ready Room" then
         
             local locationTable = multipleLocationsData[location.Name]
@@ -451,7 +451,7 @@ function GUIMinimap:InitializeLocationNames()
 
         local posX, posY = self:PlotToMap(location.Origin.x, location.Origin.z)
 
-        // Locations only supported on the big mode.
+        -- Locations only supported on the big mode.
         local locationText = GUIManager:CreateTextItem()
         local color = Color(1.0, 1.0, 1.0, 0.65)
         color = ConditionalValue(location.IsSiege, Color(1, 0, 0), color)
@@ -518,13 +518,13 @@ local function UpdatePlayerIcon(self)
 
     elseif PlayerUI_IsAReadyRoomPlayer() then
     
-        // No icons for ready room players.
+        -- No icons for ready room players.
         self.cameraLines:SetIsVisible(false)
         self.playerIcon:SetIsVisible(false)
 
     else
     
-        // Draw a player icon representing this player's position.
+        -- Draw a player icon representing this player's position.
         local playerOrigin = PlayerUI_GetPositionOnMinimap()
         local playerRotation = PlayerUI_GetMinimapPlayerDirection()
 
@@ -562,7 +562,7 @@ local function UpdatePlayerIcon(self)
         self.playerIcon:SetSize(playerIconSize)        
         self.playerIcon:SetColor(playerIconColor)
 
-        // move the background instead of the playericon in zoomed mode
+        -- move the background instead of the playericon in zoomed mode
         if self.moveBackgroundMode then
             local size = self.minimap:GetSize()
             local pos = Vector(-posX + size.x * -0.5, -posY + size.y * -0.5, 0)
@@ -828,9 +828,9 @@ local function UpdateActivityBlips_While(self, deltaTime, activity)
         endIndex = data.count
     end
     -- Log("Update %s %s-%s (%s), ui %s", EnumToString(kMinimapActivity, activity), startIndex, endIndex, data.count, updateInterval)
-    // Try to avoid issues with LuaJIT (may skip this??)
+    -- Try to avoid issues with LuaJIT (may skip this??)
     TraceStopPoint()
-    // using a foor loop here causes LuaJIT issues for some reason
+    -- using a foor loop here causes LuaJIT issues for some reason
     local i = startIndex
     while (i <= endIndex) do
         UpdateStaticIcon(self, data.blipIds[i])
@@ -884,16 +884,16 @@ end
 local function UpdateScansAndHighlight(self)
     local blipSize = self.blipSizeTable[kBlipSizeType.Normal]
     
-    // Update scan blip size and color.    
+    -- Update scan blip size and color.    
     do 
         local scanAnimFraction = (Shared.GetTime() % kScanAnimDuration) / kScanAnimDuration        
-        local scanBlipScale = 1.0 + scanAnimFraction * 9.0 // size goes from 1.0 to 10.0
+        local scanBlipScale = 1.0 + scanAnimFraction * 9.0 -- size goes from 1.0 to 10.0
         local scanAnimAlpha = 1 - scanAnimFraction
         scanAnimAlpha = scanAnimAlpha * scanAnimAlpha
         
         self.scanColor.a = scanAnimAlpha
-        self.scanSize.x = blipSize.x * scanBlipScale // do not change blipSizeTable reference
-        self.scanSize.y = blipSize.y * scanBlipScale // do not change blipSizeTable reference
+        self.scanSize.x = blipSize.x * scanBlipScale -- do not change blipSizeTable reference
+        self.scanSize.y = blipSize.y * scanBlipScale -- do not change blipSizeTable reference
     end
     
     local highlightPos, highlightTime = GetHighlightPosition()
@@ -930,7 +930,7 @@ local function GetFreeDynamicBlip(self, xPos, yPos, blipType)
     else
         
         local returnBlipItem = GUIManager:CreateGraphicItem()
-        returnBlipItem:SetLayer(kDynamicBlipsLayer) // Make sure these draw a layer above the minimap so they are on top.
+        returnBlipItem:SetLayer(kDynamicBlipsLayer) -- Make sure these draw a layer above the minimap so they are on top.
         returnBlipItem:SetTexture(kBlipTexture)
         returnBlipItem:SetBlendTechnique(GUIItem.Add)
         returnBlipItem:SetAnchor(GUIItem.Middle, GUIItem.Center)
@@ -985,7 +985,7 @@ local function AddDynamicBlip(self, xPos, yPos, blipType)
     
 end
 
-// Initialize a minimap item (icon) from a blipType
+-- Initialize a minimap item (icon) from a blipType
 function GUIMinimap:InitMinimapIcon(item, blipType, blipTeam)
   
     local blipInfo = self.blipInfoTable[blipType]
@@ -1067,7 +1067,7 @@ local function DrawLocalBlips(self)
 end
 
 
-// update the list of non-entity related mapblips
+-- update the list of non-entity related mapblips
 local function UpdateLocalBlips(self)
   
     local key = "spawn"
@@ -1114,7 +1114,7 @@ end
 local function UpdateAttackBlip(self, blip)
     local blipLifeRemaining = blip.Time - Shared.GetTime()
     local blipItem = blip.Item
-    // Fade in.
+    -- Fade in.
     if blipLifeRemaining >= kAttackBlipFadeInTime then
     
         local fadeInAmount = ((kAttackBlipTime - blipLifeRemaining) / (kAttackBlipTime - kAttackBlipFadeInTime))
@@ -1124,7 +1124,7 @@ local function UpdateAttackBlip(self, blip)
         blipItem:SetColor(Color(1, 1, 1, 1))
     end
     
-    // Fade out.
+    -- Fade out.
     if blipLifeRemaining <= kAttackBlipFadeOutTime then
     
         if blipLifeRemaining <= 0 then
@@ -1138,14 +1138,14 @@ local function UpdateAttackBlip(self, blip)
     local blipSize = LerpGeneric(kAttackBlipMinSize, kAttackBlipMaxSize / 2, pulseAmount)
     
     blipItem:SetSize(blipSize)
-    // Make sure it is always centered.
+    -- Make sure it is always centered.
     local sizeDifference = kAttackBlipMaxSize - blipSize
     local xOffset = (sizeDifference.x / 2) - kAttackBlipMaxSize.x / 2
     local yOffset = (sizeDifference.y / 2) - kAttackBlipMaxSize.y / 2
     local plotX, plotY = self:PlotToMap(blip.X, blip.Y)
     blipItem:SetPosition(Vector(plotX + xOffset, plotY + yOffset, 0))
     
-    // Not done yet.
+    -- Not done yet.
     return false
     
 end
@@ -1187,22 +1187,22 @@ end
 local function UpdateColorNames(self)
 
     if self.locationItems ~= nil then
-    //Change Siege/Front names to Red, Blue for rooms with built powernode and Green for Rooms with unbuilt/killed node. 
+    --Change Siege/Front names to Red, Blue for rooms with built powernode and Green for Rooms with unbuilt/killed node. 
 
         for _, locationItem in ipairs(self.locationItems) do
        local room = locationItem.name
-    //   local built = false
+    --   local built = false
        local color = Color(1.0, 1.0, 1.0, 0.65)
              local powerpoint = GetPowerPointForLocation(room)
              if powerpoint ~= nil then
                 if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then 
-                   //     built = true
+                   --     built = true
                         color = Color(20/255, 127/255, 209/55, 1)
                 elseif powerpoint:GetIsDisabled() or  powerpoint:GetIsSocketed() then     
                         color = Color(18/255, 231/255, 22/255, 1)
                 end
                    SetLocationTextColor( locationItem, color )
-                   //Print("Room is %s, built is %s", room, built )
+                   --Print("Room is %s, built is %s", room, built )
               end
         end
     end
@@ -1213,7 +1213,7 @@ local function UpdateMapClick(self)
 
     if PlayerUI_IsOverhead() then
     
-        // Don't teleport if the command is dragging a selection or pinging.
+        -- Don't teleport if the command is dragging a selection or pinging.
         if PlayerUI_IsACommander() and (not CommanderUI_GetUIClickable() or GetCommanderPingEnabled()) then
             return
         end
@@ -1283,12 +1283,12 @@ local function UpdateConnections(self)
     
     end
 
-    //Print("num minimap connections %s", ToString(#self.minimapConnections))
+    --Print("num minimap connections %s", ToString(#self.minimapConnections))
 
 end
 
 local function UpdateCommanderPing(self)
-    // update commander ping
+    -- update commander ping
     if self.commanderPing then
       
         for index, entity in ientitylist(Shared.GetEntitiesWithClassname("TeamInfo")) do
@@ -1334,8 +1334,8 @@ function GUIMinimap:Update(deltaTime)
         local now = Shared.GetTime()
         local player = Client.GetLocalPlayer()
         
-        // need to recalc the player team because it may have changed
-        // maybe smarter to rebuild gui scripts on team change...
+        -- need to recalc the player team because it may have changed
+        -- maybe smarter to rebuild gui scripts on team change...
         local playerTeam = player:GetTeamNumber()
         if playerTeam == kMarineTeamType then
             playerTeam = kMinimapBlipTeam.Marine
@@ -1395,7 +1395,7 @@ function GUIMinimap:GetMinimapSize()
     return Vector(GUIMinimap.kBackgroundWidth * self.scale, GUIMinimap.kBackgroundHeight * self.scale, 0)
 end
 
-// Shows or hides the big map.
+-- Shows or hides the big map.
 function GUIMinimap:ShowMap(showMap)
 
     if self.background:GetIsVisible() ~= showMap then
@@ -1431,7 +1431,7 @@ function GUIMinimap:SendKeyEvent(key, down)
             
                 if self.buttonsScript then
                 
-                    // Cancel just in case the user had a targeted action selected before this press.
+                    -- Cancel just in case the user had a targeted action selected before this press.
                     CommanderUI_ActionCancelled()
                     self.buttonsScript:SetTargetedButton(nil)
                     
@@ -1485,7 +1485,7 @@ function GUIMinimap:SetScale(scale)
         self.scale = scale
         self:ResetAll()
         
-        // compute map to minimap transformation matrix
+        -- compute map to minimap transformation matrix
         local xFactor = 2 * self.scale
         local mapRatio = ConditionalValue(Client.minimapExtentScale.z > Client.minimapExtentScale.x, Client.minimapExtentScale.z / Client.minimapExtentScale.x, Client.minimapExtentScale.x / Client.minimapExtentScale.z)
         local zFactor = xFactor / mapRatio
@@ -1494,13 +1494,13 @@ function GUIMinimap:SetScale(scale)
         self.plotToMapLinX = GUIMinimap.kBackgroundHeight / (Client.minimapExtentScale.x / xFactor)
         self.plotToMapLinY = GUIMinimap.kBackgroundWidth / (Client.minimapExtentScale.z / zFactor)
         
-        // update overview size
+        -- update overview size
         if self.minimap then
           local size = Vector(GUIMinimap.kBackgroundWidth * scale, GUIMinimap.kBackgroundHeight * scale, 0)
           self.minimap:SetSize(size)
         end
 
-        // reposition location names
+        -- reposition location names
         if self.locationItems then
           for _, locationItem in ipairs(self.locationItems) do
             local mapPos = Vector(self:PlotToMap(locationItem.origin.x, locationItem.origin.z ))

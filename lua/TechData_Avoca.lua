@@ -25,7 +25,7 @@ local kAvoca_TechData =
       [kTechDataCostKey] = kRebirthCost, 
      [kTechDataTooltipInfo] = "Replaces death with gestation if cooldown is reached", },
 
-      // Lifeform purchases
+      -- Lifeform purchases
         { [kTechDataId] = kTechId.Redemption, 
        [kTechDataCategory] = kTechId.CragHiveTwo,  
         [kTechDataDisplayName] = "Redemption", 

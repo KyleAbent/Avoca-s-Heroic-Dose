@@ -14,7 +14,7 @@ Shine.VoteMenu:AddPage ("SpendStructuresCredit", function( self )
 		self:AddSideButton("InfantryPortal: "..gCreditStructureInfantryPortalCost , function() Shared.ConsoleCommand ("sh_buy InfantryPortal credit")  end)
         self:AddSideButton("RoboticsFactory: "..gCreditStructureRoboticsFactoryCost, function() Shared.ConsoleCommand ("sh_buy RoboticsFactory credit") end)
        -- self:AddSideButton("Wall: "..gCreditStructureWallCost, function() Shared.ConsoleCommand ("sh_buy Wall") end)    
-   // self:AddSideButton( "LowerSupplyLimit(5)", function() Shared.ConsoleCommand ("sh_buy LowerSupplyLimit")  end)
+   -- self:AddSideButton( "LowerSupplyLimit(5)", function() Shared.ConsoleCommand ("sh_buy LowerSupplyLimit")  end)
     elseif player:GetTeamNumber() == 2 then
 		if player:isa("Gorge") then
 		self:AddTopButton("Tunnel@Hive: "..gCreditStructureCostTunnelToHive , function() Shared.ConsoleCommand ("sh_buycustom TunnelEntrance credit")  end)
@@ -30,7 +30,7 @@ Shine.VoteMenu:AddPage ("SpendStructuresCredit", function( self )
 		self:AddSideButton("Crag: "..gCreditStructureCostCrag, function() Shared.ConsoleCommand ("sh_buy Crag credit")  end)
 
    -- self:AddSideButton( "Clog(2)", function() Shared.ConsoleCommand ("sh_buy Clog")  end)
-    //self:AddSideButton( "LowerSupplyLimit(5)", function() Shared.ConsoleCommand ("sh_buy LowerSupplyLimit")  end)
+    --self:AddSideButton( "LowerSupplyLimit(5)", function() Shared.ConsoleCommand ("sh_buy LowerSupplyLimit")  end)
    end
 
         self:AddBottomButton( "Back", function()self:SetPage("SpendCredit")end) 

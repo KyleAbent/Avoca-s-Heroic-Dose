@@ -6,7 +6,7 @@
 --
 -- Manages the alien buy/evolve menu.
 --
--- ========= For more information, visit us at http://www.unknownworlds.com =====================
+-- ========= For more information, visit us at http:--www.unknownworlds.com =====================
 
 Script.Load("lua/GUIParticleSystem.lua")
 Script.Load("lua/tweener/Tweener.lua")
@@ -219,7 +219,7 @@ function GUIAlienBuyMenu:_InitializeSlots()
     
     for i = 1, #self.slots do
     
-        local angle = (i-1) * anglePerSlot + math.pi * 0.15 //herp
+        local angle = (i-1) * anglePerSlot + math.pi * 0.15 --herp
         local distance = GUIAlienBuyMenu.kSlotDistance
         
         self.slots[i].Graphic:SetPosition( Vector( math.cos(angle) * distance - GUIAlienBuyMenu.kSlotSize * .5, math.sin(angle) * distance - GUIAlienBuyMenu.kSlotSize * .5, 0) )
@@ -616,7 +616,7 @@ function GUIAlienBuyMenu:_InitializeUpgradeButtons()
     
         local upgrades = AlienUI_GetUpgradesForCategory(self.slots[i].Category)
         local offsetAngle = self.slots[i].Angle
-        local anglePerUpgrade = math.pi * 0.24 / 4 //derp
+        local anglePerUpgrade = math.pi * 0.24 / 4 --derp
         local category = self.slots[i].Category
         
         for upgradeIndex = 1, #upgrades do

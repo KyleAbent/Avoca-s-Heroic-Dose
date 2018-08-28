@@ -5,7 +5,7 @@ Shine.MapStatsData = {}
 
 Plugin.Version = "1.0"
 
-local MapStatsPath = "config://shine/plugins/mapstats.json"
+local MapStatsPath = "config:--shine/plugins/mapstats.json"
 
 function Plugin:Initialise()
 self.Enabled = true
@@ -46,7 +46,7 @@ function Plugin:SetGameState( Gamerules, State, OldState )
      self:SimpleTimer(3, function()
      self.MapStatsData.Maps[tostring(Shared.GetMapName() ) ] = {marines = self:GetStatsData(false, true), aliens = self:GetStatsData(true, false) }
      Shine.SaveJSONFile( self.MapStatsData, MapStatsPath  )
-    // self:ShowStats()
+    -- self:ShowStats()
      self.MarinesWon = false
      end)
      elseif State == kGameState.Team2Won then
@@ -56,7 +56,7 @@ function Plugin:SetGameState( Gamerules, State, OldState )
      self:SimpleTimer(3, function()
      self.MapStatsData.Maps[tostring(Shared.GetMapName() ) ] = {marines = self:GetStatsData(false, true), aliens = self:GetStatsData(true, false) }
      Shine.SaveJSONFile( self.MapStatsData, MapStatsPath  )
-    // self:ShowStats()
+    -- self:ShowStats()
      self.AliensWon = false 
      end)    
   end

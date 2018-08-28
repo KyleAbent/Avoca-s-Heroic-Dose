@@ -1,5 +1,5 @@
 --Kyle 'Avoca' Abent 
-//Well I am copying everything, you know. But I like my name cause it's a good one.
+--Well I am copying everything, you know. But I like my name cause it's a good one.
 local networkVars = {lastswitch = "private time", nextangle = "private integer (0 to 8)", lockedId = "entityid"} 
 class 'AvocaSpectator' (Spectator)
 AvocaSpectator.kMapName = "Spectator"
@@ -78,14 +78,14 @@ end
 function AvocaSpectator:OverrideInput(input)
 
     ClampInputPitch(input)
-     //Attempts of Zooming in when outside radius
+     --Attempts of Zooming in when outside radius
           if  self.lockedId ~= Entity.invalidI then
             local target = Shared.GetEntity( self.lockedId ) 
               if target and  ( target.GetIsAlive and target:GetIsAlive() ) then
                  if target:isa("Contamination") then input.move.x = input.move.x + 0.15 end
                  local distance = self:GetDistance(target)
                  if distance >= GetCDistance(target) then
-                    //  Print("Distance %s lastzoom %s", distance, self.lastzoom) //debug my ass
+                    --  Print("Distance %s lastzoom %s", distance, self.lastzoom) --debug my ass
                       input.move.z = input.move.z + 0.5
                       local ymove = 0
                       local myY = self:GetOrigin().y
@@ -101,7 +101,7 @@ function AvocaSpectator:OverrideInput(input)
                        input.move.y = input.move.y + (ymove) 
                    elseif distance <= 1.8 then
                    input.move.z = input.move.z - 1
-                     // Print(" new distance is %s, new lastzoom is %s", distance, self.lastzoom)
+                     -- Print(" new distance is %s, new lastzoom is %s", distance, self.lastzoom)
                  end
               end
           

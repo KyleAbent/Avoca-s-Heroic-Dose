@@ -1,4 +1,4 @@
-//derp
+--derp
 
 local kDualWelderModelName = PrecacheAsset("models/marine/exosuit/exosuit_rr.model")
 local kDualWelderAnimationGraph = PrecacheAsset("models/marine/exosuit/exosuit_rr.animation_graph")

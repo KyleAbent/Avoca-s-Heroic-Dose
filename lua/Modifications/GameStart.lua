@@ -7,7 +7,7 @@ end
 
 
 function Conductor:SpawnBaseEntities()
-//messy and mir-air. But whatever. Requires GetGroundPosition
+--messy and mir-air. But whatever. Requires GetGroundPosition
 local techPointOrigin = nil
         local cc = GetEntitiesForTeam("CommandStructure", 1)
         if cc and #cc > 0 and not techPointOrigin then

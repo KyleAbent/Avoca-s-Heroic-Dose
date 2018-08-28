@@ -14,8 +14,8 @@ local orig_Alien_OnCreate = Alien.OnCreate
 function Alien:OnCreate()
     orig_Alien_OnCreate(self)
      self:UpdateWeapons()
-    // self.lastredeemorrebirthtime = 0 --i would like to make a new alien class with custom networkvars like this some day :/
-    // self.canredeemorrebirth = true
+    -- self.lastredeemorrebirthtime = 0 --i would like to make a new alien class with custom networkvars like this some day :/
+    -- self.canredeemorrebirth = true
       self.primaled = false
       self.primaledID = Entity.invalidI 
       self.primalGiveTime = 0
@@ -107,7 +107,7 @@ function Alien:TeleportToHive(usedhive)
     if selectedhive then 
             local position = table.random(selectedhive.eggSpawnPoints)
                 SpawnPlayerAtPoint(self, position)
-//               --Shared.Message("LOG - %s SuccessFully Redeemed", self:GetClient():GetControllingPlayer():GetUserId() )
+--               --Shared.Message("LOG - %s SuccessFully Redeemed", self:GetClient():GetControllingPlayer():GetUserId() )
                 success = true
     end
 
@@ -118,9 +118,9 @@ function Alien:TriggerRebirth()
         local position = self:GetOrigin()
         local trace = Shared.TraceRay(position, position + Vector(0, -0.5, 0), CollisionRep.Move, PhysicsMask.AllButPCs, EntityFilterOne(self))
         
-            // Check for room
+            -- Check for room
             local eggExtents = LookupTechData(kTechId.Embryo, kTechDataMaxExtents)
-            local newLifeFormTechId = self:GetTechId() /// :P
+            local newLifeFormTechId = self:GetTechId() --/ :P
             local upgradeManager = AlienUpgradeManager()
             upgradeManager:Populate(self)
              upgradeManager:AddUpgrade(lifeFormTechId)
@@ -135,8 +135,8 @@ function Alien:TriggerRebirth()
             local roomAfter
             local spawnPoint
        
-            // If not on the ground for the buy action, attempt to automatically
-            // put the player on the ground in an area with enough room for the new Alien.
+            -- If not on the ground for the buy action, attempt to automatically
+            -- put the player on the ground in an area with enough room for the new Alien.
             if not evolveAllowed then
             
                 for index = 1, 100 do
@@ -175,7 +175,7 @@ function Alien:TriggerRebirth()
                 local newPlayer = self:Replace(Embryo.kMapName)
                 position.y = position.y + Embryo.kEvolveSpawnOffset
                 newPlayer:SetOrigin(position)
-                // Clear angles, in case we were wall-walking or doing some crazy alien thing
+                -- Clear angles, in case we were wall-walking or doing some crazy alien thing
                 local angles = Angles(self:GetViewAngles())
                 angles.roll = 0.0
                 angles.pitch = 0.0
@@ -187,12 +187,12 @@ function Alien:TriggerRebirth()
                 newPlayer:DropToFloor()
                 
                newPlayer:TriggerRebirthCountDown(newPlayer:GetClient():GetControllingPlayer())
-               newPlayer:SetGestationData(upgradeManager:GetUpgrades(), newLifeFormTechId, 10, 10) //Skulk to X 
+               newPlayer:SetGestationData(upgradeManager:GetUpgrades(), newLifeFormTechId, 10, 10) --Skulk to X 
                newPlayer.gestationTime = self:GetRebirthLength()
                newPlayer.lastredeemorrebirthtime = Shared.GetTime()
                newPlayer.triggeredrebirth = true
                
-               //Spawn protective boneshield    
+               --Spawn protective boneshield    
                 success = true
                 
                 
@@ -328,7 +328,7 @@ function Alien:TeleportToHive(usedhive)
     if selectedhive then 
             local position = table.random(selectedhive.eggSpawnPoints)
                 SpawnPlayerAtPoint(self, position)
-//               Shared.Message("LOG - %s SuccessFully Redeemed", self:GetClient():GetControllingPlayer():GetUserId() )
+--               Shared.Message("LOG - %s SuccessFully Redeemed", self:GetClient():GetControllingPlayer():GetUserId() )
                 success = true
     end
    
@@ -357,7 +357,7 @@ end
 
 
 
-end //server
+end --server
 
 function Alien:GetHasPrimalScream()
     return self.primaled
@@ -461,4 +461,4 @@ return
 
 end
 
-end //client 
+end --client 

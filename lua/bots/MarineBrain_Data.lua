@@ -915,7 +915,7 @@ kMarineBrainActions =
 }
 
     local function CertainRules(who)
-         return who:GetIsAlive() --true //not cloaked? getissighted? //who:isa("CommandStation") or who:isa("ARC") or ( who:isa("PowerPoint") and not who:GetIsDisabled() )
+         return who:GetIsAlive() --true --not cloaked? getissighted? --who:isa("CommandStation") or who:isa("ARC") or ( who:isa("PowerPoint") and not who:GetIsDisabled() )
     end
     
 ------------------------------------------
@@ -976,7 +976,7 @@ function CreateMarineBrainSenses()
 
     s:Add("biggestThreat", function(db)
       local marine = db.bot:GetPlayer()
-      // local hasFlamethrower = marine:GetWeapon( Flamethrower.kMapName ) ~= nil
+      -- local hasFlamethrower = marine:GetWeapon( Flamethrower.kMapName ) ~= nil
        local nearestnonPlayer = GetNearestMixin(marine:GetOrigin(), "Construct", 2,  function(ent) return CertainRules(ent)  end )
        local nearestPlayer = GetNearest(marine:GetOrigin(), "Player", 2,  function(ent)  return ent:GetIsAlive() and GetLocationForPoint(marine:GetOrigin()) ==  GetLocationForPoint(ent:GetOrigin())  end )        
         

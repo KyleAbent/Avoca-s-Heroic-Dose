@@ -19,13 +19,13 @@ local orig = Marine.InitWeapons
 function Marine:InitWeapons()
       orig(self)
       
-    // if not self:isa("JetpackMarine") and Server then 
-    //  self:GiveJetpack()
+    -- if not self:isa("JetpackMarine") and Server then 
+    --  self:GiveJetpack()
    
        self:GiveItem(Welder.kMapName)
         self:SetActiveWeapon(Rifle.kMapName)
 
-    //end
+    --end
 
 end
 
@@ -227,7 +227,7 @@ function Marine:AttemptToBuy(techIds)
            /*
                if techId == kTechId.JumpPack then
               --  StartSoundEffectForPlayer(Marine.activatedsound, self)
-            //    self:AddResources(-GetCostForTech(techId))
+            --    self:AddResources(-GetCostForTech(techId))
                 self.hasjumppack = true
               --  Print("Bought jump pack")
                 return true
