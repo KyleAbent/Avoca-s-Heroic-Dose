@@ -295,13 +295,7 @@ end
 
 
 local function MoveToMainRoom(self)
-     --   Print("MoveToMainRoom 1")
---      for index, pheromone in ientitylist(Shared.GetEntitiesWithClassname("Pheromone")) do
-  --          self:GiveOrder(kTechId.Move, nil, pheromone:GetOrigin(), nil, true, true)
-    --        break
-      --     end
-      local ent = GetRandomEligable(self) --GetUnpoweredLocationWithoutArc()
-             -- Print("MoveToMainRoom ent is %s", ent:GetMapName())
+      local ent = GetRandomEligable(self)
       local where = ent:GetOrigin()
       if not where then return end
       self:GiveOrder(kTechId.Move, nil, FindFreeSpace(where), nil, true, true)
@@ -311,14 +305,11 @@ end
 local function MoveToHives(who) --Closest hive from origin
 local where = who:GetOrigin()
  local hive =  GetNearest(where, "Hive", 2, function(ent) return not ent:GetIsDestroyed() end)
-
- 
                if hive then
-        local origin = hive:GetOrigin() -- The arc should auto deploy beforehand
-        who:GiveOrder(kTechId.Move, nil, origin, nil, true, true)
-                    return
+                  local origin = hive:GetOrigin() -- The arc should auto deploy beforehand
+                  who:GiveOrder(kTechId.Move, nil, origin, nil, true, true)
+                  return
                 end  
-     --Print("No closest hive????")    
 end
 
 local function AliensStop(who)

@@ -1,8 +1,8 @@
 --Change grenade type by right clicking and display to player which is setting before primary clicking. 
 --One day on the workshop by another author. Idea by TriggerHappy Stoner && Transcribed by Avoca -- Siege Developer
 
+Grenade.kClearOnImpact = true
 local networkVars = 
-
 {   
 
 grenadeType = "integer (1 to 4)",

@@ -198,7 +198,7 @@ OldSmashNearbyEggs = Shine.Hook.ReplaceLocalFunction( Exo.OnCreate, "SmashNearby
 
 Shine.Hook.SetupClassHook( "PlayingTeam", "GetCommander", "OnGetCommander", "Replace" )
 
-Shine.Hook.SetupClassHook( "Conductor", "TriggerPhaseTwo", "OnTriggerPhaseTwo", "PassivePost" )
+Shine.Hook.SetupClassHook( "Conductor", "SetGameState", "OnConductSetGameState", "PassivePost" )
 
 function Plugin:NotifyPayloadTimer( Player, String, Format, ... )
 Shine:NotifyDualColour( Player, 255, 165, 0,  "[PayloadTimer]",  math.random(0,255), math.random(0,255), math.random(0,255), String, Format, ... )
@@ -271,13 +271,18 @@ local function GiveThirdFourthTimersToAll() --Gotta do onjoin for those who join
               end
 end
 
-function Plugin:OnTriggerPhaseTwo()
-   Print("Shine OnTriggerPhaseTwo")
-   GiveThirdFourthTimersToAll()
+function Plugin:NotifyConductor( Player, String, Format, ... )
+Shine:NotifyDualColour( Player, 255, 165, 0,  "[Admin Abuse]",  255, 0, 0, String, Format, ... )
+end
+
+function Plugin:OnConductSetGameState(state)
+  self:NotifyConductor( nil, "Changed %s networkvar %s to value %s", true, Player:GetName(), String, Setting)
 end
 
 function Plugin:SetGameState( Gamerules, State, OldState )
+
            if State == kGameState.Started then
+           GetGamerules():SetDamageMultiplier(1)
                 for _, conductor in ientitylist(Shared.GetEntitiesWithClassname("Conductor")) do
                conductor:OnRoundStart()
                break
@@ -336,14 +341,19 @@ function Plugin:ClientConfirmConnect(client)
      if GetGamerules():GetGameStarted() then
          
    -- if ( Shared.GetTime() - GetGamerules():GetGameStartTime() ) < kPhaseOneTimer then
+   if not GetConductor():GetIsPhaseOneBoolean() then
        AddPhaseOneTimer(client)
-   --  end
+     end
     
-   -- if ( Shared.GetTime() - GetGamerules():GetGameStartTime() ) < kPhaseTwoTimer then
+     if not GetConductor():GetIsPhaseTwoBoolean() then
          AddPhaseTwoTimer(client)
-   --end
+   end
+      if not GetConductor():GetIsPhaseThreeBoolean() then
      AddPhaseThreeTimer(client)
+     end
+        if not GetConductor():GetIsPhaseFourBoolean() then
      AddPhaseFourTimer(client)
+     end
    
    end
       

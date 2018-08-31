@@ -1,4 +1,9 @@
 
+kHeavyMachineGunDamage = 6
+kHeavyMachineGunDamageType = kDamageType.Puncture
+kHeavyMachineGunSpread = Math.Radians(5)
+
+
 kRedemptionCost = 2
 kRebirthCost = 2
 kRedemptionCooldown = 45

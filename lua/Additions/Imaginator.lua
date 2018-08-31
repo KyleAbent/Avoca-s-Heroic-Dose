@@ -622,7 +622,7 @@ local canafford = {}
       table.insert(tospawn, kTechId.Shade)
       end 
       
-      local timecheck = ( Shared.GetTime() - GetGamerules():GetGameStartTime() ) >= 120
+      local timecheck = true --( Shared.GetTime() - GetGamerules():GetGameStartTime() ) >= 120
        if timecheck and not GetHasThreeHives() then
       table.insert(tospawn, kTechId.Hive)
       end
@@ -785,7 +785,7 @@ end
 
 function Imaginator:ActualAlienFormula(cystonly)
   GetConductor():ManageDrifters() 
-  GetConductor():ManageStructures() --gonna affect Phase Cannon
+   GetConductor():ManageStructures() --gonna affect Phase Cannon ....... horrible perf?
   local randomspawn = nil
   local powerpoint  = GetRandomDisabledPower()
   local tospawn, cost = GetAlienSpawnList(self) --, cost, gamestarted = GetAlienSpawnList(self, cystonly)

@@ -243,18 +243,22 @@ function Exo:OnStun()    --so the stunwall places the exo in the air making him 
         end
 end
 
-    /*
+
+local origEject = Exo.EjectExo
+
 function Exo:EjectExo()
-
-    if self:GetCanEject() then
-         
-        if Server then
-            self:PerformDelayedEject()
-        end
-    
-    end
-
+   origEject(self)
+  -- marine.timeOfLastDrop = Shared.GetTime()
 end
+
+local kEngageOffset = Vector(0, 1.5, 0)
+local kRandDebuff = Vector(math.random(0,2), math.random(0,2), math.random(0,2)  )
+function Exo:GetEngagementPointOverride()
+    return (self:GetOrigin() + kEngageOffset)+ kRandDebuff
+end
+
+
+/*
 if Server then
 
     function Exo:PerformDelayedEject()
@@ -276,6 +280,7 @@ end
             marine:SetHealth(self.prevPlayerHealth or kMarineHealth)
             marine:SetMaxArmor(self.prevPlayerMaxArmor or kMarineArmor)
             marine:SetArmor(self.prevPlayerArmor or kMarineArmor)
+            marine.timeOfLastDrop = Shared.GetTime()
             
             --exosuit:SetOwner(marine) --explode lol
             

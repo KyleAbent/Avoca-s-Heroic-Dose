@@ -17,6 +17,10 @@ local networkVars =
    PhaseOneTimer = "float",
    PhaseThreeTimer = "float",
    PhaseFourTimer = "float",
+   
+   --modeling after ns2 gamerules in gamestate for hooking trigger for specific rules on each state of round.
+   --thanks  stoner
+   
   
    
    
@@ -248,7 +252,18 @@ end
 function Conductor:GetIsPhaseFour()
            local gamestarttime = GetGameInfoEntity():GetStartTime()
            local gameLength = Shared.GetTime() - gamestarttime
-           return  gameLength >= self.PhaseFourTimer
+           local istrue = gameLength >= self.PhaseFourTimer
+           if istrue then
+             self:SetGameState("Four")
+             
+                 if Server then 
+                 GetGamerules():SetDamageMultiplier(2)
+               end
+               
+               
+            end
+    
+           return  istrue
 end
 
 
@@ -514,44 +529,59 @@ function Conductor:ManageStructures()
        
        for i = 1, random do --maybe time delay ah
            local hive = GetRandomHive()
-           local nearestof = GetNearestMixin(hive:GetOrigin(), "Construct", 2, function(ent) return ent:GetIsBuilt() and ent.GetIsInCombat and not ent:GetIsInCombat() and ent:isa("Whip") or ent:isa("Shift") or ent:isa("Shade") or ent:isa("Crag") end)
+           local nearestof = GetNearest(hive:GetOrigin(), "Whip", 2, function(ent) return ent:GetIsBuilt() and ( ent.GetIsInCombat and not ent:GetIsInCombat() )  end)
             if nearestof then
                local power = GetNearest(nearestof:GetOrigin(), "PowerPoint", 1,  function(ent) return ent:GetIsBuilt() and not ent:GetIsDisabled()  end ) 
                if power then
-                 nearestof:GiveOrder(kTechId.Move, power:GetId(), FindFreeSpace(power:GetOrigin(), 4), nil, false, false)  
+                 nearestof:GiveOrder(kTechId.Move, power:GetId(), FindFreeSpace(power:GetOrigin(), 4), nil, false, false) 
+                  CreatePheromone(kTechId.ThreatMarker,power:GetOrigin(), 2) 
                end
             end 
        end   
 
 end
 
+
+ function Conductor:SetGameState(state)
+    
+
+        if state ~= self.gameState then
+        
+            self.gameState = state
+           -- self.gameInfo:SetState(state)
+           -- self.timeGameStateChanged = Shared.GetTime()
+          --  self.timeSinceGameStateChanged = 0
+
+            --kGameState = enum( {'NotStarted', 'WarmUp', 'PreGame', 'Countdown', 'Started', 'Team1Won', 'Team2Won', 'Draw'} )
+          --  if self.gameState == "Four" then --kGameState.Started then
+               if Server then 
+                 GetGamerules():SetDamageMultiplier(10)
+               end
+               -- PostGameViz("Phase Four")
+
+                --
+              --  SendTeamMessage(self.team1, kTeamMessageTypes.GameStarted)
+              --  SendTeamMessage(self.team2, kTeamMessageTypes.GameStarted)
+                
+          --  end
+            
+        end
+        
+    end
+
 if Server then 
 
 
 
 function Conductor:CollectResources()  --Not great for CO_ With 4 total PP. 0 res.
-   local builtpower = 0
-   local disabledpower = 0
+   local builtpower = 9
+   local disabledpower = 9
    local marineteam = nil
    local alienteam = nil
 
-   
-          for index, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-            if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
-               builtpower = builtpower + 1
-            else
-               disabledpower = disabledpower + 1
-            end
-        end
-   
-      if self:GetIsPhaseOneBoolean() then
-       disabledpower = disabledpower * 2
-       builtpower = builtpower * 2
-      end
-   
        for _, player in ipairs(GetEntitiesForTeam("Player", 1)) do
         if not player:isa("Commander") then
-            player:AddResources(builtpower / 10 ) 
+            player:AddResources(builtpower / 10 )  --clamp it
             if not marineteam then marineteam = player:GetTeam() end
         end
     end

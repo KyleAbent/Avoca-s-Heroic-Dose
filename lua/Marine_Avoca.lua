@@ -29,6 +29,12 @@ function Marine:InitWeapons()
 
 end
 
+local kRandDebuff = Vector(math.random(0,1), math.random(0,1), math.random(0,1)  )
+function Marine:GetEngagementPointOverride()
+    return self:GetOrigin() + kRandDebuff
+end
+
+
 function Marine:ModifyGravityForce(gravityTable)
       if self:GetIsOnGround() then
             gravityTable.gravity = 0
