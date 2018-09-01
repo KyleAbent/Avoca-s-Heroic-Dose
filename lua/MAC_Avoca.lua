@@ -13,7 +13,7 @@ function MAC:OnInitialized()
            self.avoca = true 
         --   MAC.kConstructRate =  0.4* 1.4 
         --  MAC.kWeldRate =  0.5 * 1.4
-           MAC.kRepairHealthPerSecond =  125
+           MAC.kRepairHealthPerSecond =  100
          return
       end
         

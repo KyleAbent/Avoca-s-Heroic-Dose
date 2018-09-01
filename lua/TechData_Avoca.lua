@@ -36,6 +36,15 @@ local kAvoca_TechData =
 
    
      
+     
+         { [kTechDataId] = kTechId.RailgunWelderExoSuit,    
+ [kTechIDShowEnables] = false,     
+  [kTechDataDisplayName] = "RailgunWelderExoSuit  ", 
+[kTechDataMapName] = "exo",         
+      [kTechDataCostKey] = kDualExosuitCost - 5, 
+[kTechDataHotkey] = Move.E,
+ [kTechDataTooltipInfo] = "RailgunWelderExoSuit", 
+[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
 
 
          { [kTechDataId] = kTechId.DualFlamerExosuit,    

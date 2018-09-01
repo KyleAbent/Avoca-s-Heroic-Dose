@@ -25,7 +25,7 @@
                 exoPlayer = player:GiveDualWelder()
             elseif self.layout == "FlamerFlamer" then
                 exoPlayer = player:GiveDualFlamer()
-            elseif self.layout == "WelderFlamer" then
+            elseif self.layout == "RailGunWelder" then
                  exoPlayer = player:GiveWelderFlamer()
             else
                 exoPlayer = player:GiveExo()

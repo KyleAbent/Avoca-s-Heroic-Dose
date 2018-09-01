@@ -181,7 +181,7 @@ function Exo:InitExoModel()
     local modelName = kDualWelderModelName
     local graphName = kDualWelderAnimationGraph
     
-  if self.layout == "WelderWelder" or self.layout == "FlamerFlamer" or self.layout == "WelderFlamer" then --!= Minigun, != Railgun
+  if self.layout == "WelderWelder" or self.layout == "FlamerFlamer" or self.layout == "WelderFlamer" or self.layout == "RailGunWelder"   then --!= Minigun, != Railgun
          modelName = kDualWelderModelName
         graphName = kDualWelderAnimationGraph
         self.hasDualGuns = true
@@ -218,6 +218,10 @@ function Exo:InitWeapons()
         return
         elseif self.layout == "WelderFlamer" then
         weaponHolder:SetWelderFlamer()
+        self:SetHUDSlotActive(1)
+        return
+        elseif self.layout == "RailGunWelder" then
+        weaponHolder:SetRailgunWelder()
         self:SetHUDSlotActive(1)
         return
         end

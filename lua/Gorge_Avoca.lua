@@ -39,6 +39,12 @@ function Gorge:OnInitialized()
 end
 
 
+local kRandDebuff = Vector(math.random(0,.7), math.random(0,.7), math.random(0,.7)  ) --if 1 isnt too much
+function Gorge:GetEngagementPointOverride()
+    return self:GetOrigin() + kRandDebuff
+end
+
+
 function Gorge:GetRebirthLength()
 return 3
 end

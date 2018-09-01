@@ -29,7 +29,7 @@ function Marine:InitWeapons()
 
 end
 
-local kRandDebuff = Vector(math.random(0,1), math.random(0,1), math.random(0,1)  )
+local kRandDebuff = Vector(math.random(0,.3), math.random(0,.3), math.random(0,.3)  ) --if 1 isnt too much
 function Marine:GetEngagementPointOverride()
     return self:GetOrigin() + kRandDebuff
 end
@@ -122,6 +122,12 @@ function Marine:GiveDualFlamer(spawnPoint)
     return exo
     
 end
+function Marine:GiveRailGunWelderExo(spawnPoint)
+
+    local exo = self:Replace(Exo.kMapName, self:GetTeamNumber(), false, spawnPoint, { layout = "RailGunWelder"  })
+    return exo
+    
+end
 
 function Marine:GiveWelderFlamer(spawnPoint)
 
@@ -143,7 +149,7 @@ function Marine:GiveDualRailgunExo(spawnPoint)
     
 end
 kIsExoTechId = { [kTechId.DualFlamerExosuit] = true, [kTechId.DualMinigunExosuit] = true, [kTechId.DualWelderExosuit] = true, [kTechId.WeldFlamerExosuit] = true,
-                 [kTechId.DualRailgunExosuit] = true }
+                 [kTechId.DualRailgunExosuit] = true, [kTechId.RailgunWelderExoSuit] = true, }
                  
 local function BuyExo(self, techId)
 
@@ -181,6 +187,8 @@ local function BuyExo(self, techId)
                 exo = self:GiveWelderFlamer(spawnPoint)
             elseif techId == kTechId.DualRailgunExosuit then
                 exo = self:GiveDualRailgunExo(spawnPoint)
+            elseif techId == kTechId.RailgunWelderExoSuit then
+                exo = self:GiveRailGunWelderExo(spawnPoint)
             end
             
 

@@ -5,6 +5,9 @@ ModLoader.SetupFileHook( "lua/Marine.lua", "lua/Marine_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Alien.lua", "lua/Alien_Avoca.lua", "post" )
 
+
+--ModLoader.SetupFileHook( "lua/DamageTypes.lua", "lua/DamageTypes_Avoca.lua", "post" )
+
 ModLoader.SetupFileHook( "lua/Exo.lua", "lua/Exo_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Whip.lua", "lua/Whip_Avoca.lua", "post" )

@@ -17,6 +17,7 @@ local networkVars =
    PhaseOneTimer = "float",
    PhaseThreeTimer = "float",
    PhaseFourTimer = "float",
+   phase = "float",
    
    --modeling after ns2 gamerules in gamestate for hooking trigger for specific rules on each state of round.
    --thanks  stoner
@@ -179,7 +180,10 @@ local function DeleteResNodes(self)
 
 end
 
-
+    local kMachineGunPlayerDamageScalar = 1.7
+     local function MultiplyForMachineGun(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
+     return ConditionalValue(target:isa("Player") or target:isa("Exosuit"), damage * kMachineGunPlayerDamageScalar, damage), armorFractionUsed, healthPerArmor
+    end  
 function Conductor:OnRoundStart() 
             self.gameStartTime = Shared.GetTime()
            self:TimerValues()
@@ -188,6 +192,20 @@ function Conductor:OnRoundStart()
               DeleteResNodes(self)
               self:SpawnInitialStructures()
             end
+            
+    if kDamageTypeRules then      --DamageTypes.lua overwrite mod
+
+    
+    kDamageTypeRules[kDamageType.MachineGun] = {}
+    table.insert(kDamageTypeRules[kDamageType.MachineGun], MultiplyForMachineGun)
+ 
+    
+    kDamageTypeRules[kDamageType.Corrode] = {}
+    table.insert(kDamageTypeRules[kDamageType.Corrode], ReduceGreatlyForPlayers)
+    table.insert(kDamageTypeRules[kDamageType.Corrode], IgnoreHealthForPlayersUnlessExo)
+    
+       end
+    
 end
 function Conductor:OnCreate()  
    self.gameStartTime = 0 
@@ -231,36 +249,47 @@ function Conductor:GetIsPhaseFourBoolean()
        --Print(" Conductor:GetIsPhaseTwoBoolean() is %s", self:GetIsPhaseTwo())
         return  self:GetIsPhaseFour()
 end
-function Conductor:GetIsPhaseTwo()
-           local gamestarttime =   self.gameStartTime
-           local gameLength = Shared.GetTime() - gamestarttime
-           --Print(" GetIsPhaseTwo gameLength is %s, PhaseTwoTimer is %s", gameLength, self.PhaseTwoTimer)
-           return  gameLength >= self.PhaseTwoTimer
-end
 function Conductor:GetIsPhaseOne()
+           if self.phase == 1 then return true end 
            local gamestarttime = self.gameStartTime
            local gameLength = Shared.GetTime() - gamestarttime
+            local istrue = gameLength >= self.PhaseOneTimer 
+           if istrue then
+             self:SetGamePhase(1)
+            end
           // Print(" GetIsPhaseOne (%s) gameLength is %s, PhaseOneTimer is %s", gameLength >= self.PhaseOneTimer, gameLength, self.PhaseOneTimer)
            return  gameLength >= self.PhaseOneTimer
 end
+function Conductor:GetIsPhaseTwo()
+           if self.phase == 2 then return true end 
+           local gamestarttime =   self.gameStartTime
+           local gameLength = Shared.GetTime() - gamestarttime
+            local istrue = gameLength >= self.PhaseTwoTimer 
+           if istrue then
+             self:SetGamePhase(2)
+            end
+           --Print(" GetIsPhaseTwo gameLength is %s, PhaseTwoTimer is %s", gameLength, self.PhaseTwoTimer)
+           return  gameLength >= self.PhaseTwoTimer
+end
+
  
  function Conductor:GetIsPhaseThree()
+             if self.phase == 3 then return true end 
            local gamestarttime = GetGameInfoEntity():GetStartTime()
            local gameLength = Shared.GetTime() - gamestarttime
+           local istrue = gameLength >= self.PhaseFourTimer 
+           if istrue then
+             self:SetGamePhase(3)
+            end
            return  gameLength >= self.PhaseThreeTimer
 end
 function Conductor:GetIsPhaseFour()
+           if self.phase == 4 then return true end 
            local gamestarttime = GetGameInfoEntity():GetStartTime()
            local gameLength = Shared.GetTime() - gamestarttime
-           local istrue = gameLength >= self.PhaseFourTimer
+           local istrue = gameLength >= self.PhaseFourTimer --and state != "Four" -- still iteratively annoying
            if istrue then
-             self:SetGameState("Four")
-             
-                 if Server then 
-                 GetGamerules():SetDamageMultiplier(2)
-               end
-               
-               
+             self:SetGamePhase(4)
             end
     
            return  istrue
@@ -342,8 +371,18 @@ end
 function Conductor:SendNotification(who, seconds)
 --replace with shine plugin avocagamerules
 end
+function Conductor:DoMist()
+   local hive = GetRandomHive()
+   local embryo = nil
+      if hive then
+         embryo = GetNearest(hive:GetOrigin(), "Embryo", 2,  function(ent) return ent:GetIsAlive()  end ) --not misted
+         if embryo then
+            CreateEntity(NutrientMist.kMapName,embryo:GetModelOrigin(), 2 )
+         end
+      end
+end
 function Conductor:Automations()
-
+              self:DoMist()
               self:CollectResources()
             --  self:MaintainHiveDefense()
               self:HandoutMarineBuffs()
@@ -529,12 +568,12 @@ function Conductor:ManageStructures()
        
        for i = 1, random do --maybe time delay ah
            local hive = GetRandomHive()
-           local nearestof = GetNearest(hive:GetOrigin(), "Whip", 2, function(ent) return ent:GetIsBuilt() and ( ent.GetIsInCombat and not ent:GetIsInCombat() )  end)
+           local nearestof = GetNearest(hive:GetOrigin(), "Whip", 2, function(ent) return ent:GetIsBuilt() and ( ent.GetIsInCombat and not ent:GetIsInCombat() and not ent:GetIsACreditStructure() )  end)
             if nearestof then
                local power = GetNearest(nearestof:GetOrigin(), "PowerPoint", 1,  function(ent) return ent:GetIsBuilt() and not ent:GetIsDisabled()  end ) 
                if power then
                  nearestof:GiveOrder(kTechId.Move, power:GetId(), FindFreeSpace(power:GetOrigin(), 4), nil, false, false) 
-                  CreatePheromone(kTechId.ThreatMarker,power:GetOrigin(), 2) 
+                 -- CreatePheromone(kTechId.ThreatMarker,power:GetOrigin(), 2)  if get is time up then
                end
             end 
        end   
@@ -542,28 +581,34 @@ function Conductor:ManageStructures()
 end
 
 
- function Conductor:SetGameState(state)
+local function PhaseFourYo(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
+
+    if target:isa("Player") and attacker:isa("Player") then
+    damage = damage * 1.4
+    end
+    return damage, armorFractionUsed, healthPerArmor
+
+end
+
+
+ function Conductor:SetGamePhase(phase)
     
 
-        if state ~= self.gameState then
+        if phase ~= self.phase then
         
-            self.gameState = state
-           -- self.gameInfo:SetState(state)
-           -- self.timeGameStateChanged = Shared.GetTime()
-          --  self.timeSinceGameStateChanged = 0
+          self.phase = phase
+          
+          if phase == 1 then
+          elseif phase == 2 then
+          elseif  phase == 3 then
+           elseif phase == 4 then
 
-            --kGameState = enum( {'NotStarted', 'WarmUp', 'PreGame', 'Countdown', 'Started', 'Team1Won', 'Team2Won', 'Draw'} )
-          --  if self.gameState == "Four" then --kGameState.Started then
-               if Server then 
-                 GetGamerules():SetDamageMultiplier(10)
-               end
-               -- PostGameViz("Phase Four")
-
-                --
-              --  SendTeamMessage(self.team1, kTeamMessageTypes.GameStarted)
-              --  SendTeamMessage(self.team2, kTeamMessageTypes.GameStarted)
-                
-          --  end
+              --if state == four
+            --   if kDamageTypeGlobalRules then --Server then 
+            --     table.insert(kDamageTypeGlobalRules, PhaseFourYo) --if this works then better than checking on every dmg prior
+           --    end
+               
+           end
             
         end
         

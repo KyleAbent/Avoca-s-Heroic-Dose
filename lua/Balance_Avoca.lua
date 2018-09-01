@@ -1,7 +1,7 @@
 
-kHeavyMachineGunDamage = 6
-kHeavyMachineGunDamageType = kDamageType.Puncture
-kHeavyMachineGunSpread = Math.Radians(5)
+--kHeavyMachineGunDamage = 5--or 6 or 7
+--kHeavyMachineGunDamageType = kDamageType.Puncture
+--kHeavyMachineGunSpread = Math.Radians(5)
 
 
 kRedemptionCost = 2
@@ -25,7 +25,7 @@ kPlayingTeamInitialTeamRes = 999
 kCompoundFireDamageDelay = 0
 kCompundFireDamageScalar = 3.7
 
-kExoFlamerDamage = 25
+kExoFlamerDamage = 26
 kExoWelderDamagePerSecond = 28
 kExoPlayerWeldRate = 15
 kExoStructureWeldRate = 65

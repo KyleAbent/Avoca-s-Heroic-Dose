@@ -38,10 +38,13 @@ function Conductor:FirePhaseCannons(powerpoint)
              CreateEntity(Contamination.kMapName, FindFreeSpace(origin, 1, 8), 2)
           
       local  WhipCount = GetEntitiesForTeam( "Whip", 2 )   
+      local doCons = GetConductor():GetIsPhaseFourBoolean()
       if #WhipCount < 18 then
              for i = 1, math.random(1,4) do
                local whip = CreateEntity(Whip.kMapName, FindFreeSpace(origin, 1, 8), 2)
-               --whip:SetConstructionComplete() -- chance < 100% ?
+               if doCons then
+               whip:SetConstructionComplete() -- chance < 100% ?
+               end
                whip.rooted = true
                whip:Root() 
              end

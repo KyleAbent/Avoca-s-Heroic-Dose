@@ -13,7 +13,7 @@ local TableInsertUnique = table.InsertUnique
 Plugin.HasConfig = true
 Plugin.ConfigName = "CreditsConfig.json"
 
-Plugin.DefaultConfig  = { kCreditMultiplier = 1, kCreditsCapPerRound = 200 }
+Plugin.DefaultConfig  = { kCreditMultiplier = 1, kCreditsCapPerRound = 900 }
 
 Shine.CreditData = {}
 Shine.BadgeData = {}
@@ -54,7 +54,7 @@ self.CredityPlayers = {} --To toggle spending between pres and credit in an easy
 self.UserStartOfRoundCredits = {}
 self.MarineTotalSpent = 0
 self.AlienTotalSpent = 0
-self.Refunded = false
+--self.Refunded = false
 
 self.PlayerSpentAmount = {}
 
@@ -198,7 +198,7 @@ function Plugin:PrimalScreamPointBonus(who, Points)
 end
 */
 
-function Plugin:OnScore( Player, Points, Res, WasKill )
+function Plugin:OnScore( Player, Points, Res, WasKill ) --or on spawn xD
 if Points ~= nil and Points ~= 0 and Player and not Shared.GetCheatsEnabled() then
    --if not self.GameStarted then Points = 1  AddOneScore(Player,Points,Res, WasKill) end
   --if WasKill and Player:isa("Alien") then self:PrimalScreamPointBonus(Player, Points) end
@@ -225,38 +225,6 @@ end
 
 
 
-function Plugin:OnReset()
-  if self.GameStarted and not self.Refunded then
-       self:NotifyCredit( nil, "Did you spend any credits only for the round to reset? If so, then no worries! - You have just been refunded!", true )
-       
-              Shine.ScreenText.End("Credit")  
-              Shine.ScreenText.End(80)
-              Shine.ScreenText.End(81)  
-              Shine.ScreenText.End(82)  
-              Shine.ScreenText.End(83)  
-              Shine.ScreenText.End(84)  
-              Shine.ScreenText.End(85)  
-              Shine.ScreenText.End(86)   
-              Shine.ScreenText.End(87)  
-              self.marinecredits = 0
-              self.aliencredits = 0
-              self.marinebonus = 0
-              self.alienbonus = 0
-              self.MarineTotalSpent = 0 
-              self.AlienTotalSpent = 0
-              self.CreditUsers = {}
-              self.PlayerSpentAmount = {}
-          
-              local Players = Shine.GetAllPlayers()
-              for i = 1, #Players do
-              local Player = Players[ i ]
-                  if Player then
-                  Shine.ScreenText.Add( "Credit", {X = 0.20, Y = 0.95,Text = string.format( "%s Credit", self:GetPlayerCreditInfo(Player:GetClient()) ),Duration = 1800,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 3,FadeIn = 0,}, Player:GetClient() )
-                  end
-              end
-    self.Refunded = true
-   end     
-end
 
 function Plugin:OnFirstThink() 
 local CreditsFile = Shine.LoadJSONFile( CreditsPath )
@@ -317,7 +285,7 @@ function Plugin:GetPlayerCreditInfo(Client)
           Credits = self.CreditUsers[ Client ]
        elseif not self.CreditUsers[ Client ] then 
           local Data = self:GetCreditData( Client )
-           if Data and Data.credits then 
+           if Data and Data.credits ~= nil then 
            Credits = Data.credits 
            end
        end
@@ -467,7 +435,7 @@ function Plugin:SetGameState( Gamerules, State, OldState )
               for i = 1, #Players do
               local Player = Players[ i ]
                   if Player then
-                 -- self:SaveCredits(Player:GetClient())
+                   self:SaveCredits(Player:GetClient())
                      if Player:GetTeamNumber() == 1 or Player:GetTeamNumber() == 2 then
                     Shine.ScreenText.Add( 80, {X = 0.40, Y = 0.15,Text = "Total Credit Earned:".. math.round((Player:GetScore() / 10 ), 2), Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,}, Player )
                     Shine.ScreenText.Add( 81, {X = 0.40, Y = 0.20,Text = "Total Credit Spent:".. self.PlayerSpentAmount[Player:GetClient()], Duration = 120,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 4,FadeIn = 0,}, Player )

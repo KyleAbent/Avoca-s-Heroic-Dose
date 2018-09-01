@@ -143,26 +143,6 @@ function Imaginator:OnUpdate(deltatime)
    
 end
 
-local function PowerPointStuff(who)
-local team = 0
-local location = GetLocationForPoint(who:GetOrigin())
-local powerpoint =  location and GetPowerPointForLocation(location.name)
-      if powerpoint ~= nil then 
-              if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then 
-                team = 1
-             elseif powerpoint:GetIsDisabled() or  powerpoint:GetIsSocketed()  then
-             -- local infestation = GetEntitiesWithMixinWithinRange("Infestation", who:GetOrigin(), 7) 
-               -- if #infestation >= 1 then
-                 team = 2
-                -- end
-               end
-     end
-     return team
-end
-local function WhoIsQualified(who)
-   return PowerPointStuff(who)
-end
-
 function Imaginator:Imaginations() --Tres spending WIP
       local marine = GetEntitiesWithMixinForTeam("Construct", 1) 
       local alien = GetEntitiesWithMixinForTeam("Construct", 2) 
@@ -767,19 +747,19 @@ return true
 
 end
 
-/*
+
 
 local function FakeCyst(where) 
          local cyst = GetEntitiesWithinRange("Cyst",where, kCystRedeployRange)
          local cost = 1 
-        if not (#cyst >=1) and TresCheck(2, cost) then
+        if not (#cyst >=1) then --and TresCheck(2, cost) then
         where = FindFreeSpace(where, 1, kCystRedeployRange-1, false)
         entity = CreateEntityForTeam(kTechId.Cyst, where, 2)
-        entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
+       -- entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
         end
 end
 
-*/
+
 
 
 
@@ -827,7 +807,7 @@ function Imaginator:ActualAlienFormula(cystonly)
                      else -- it tonly takes 1!
                           entity = CreateEntityForTeam(tospawn, randomspawn, 2)
                         -- if entity:isa("Cyst") then CystChain(entity:GetOrigin()) end
-                       --     if not entity:isa("Cyst") then FakeCyst(entity:GetOrigin()) end
+                            if not entity:isa("Cyst") then FakeCyst(entity:GetOrigin()) end
                           if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                           success = true
                      end 
