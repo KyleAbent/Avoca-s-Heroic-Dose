@@ -200,9 +200,9 @@ function Conductor:OnRoundStart()
     table.insert(kDamageTypeRules[kDamageType.MachineGun], MultiplyForMachineGun)
  
     
-    kDamageTypeRules[kDamageType.Corrode] = {}
-    table.insert(kDamageTypeRules[kDamageType.Corrode], ReduceGreatlyForPlayers)
-    table.insert(kDamageTypeRules[kDamageType.Corrode], IgnoreHealthForPlayersUnlessExo)
+  --  kDamageTypeRules[kDamageType.Corrode] = {}
+   -- table.insert(kDamageTypeRules[kDamageType.Corrode], ReduceGreatlyForPlayers)
+    --table.insert(kDamageTypeRules[kDamageType.Corrode], IgnoreHealthForPlayersUnlessExo)
     
        end
     
