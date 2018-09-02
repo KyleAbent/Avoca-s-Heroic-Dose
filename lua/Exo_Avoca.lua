@@ -181,7 +181,8 @@ function Exo:InitExoModel()
     local modelName = kDualWelderModelName
     local graphName = kDualWelderAnimationGraph
     
-  if self.layout == "WelderWelder" or self.layout == "FlamerFlamer" or self.layout == "WelderFlamer" or self.layout == "RailGunWelder"   then --!= Minigun, != Railgun
+  if self.layout == "WelderWelder" or self.layout == "FlamerFlamer" or self.layout == "WelderFlamer" or self.layout == "RailGunWelder" 
+    or self.layout == "RailgunFlamerExoSuit"  then --!= Minigun, != Railgun
          modelName = kDualWelderModelName
         graphName = kDualWelderAnimationGraph
         self.hasDualGuns = true
@@ -224,6 +225,11 @@ function Exo:InitWeapons()
         weaponHolder:SetRailgunWelder()
         self:SetHUDSlotActive(1)
         return
+        elseif self.layout == "RailgunFlamer" then
+        weaponHolder:SetRailgunFlamer()
+        self:SetHUDSlotActive(1)
+        return
+        
         end
         
         
@@ -242,7 +248,7 @@ end
 
 function Exo:OnStun()    --so the stunwall places the exo in the air making him unable to shoot. not good. 
          if Server then
-                local stunwall = CreateEntity(StunWall.kMapName, self:GetOrigin(), 2)    
+                local stunwall = CreateEntity(StunWall.kMapName, self:GetOrigin() + Vector(0, 0.5, 1), 2)    
                 StartSoundEffectForPlayer(AlienCommander.kBoneWallSpawnSound, self)
         end
 end

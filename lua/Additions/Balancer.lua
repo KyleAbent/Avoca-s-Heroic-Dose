@@ -34,17 +34,31 @@ end
 
 function Conductor:FirePhaseCannons(powerpoint)
               if not GetHasThreeHives() then return end -- although not requiring biomass. Maybe later.
+              /*
+              local mult = 0 --Clamp( GetConductor():GetIsPhaseTwoBoolean().phase, 1, 4)
+              
+              if GetConductor().phase == 4 then
+                   max = 1
+              elseif GetConductor().phase == 3 then
+                   max = 2
+              elseif GetConductor().phase == 2 then
+                   max = 3
+              elseif GetConductor().phase == 1 then
+                   max = 4
+              else
+              end
+              */
              local origin = FindFreeSpace(powerpoint:GetOrigin())
              CreateEntity(Contamination.kMapName, FindFreeSpace(origin, 1, 8), 2)
           
       local  WhipCount = GetEntitiesForTeam( "Whip", 2 )   
-      local doCons = GetConductor():GetIsPhaseFourBoolean()
+     -- local doCons = GetConductor():GetIsPhaseFourBoolean()
       if #WhipCount < 18 then
-             for i = 1, math.random(1,4) do
+             for i = 1, math.random(1, GetConductor().phase ) do  --( 18 - #WhipCount )  )  do
                local whip = CreateEntity(Whip.kMapName, FindFreeSpace(origin, 1, 8), 2)
-               if doCons then
-               whip:SetConstructionComplete() -- chance < 100% ?
-               end
+              -- if doCons then
+             --  whip:SetConstructionComplete() -- chance < 100% ?
+              -- end
                whip.rooted = true
                whip:Root() 
              end
@@ -52,7 +66,7 @@ function Conductor:FirePhaseCannons(powerpoint)
             
       local  CragCount = GetEntitiesForTeam( "Crag", 2 )
       if #CragCount < 18 then 
-             for i = 1 , math.random(1,2) do
+             for i = 1 ,math.random(1, GetConductor().phase  ) do
              local crag = CreateEntity(Crag.kMapName, FindFreeSpace(origin, 1, 8), 2)
              --crag:SetConstructionComplete()-- chance < 100% ?
              end
@@ -60,28 +74,14 @@ function Conductor:FirePhaseCannons(powerpoint)
       
       local  ShadeCount = GetEntitiesForTeam( "Shade", 2 )   --withinradius?
       if #ShadeCount < 8 then
-             for i = 1, math.random(1,2) do
+             for i = 1, math.random(1, GetConductor().phase ) do
                local shade = CreateEntity(Shade.kMapName, FindFreeSpace(origin, 1, 8), 2)
                --shade:SetConstructionComplete()-- chance < 100% ?
              end
       end
       
-       --local drifter = CreateEntity(Drifter.kMapName, FindFreeSpace(origin, 1, 8), 2)
-      
-             -- if math.random(1,2) == 1 then
-            --  CreateEntity(NutrientMist.kMapName, FindFreeSpace(origin, 1, 8), 2)
-           --  end
-             
-      if GetConductor():GetIsPhaseTwoBoolean() then  --two? hm
-           if math.random(1,2) == 1 then
-           --chance or phase three or phase four if too much movement from hives during marine rushing hives
-             local structBeacon = CreateEntity(StructureBeacon.kMapName, FindFreeSpace(origin, 1, 8), 2)
-             --CreateEntity(NutrientMist.kMapName, structBeacon:GetOrigin(), 2)
-           else
-             local eggBeacon = CreateEntity(EggBeacon.kMapName, FindFreeSpace(origin, 1, 8), 2)
-           --  CreateEntity(NutrientMist.kMapName, eggBeacon:GetOrigin(), 2)
-           end
-      end    
+       
+
     
 end
 

@@ -403,10 +403,10 @@ function FindFreeSpace(where, mindistance, maxdistance, infestreq)
            end
        end
 --           Print("No valid spot found for FindFreeSpace")
-          if infestreq and not GetIsPointOnInfestation(where) then
-             if Server then CreateEntity(Cyst.kMapName, FindFreeSpace(where,1, 6),  2) end
+         -- if infestreq and not GetIsPointOnInfestation(where) then
+            -- if Server then CreateEntity(Cyst.kMapName, FindFreeSpace(where,1, 6),  2) end
              --For now anyway, bite me. Remove later? :X or tres spend. Who knows right now. I wanna see this in action.
-          end
+        --  end
           
            return where
 end

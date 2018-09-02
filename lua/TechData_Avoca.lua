@@ -34,7 +34,15 @@ local kAvoca_TechData =
      [kTechDataTooltipInfo] = "a 3 second timer checks if your health is a random value less than or equal to 15-30% of your max hp. If so, then randomly tp to a egg spawn 1-4 seconds after.", },
    
 
-   
+     
+         { [kTechDataId] = kTechId.RailgunFlamerExoSuit,    
+ [kTechIDShowEnables] = false,     
+  [kTechDataDisplayName] = "RailgunFlamerExoSuit  ", 
+[kTechDataMapName] = "exo",         
+      [kTechDataCostKey] = kDualExosuitCost - 5, 
+[kTechDataHotkey] = Move.E,
+ [kTechDataTooltipInfo] = "RailgunFlamerExoSuit", 
+[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
      
      
          { [kTechDataId] = kTechId.RailgunWelderExoSuit,    

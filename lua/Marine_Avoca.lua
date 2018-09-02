@@ -128,7 +128,12 @@ function Marine:GiveRailGunWelderExo(spawnPoint)
     return exo
     
 end
+function Marine:GiveRailGunFlamerExo(spawnPoint)
 
+    local exo = self:Replace(Exo.kMapName, self:GetTeamNumber(), false, spawnPoint, { layout = "RailgunFlamer"  })
+    return exo
+    
+end
 function Marine:GiveWelderFlamer(spawnPoint)
 
     local exo = self:Replace(Exo.kMapName, self:GetTeamNumber(), false, spawnPoint, { layout = "WelderFlamer"  })
@@ -149,7 +154,7 @@ function Marine:GiveDualRailgunExo(spawnPoint)
     
 end
 kIsExoTechId = { [kTechId.DualFlamerExosuit] = true, [kTechId.DualMinigunExosuit] = true, [kTechId.DualWelderExosuit] = true, [kTechId.WeldFlamerExosuit] = true,
-                 [kTechId.DualRailgunExosuit] = true, [kTechId.RailgunWelderExoSuit] = true, }
+                 [kTechId.DualRailgunExosuit] = true, [kTechId.RailgunWelderExoSuit] = true, [kTechId.RailgunFlamerExoSuit] = true, }
                  
 local function BuyExo(self, techId)
 
@@ -189,6 +194,9 @@ local function BuyExo(self, techId)
                 exo = self:GiveDualRailgunExo(spawnPoint)
             elseif techId == kTechId.RailgunWelderExoSuit then
                 exo = self:GiveRailGunWelderExo(spawnPoint)
+            elseif techId == kTechId.RailgunFlamerExoSuit then
+                exo = self:GiveRailGunFlamerExo(spawnPoint)
+                
             end
             
 

@@ -205,13 +205,13 @@ if Points ~= nil and Points ~= 0 and Player and not Shared.GetCheatsEnabled() th
  local client = Player:GetClient()
  if not client then return end
          
-    local addamount = Points * 0.10     
+    local addamount = Points --* 0.10     
  local controlling = client:GetControllingPlayer()
  
          if Player:GetTeamNumber() == 1 then
-         self.marinecredits = self.marinecredits + addamount 
+         self.marinecredits = self.marinecredits + Points 
         elseif Player:GetTeamNumber() == 2 then
-         self.aliencredits = self.aliencredits + addamount 
+         self.aliencredits = self.aliencredits + Points 
          end
          
 self.CreditUsers[ controlling:GetClient() ] = self:GetPlayerCreditInfo(controlling:GetClient()) + addamount
@@ -248,8 +248,8 @@ end
  end
 function Plugin:SaveCredits(Client, disconnected)
        local Data = self:GetCreditData( Client )
-       if Data and Data.credits then 
-         if not Data.name or Data.name ~= Client:GetControllingPlayer():GetName() then
+       if Data then 
+         if Data.name ~= Client:GetControllingPlayer():GetName() then
            Data.name = Client:GetControllingPlayer():GetName()
            end        
        Data.credits = GetCreditsToSave(self, Client, Data.credits)
@@ -276,20 +276,21 @@ local Player = Client:GetControllingPlayer()
     
 end
 function Plugin:ClientDisconnect(Client)
-self:SaveCredits(Client, true)
+--self:SaveCredits(Client, true)
 self:DestroyAllCreditStructFor(Client)
 end
 function Plugin:GetPlayerCreditInfo(Client)
-   local Credits = 0
-       if self.CreditUsers[ Client ] then
-          Credits = self.CreditUsers[ Client ]
-       elseif not self.CreditUsers[ Client ] then 
-          local Data = self:GetCreditData( Client )
-           if Data and Data.credits ~= nil then 
-           Credits = Data.credits 
-           end
-       end
-return math.round(Credits, 2)
+  -- local Credits = 0
+    --   if self.CreditUsers[ Client ] then
+     --     Credits = self.CreditUsers[ Client ]
+      -- elseif not self.CreditUsers[ Client ] then 
+      --    local Data = self:GetCreditData( Client )
+         --  if Data  then 
+         --  Credits = 0 --Data.credits 
+         --  end
+     -- end
+--return math.round(Credits, 2)
+return 0
 end
 local function GetIDFromClient( Client )
 	return Shine.IsType( Client, "number" ) and Client or ( Client.GetUserId and Client:GetUserId() ) -- or nil --or nil was blocked but im testin
@@ -444,12 +445,13 @@ function Plugin:SetGameState( Gamerules, State, OldState )
              end
       end)
       
-      
+      /*
             self:SimpleTimer( 8, function() 
        local LinkFiley = Shine.LoadJSONFile( URLPath )
         self.LinkFile = LinkFiley
             self:SaveAllCredits()
             end)
+            */
             
             
            --   local Time = Shared.GetTime()

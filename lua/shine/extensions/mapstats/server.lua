@@ -63,19 +63,18 @@ function Plugin:SetGameState( Gamerules, State, OldState )
 end
 function Plugin:GetStatsData(aliens, marines)
       local Map = self.MapStatsData.Maps[ tostring( Shared.GetMapName() ) ]
-       if not Map then return 0 end
       if aliens then 
         local alienstats = 0
-        if Map and Map.aliens then alienstats = Map.aliens end
+        alienstats = Map.aliens 
         if self.AliensWon then alienstats = alienstats + 1 end
        return alienstats
      end
     if marines then
       local marinestats = 0
-       if Map and Map.marines then marinestats = Map.marines end
+        marinestats = Map.marines 
        if self.MarinesWon then marinestats = marinestats + 1 end
        return marinestats
-    end
+       end
 end
         
 function Plugin:ShowStats()

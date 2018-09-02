@@ -50,8 +50,8 @@ function LiveMixin:Kill(attacker, doer, point, direction)
         if ( HasMixin(self, "Construct") or self:isa("ARC") or self:isa("MAC") ) and attacker and attacker:isa("Player") then 
               --if GetHasHungerUpgrade(attacker) and attacker:isa("Gorge") and doer:isa("DotMarker") then 
                 if attacker:isa("Gorge") and doer:isa("DotMarker") then 
-                        attacker:TriggerEnzyme(5)
-                        attacker:AddEnergy(30)
+                        attacker:TriggerEnzyme(6)
+                        attacker:AddEnergy(40)
                end
           end
      end 

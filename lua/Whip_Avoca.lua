@@ -22,57 +22,6 @@ function Whip:OnConstructionComplete()
 end
 
 
-local orig_Whip_OnInit = Whip.OnInitialized
-function Whip:OnInitialized()
-    orig_Whip_OnInit(self)
-  InitMixin(self, InfestationMixin)
-  
-
-
-
-    if  GetConductor():GetIsPhaseFourBoolean()  then 
-        self.damageRes = 30
-       
-    elseif  GetConductor():GetIsPhaseThreeBoolean()  then 
-       self.damageRes = 20
-      
-    elseif GetConductor():GetIsPhaseTwoBoolean()  then 
-       self.damageRes = 10
-       
-    else
-        self.damageRes = 1
-    end
-    
-end
-
-
-   /*
-   
-   if I do dmgres then do it as a networkvar amt gradually increased by the current phase
-     or just gradually increase maxhp on init based on round
-   
-function Whip:GetWhipsInRange()
-      local whip = GetEntitiesWithinRange("Whip", self:GetOrigin(), Whip.kBombardRange)
-      return Clamp(#whip - 1, 0.1, 7)
-end
-  */
-
-function Whip:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
-
-    if hitPoint ~= nil and doer ~= nil then
-        damageTable.damage = damageTable.damage - (self.damageRes/100) * damageTable.damage
-    end
-
-end
-
-
-function Whip:GetUnitNameOverride(viewer) --Triggerhappy stoner
-    local unitName = GetDisplayName(self)   
-    --unitName = string.format(Locale.ResolveString("Crag (+%sS 0%)"), self:GetCragsInRange()) --, self:GetBonusAmt() )
-    unitName = "Whip (+"..self.damageRes.."% dmgres)" --, self:GetBonusAmt() )
-return unitName
-end
-
  
   function  Whip:GetInfestationRadius()
      if  GetConductor():GetIsPhaseTwoBoolean() then
@@ -86,14 +35,6 @@ end
    
 if Server then
 
-
-    
-local origupdate = Whip.OnUpdate
-function Whip:OnUpdate(deltaTime)
-        origupdate(self, deltaTime)
-        self.kDamage = kWhipSlapDamage * Clamp(self:GetHealthScalar(), .3, 1)
-        self.kRange = 7 * Clamp(self:GetHealthScalar(), .3, 1)
-end
 
 function Whip:UpdateRootState()
     
@@ -110,7 +51,5 @@ function Whip:UpdateRootState()
     end
     
 end
-end
-function Whip:OnKill(attacker, doer, point, direction)
- --if attacker and attacker:isa("ARC") then AddPayLoadTime(1) end
+
 end

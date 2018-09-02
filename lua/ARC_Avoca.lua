@@ -7,7 +7,6 @@ local kAvocaWeedMaterial = PrecacheAsset("Glow/green/green.material")
 local networkVars = 
 {
  avoca = "boolean",
- mainroom = "boolean",
  lastCheck = "time",
   vortexCheck = "boolean",
 }
@@ -51,8 +50,6 @@ function ARC:OnInitialized()
      self.lastCheck = 0
      if  GetPayLoadArc() == nil then
            self.avoca = true 
-     else
-     self.mainroom = true
         end
      self.vortexCheck = false
 end
@@ -109,6 +106,8 @@ local function GetNearestEligable(self)
 end
 
 
+/*
+
 local function GetRandomEligable(self)
  local eligable = {}
         for index, target in ipairs(GetEntitiesWithMixinWithinRange("Construct", self:GetOrigin(), 9999 )) do
@@ -121,6 +120,10 @@ local function GetRandomEligable(self)
         --  Print("GetRandomEligable is %s", ent:GetMapName())
           return  ent
 end
+
+*/
+
+
 
 local function hasScan(who, where)
           if not where then where = who:GetOrigin() end 
@@ -245,32 +248,40 @@ function ARC:GiveScan()
  --   self.vortexCheck = false
  --   self:CheckVortex()
  --  end
+  
+   if not self:GetInAttackMode() or  self.targetPosition == nil then return end
    
-    local where = GetNearestEligable(self):GetOrigin()
-    
-    for _, shade in ipairs(GetEntitiesWithinRange("Shade", where, 20)) do
+ --   local where = GetNearestEligable(self):GetOrigin()
+
+    if not hasScan(self, self.targetPosition ) then  
+      CreateEntity(Scan.kMapName, self.targetPosition , 1) 
+      end
+      
+    for _, shade in ipairs(GetEntitiesWithinRange("Shade", self.targetPosition, 20)) do
        if shade:GetIsBuilt() then
-         shade.shouldInk = true
+           shade.shouldInk = true  --better than shade onup scan check
+           break -- one at a time?
        --  self.vortexCheck = true
          end
     end
     
-    if not hasScan(self, where) then  
-      CreateEntity(Scan.kMapName, where , 1) 
-      end
+
 end
 
-
+/*
 local origu = ARC.OnUpdate
 function ARC:OnUpdate(deltaTime)
     origu(self, deltaTime)
+   
    
     if self:GetInAttackMode() and  GetIsTimeUp(self.lastCheck, 4)  then
       self.lastCheck = Shared.GetTime()
       self:GiveScan()
     end
+    
 
 end
+*/
 
 
 
@@ -293,15 +304,34 @@ end
 
 
 
-
-local function MoveToMainRoom(self)
-      local ent = GetRandomEligable(self)
-      local where = ent:GetOrigin()
-      if not where then return end
-      self:GiveOrder(kTechId.Move, nil, FindFreeSpace(where), nil, true, true)
-
+local function GetPowerBuilt(self)
+    local choice = math.random(1,100)  
+    local power = nil
+     if choice >= 70 then
+      power =  GetNearest(self:GetOrigin(), "PowerPoint", 1, function(ent) return ent:GetIsBuilt() and not ent:GetIsDisabled() and GetLocationForPoint(self:GetOrigin()) ~= GetLocationForPoint(ent:GetOrigin())   end) --or arc nearby and not in attack radius 
+     else 
+      power = GetRandomActivePower()
+     end
+     if power then
+          --  Print("Power is %s", GetLocationForPoint(power:GetOrigin()).name)
+            return power
+     else
+            return nil
+     end
 end
 
+local function GetRandomEligable(self)
+ local eligable = {}
+        for index, target in ipairs(GetEntitiesWithMixinWithinRange("Construct", self:GetOrigin(), 9999 )) do
+                if target:GetTeamNumber() == 2 and CanMoveTo(self, target) then
+                  table.insert(eligable, target)
+                end
+          end
+          if #eligable == 0 then return nil end
+          local ent = table.random(eligable)
+        --  Print("GetRandomEligable is %s", ent:GetMapName())
+          return  ent
+end
 local function MoveToHives(who) --Closest hive from origin
 local where = who:GetOrigin()
  local hive =  GetNearest(where, "Hive", 2, function(ent) return not ent:GetIsDestroyed() end)
@@ -311,6 +341,41 @@ local where = who:GetOrigin()
                   return
                 end  
 end
+
+
+local function MoveToMainRoom(self)
+    local power = nil
+    local phase = GetConductor().phase
+    --Print("Phase is %s", phase)
+    if phase == 1 then
+           power = GetPowerBuilt(self)
+    elseif phase == 2 then
+           power = GetNearestEligable(self)
+    elseif phase == 3 then
+           power = GetNearestEligable(self)
+    elseif phase == 4 then
+           MoveToHives(self) --90 percent chance or so mething, else nearest or chance random
+           return
+    else
+           power = GetPowerBuilt(self)
+    end
+    --local chance = 50 50 to random eligable?
+      --GetRandomEligable(self)
+    --  if power then --or chance
+    --  else                                --GetRandomEligable is bad because for loop anyway
+   --      power = GetNearestEligable(self) --GetRandomEligable(self) --getNEarest or getrandom is better dunno. chance it, better chance nerest
+     -- end
+         if not power then 
+         power = GetNearestEligable(self)
+         return 
+        end
+        if not power then return end
+         local where = power:GetOrigin()
+         if not where then return end
+         self:GiveOrder(kTechId.Move, nil, where, nil, true, true)
+
+end
+
 
 local function AliensStop(who)
   
@@ -333,27 +398,20 @@ end
 
 */
 
-function ARC:SpecificRules()
+function ARC:SpecificRules(phase)
 --BuffPlayers(self)
 
 local moving = self.mode == ARC.kMode.Moving     
 --Print("moving is %s", moving) 
         
 local attacking = self.deployMode == ARC.kDeployMode.Deployed
---Print("avoca is %s mainroom is %s attacking is %s", self.avoca, self.mainroom, attacking) 
+      if attacking then self:GiveScan() end
 local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self)  
---Print("avoca is %s mainroom is %s inradius is %s", self.avoca, self.mainroom, inradius) 
-
 local shouldstop = ShouldStop(self)
---Print("avoca is %s mainroom is %s shouldstop is %s", self.avoca, self.mainroom, shouldstop) 
 local shouldmove = not shouldstop and not moving and not inradius
---Print("avoca is %s mainroom is %s shouldmove is %s", self.avoca, self.mainroom, shouldmove) 
       shouldstop = moving and shouldstop
---Print("avoca is %s mainroom is %s shouldstop is %s", self.avoca, self.mainroom, shouldstop) 
 local shouldattack = inradius and not attacking 
---Print("avoca is %s mainroom is %s shouldattack is %s", self.avoca, self.mainroom, shouldattack) 
 local shouldundeploy = attacking and not inradius and not moving
---Print("avoca is %s mainroom is %s shouldundeploy is %s", self.avoca, self.mainroom, shouldundeploy) 
   
   if moving then
     
@@ -371,9 +429,9 @@ local shouldundeploy = attacking and not inradius and not moving
          GiveUnDeploy(self)
        else --should move
        --Print("CanMove")
-          if self.mainroom == true then 
-           MoveToMainRoom(self)
-          elseif self.avoca == true then
+          if self.avoca == false then 
+              MoveToMainRoom(self)
+          else
              MoveToHives(self)
           end
        end

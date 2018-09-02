@@ -144,9 +144,9 @@ function Imaginator:OnUpdate(deltatime)
 end
 
 function Imaginator:Imaginations() --Tres spending WIP
-      local marine = GetEntitiesWithMixinForTeam("Construct", 1) 
-      local alien = GetEntitiesWithMixinForTeam("Construct", 2) 
-       Print("Construct Count:  marine: %s, alien %s", #marine, #alien)
+   --   local marine = GetEntitiesWithMixinForTeam("Construct", 1) 
+  --    local alien = GetEntitiesWithMixinForTeam("Construct", 2) 
+--       Print("Construct Count:  marine: %s, alien %s", #marine, #alien)
 
       
               self:MarineConstructs()
@@ -551,23 +551,9 @@ function Imaginator:ActualFormulaMarine()
 end
 
 
-local function HasTeamInNeed(who)
-      for _, entity in ipairs(GetEntitiesWithinRange("Live", who:GetOrigin(), who.kHealRadius)) do
-             if entity:GetIsAlive() and not entity:isa("Commander") then 
-                 if entity:GetIsInCombat() and entity:GetHealthScalar() <= 0.91  then
-                        return true
-                end
-            end
-      end
-end
 
-local function AllNearByHealWave(who)
-    for _, crag in ipairs(GetEntitiesWithinRange("Crag", who:GetOrigin(), who.kHealRadius)) do
-         if not crag:GetIsOnFire() and  GetIsUnitActive(crag) then
-            crag:TriggerHealWave()
-         end
-    end
-end
+
+
 
 local function GetAlienSpawnList(self)
 
@@ -614,20 +600,7 @@ local canafford = {}
              end
          end
   
-      local  Crag = GetEntitiesForTeam( "Crag", 2 )
-        --HealWave
-      if #Crag >= 1 and  TresCheck(2,2) then
-          for i = 1, #Crag do
-            local ent = Crag[i]
-               local cost = LookupTechData(kTechId.HealWave, kTechDataCostKey)
-                  if not ent:GetIsOnFire() and GetIsUnitActive(ent) and GetIsTimeUp(self.lasthealwave, kHealWaveCooldown) and  HasTeamInNeed(ent)  then --or ( IsInRangeOfHive(ent) and GetSiegeDoorOpen() and GetArcsDeployedSiege() ) ) then
-                   AllNearByHealWave(ent)
-                   self.lasthealwave = Shared.GetTime()
-                   ent:GetTeam():SetTeamResources(ent:GetTeam():GetTeamResources() - cost) 
-                  break
-                 end
-          end
-      end
+
       
       
       local finalchoice = table.random(canafford)
@@ -748,8 +721,8 @@ return true
 end
 
 
-
-local function FakeCyst(where) 
+/*
+local function Fake(where) 
          local cyst = GetEntitiesWithinRange("Cyst",where, kCystRedeployRange)
          local cost = 1 
         if not (#cyst >=1) then --and TresCheck(2, cost) then
@@ -758,6 +731,7 @@ local function FakeCyst(where)
        -- entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
         end
 end
+*/
 
 
 
@@ -765,7 +739,9 @@ end
 
 function Imaginator:ActualAlienFormula(cystonly)
   GetConductor():ManageDrifters() 
-   GetConductor():ManageStructures() --gonna affect Phase Cannon ....... horrible perf?
+  GetConductor():ManageCrags() 
+  GetConductor():ManageShifts()
+  GetConductor():ManageWhips() --gonna affect Phase Cannon ....... horrible perf?
   local randomspawn = nil
   local powerpoint  = GetRandomDisabledPower()
   local tospawn, cost = GetAlienSpawnList(self) --, cost, gamestarted = GetAlienSpawnList(self, cystonly)
@@ -796,7 +772,7 @@ function Imaginator:ActualAlienFormula(cystonly)
                           local minrange =  nearestof.GetMinRangeAC and nearestof:GetMinRangeAC() or math.random(4,8) --nearestof:GetMinRangeAC()
                          -- if tospawn == kTechId.NutrientMist then minrange = NutrientMist.kSearchRange end
                            if range >=  minrange then
-                             Print("ActualAlienFormula range range >=  minrange")
+                             --Print("ActualAlienFormula range range >=  minrange")
                              entity = CreateEntityForTeam(tospawn, randomspawn, 2)
                              -- cost = GetAlienCostScalar(self, cost)
                              if gamestarted then
@@ -807,7 +783,7 @@ function Imaginator:ActualAlienFormula(cystonly)
                      else -- it tonly takes 1!
                           entity = CreateEntityForTeam(tospawn, randomspawn, 2)
                         -- if entity:isa("Cyst") then CystChain(entity:GetOrigin()) end
-                            if not entity:isa("Cyst") then FakeCyst(entity:GetOrigin()) end
+                      --      if not entity:isa("Cyst") then FakeCyst(entity:GetOrigin()) end
                           if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                           success = true
                      end 

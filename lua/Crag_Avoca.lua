@@ -22,12 +22,16 @@ self.lastCheck = 0
 
     if  GetConductor():GetIsPhaseFourBoolean()  then 
         self.bonusHeal = 30
+        Crag.kHealRadius = 14 * 1.3
     elseif  GetConductor():GetIsPhaseThreeBoolean()  then 
        self.bonusHeal = 20
+       Crag.kHealRadius = 14 * 1.2
     elseif  GetConductor():GetIsPhaseTwoBoolean()  then 
        self.bonusHeal = 10    
+       Crag.kHealRadius = Crag.kHealRadius * 1.10
     else
         self.bonusHeal = 1
+        Crag.kHealRadius = 14
     end
     
 end
@@ -48,6 +52,22 @@ function Crag:GetMinRangeAC()
 return 14/5 
 end
 
+local function ManageHealWave(self)
+      for _, entity in ipairs(GetEntitiesWithinRange("Live", self:GetOrigin(), Crag.kHealRadius)) do
+                 if not self:GetIsOnFire() and GetIsUnitActive(self) and entity:GetIsInCombat() and entity:GetHealthScalar() <= .9  then
+                         self:TriggerHealWave()
+                         if self.moving then 
+                            self:ClearOrders()
+                        end
+                end
+      end
+end
+
+
+
+function Crag:InstructSpecificRules()
+ManageHealWave(self)
+end
 
 
 

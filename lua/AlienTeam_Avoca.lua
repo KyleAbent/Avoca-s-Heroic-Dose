@@ -50,4 +50,18 @@ function AlienTeam:InitTechTree()
     PlayingTeam.InitTechTree = orig_PlayingTeam_InitTechTree
 end
 
+local origInitial = AlienTeam.SpawnInitialStructures
+function AlienTeam:SpawnInitialStructures(techPoint)   --Not convenient to copy local function from marineteam exactly as written just to place more than default IP amount.
+    local techPointOrigin = techPoint:GetOrigin() + Vector(0, 2, 0)
+	for i = 1, 4 do
+              local spawnPoint = GetRandomBuildPosition( kTechId.Crag, techPointOrigin, Crag.kHealRadius )
+              spawnPoint = spawnPoint and spawnPoint - Vector( 0, 0.6, 0 )
+                  if spawnPoint then
+                  local crag = CreateEntity(Crag.kMapName, spawnPoint, self:GetTeamNumber())
+               --   SetRandomOrientation(ip)
+                  crag:SetConstructionComplete()
+                  end
+	end
 
+return origInitial(self,techPoint)
+end

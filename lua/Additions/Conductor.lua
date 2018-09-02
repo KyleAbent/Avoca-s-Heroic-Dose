@@ -38,6 +38,7 @@ function Conductor:TimerValues()
    self.PhaseTwoTimer = 600
    self.PhaseThreeTimer = 900
    self.PhaseFourTimer = 1200
+   self.phase = 0
    
 end
 function Conductor:OnReset() 
@@ -165,7 +166,7 @@ local function BuildAllNodes(self)
           for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
              powerpoint:SetConstructionComplete() 
              local where = powerpoint:GetOrigin()
-               if powerpoint:GetIsBuilt() and powerpoint.lightHandler then  powerpoint.lightHandler:SimpleLights() end
+               if powerpoint:GetIsBuilt() and powerpoint.lightHandler then  powerpoint.lightHandler:DiscoLights() end
               if not GetIsPointInMarineBase(where) and math.random(1,2) == 1  then 
                      powerpoint:Kill() 
               end 
@@ -180,10 +181,7 @@ local function DeleteResNodes(self)
 
 end
 
-    local kMachineGunPlayerDamageScalar = 1.7
-     local function MultiplyForMachineGun(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
-     return ConditionalValue(target:isa("Player") or target:isa("Exosuit"), damage * kMachineGunPlayerDamageScalar, damage), armorFractionUsed, healthPerArmor
-    end  
+
 function Conductor:OnRoundStart() 
             self.gameStartTime = Shared.GetTime()
            self:TimerValues()
@@ -194,12 +192,7 @@ function Conductor:OnRoundStart()
             end
             
     if kDamageTypeRules then      --DamageTypes.lua overwrite mod
-
-    
-    kDamageTypeRules[kDamageType.MachineGun] = {}
-    table.insert(kDamageTypeRules[kDamageType.MachineGun], MultiplyForMachineGun)
- 
-    
+     DoAvoca()
   --  kDamageTypeRules[kDamageType.Corrode] = {}
    -- table.insert(kDamageTypeRules[kDamageType.Corrode], ReduceGreatlyForPlayers)
     --table.insert(kDamageTypeRules[kDamageType.Corrode], IgnoreHealthForPlayersUnlessExo)
@@ -213,7 +206,7 @@ function Conductor:OnCreate()
    self.phaseCannonTime = 30
    self.powerlighth = nil
    end
-  self:TimerValues()
+    self.phase = 0
       self:SetUpdates(true)
 end
 
@@ -393,10 +386,20 @@ end
 
 
 function Conductor:ManageArcs()
-
+    /*
+    if self.phase == 1 then
+    elseif self.phase == 2 then
+    elseif self.phase == 3 then
+    elseif self.phase== 4 then
+    else
+    end
+    */
+    
    for index, arc in ipairs(GetEntitiesForTeam("ARC", 1)) do
      arc:Instruct()
    end
+   
+   
 end
 
 local function ManagePower(who, where)
@@ -555,8 +558,48 @@ function Conductor:ManageDrifters()
    end
    
 end
+function Conductor:ManageShifts()
 
-function Conductor:ManageStructures()
+       local random = math.random(1,4)
+       
+
+       
+       for i = 1, random do --maybe time delay ah
+           local hive = GetRandomHive()
+           local nearestof = GetNearest(hive:GetOrigin(), "Shift", 2, function(ent) return ent:GetIsBuilt() and ( ent.GetIsInCombat and not ent:GetIsInCombat() and not ent:GetIsACreditStructure() and not ent.moving )  end)
+            if nearestof then
+               local power = GetNearest(nearestof:GetOrigin(), "PowerPoint", 1,  function(ent) return ent:GetIsBuilt() and ent:GetIsDisabled() and GetLocationForPoint(nearestof:GetOrigin()) ~= GetLocationForPoint(ent:GetOrigin())  end ) 
+               if power then
+                 nearestof:GiveOrder(kTechId.Move, power:GetId(), FindFreeSpace(power:GetOrigin(), 4), nil, false, false) 
+               end
+            end 
+       end  
+end
+
+
+
+function Conductor:ManageCrags()
+
+       local random = math.random(1,4)
+       
+
+       
+       for i = 1, random do --maybe time delay ah
+           local hive = GetRandomHive()
+           local nearestof = GetNearest(hive:GetOrigin(), "Crag", 2, function(ent) return ent:GetIsBuilt() and not ent:GetIsACreditStructure() end) --and not ent.moving )  end)
+            if nearestof then
+            --if moving then like arc instruct specificrules
+               nearestof:InstructSpecificRules()
+               if nearestof.moving then return end
+               local power = GetNearest(nearestof:GetOrigin(), "PowerPoint", 1,  function(ent) return ent:GetIsBuilt() and ent:GetIsDisabled() and GetLocationForPoint(nearestof:GetOrigin()) ~= GetLocationForPoint(ent:GetOrigin()) end ) 
+               if power then
+                 nearestof:GiveOrder(kTechId.Move, power:GetId(), FindFreeSpace(power:GetOrigin(), 4), nil, false, false) 
+               end
+            end 
+       end  
+end
+
+function Conductor:ManageWhips()
 
        --mindfuck would be getnearest built node that is beyond the arc radius of the closest arc to that node. HAH.
        --local powerpoint = GetRandomActivePower() 
@@ -568,7 +611,7 @@ function Conductor:ManageStructures()
        
        for i = 1, random do --maybe time delay ah
            local hive = GetRandomHive()
-           local nearestof = GetNearest(hive:GetOrigin(), "Whip", 2, function(ent) return ent:GetIsBuilt() and ( ent.GetIsInCombat and not ent:GetIsInCombat() and not ent:GetIsACreditStructure() )  end)
+           local nearestof = GetNearest(hive:GetOrigin(), "Whip", 2, function(ent) return ent:GetIsBuilt() and ( ent.GetIsInCombat and not ent:GetIsInCombat() and not ent:GetIsACreditStructure() and not ent.moving )  end)
             if nearestof then
                local power = GetNearest(nearestof:GetOrigin(), "PowerPoint", 1,  function(ent) return ent:GetIsBuilt() and not ent:GetIsDisabled()  end ) 
                if power then
@@ -581,14 +624,7 @@ function Conductor:ManageStructures()
 end
 
 
-local function PhaseFourYo(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
 
-    if target:isa("Player") and attacker:isa("Player") then
-    damage = damage * 1.4
-    end
-    return damage, armorFractionUsed, healthPerArmor
-
-end
 
 
  function Conductor:SetGamePhase(phase)

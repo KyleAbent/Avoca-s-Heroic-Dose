@@ -6,7 +6,7 @@ ModLoader.SetupFileHook( "lua/Marine.lua", "lua/Marine_Avoca.lua", "post" )
 ModLoader.SetupFileHook( "lua/Alien.lua", "lua/Alien_Avoca.lua", "post" )
 
 
---ModLoader.SetupFileHook( "lua/DamageTypes.lua", "lua/DamageTypes_Avoca.lua", "post" )
+ModLoader.SetupFileHook( "lua/DamageTypes.lua", "lua/DamageTypes_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Exo.lua", "lua/Exo_Avoca.lua", "post" )
 
@@ -29,6 +29,9 @@ ModLoader.SetupFileHook( "lua/Armory.lua", "lua/Armory_Avoca.lua", "post" )
 ModLoader.SetupFileHook( "lua/Skulk.lua", "lua/Skulk_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/ConstructMixin.lua", "lua/ConstructMixin_Siege19.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/PowerConsumerMixin.lua", "lua/PowerConsumerMixin_Siege19.lua", "post" )
+
 
 ModLoader.SetupFileHook( "lua/Lerk.lua", "lua/Lerk_Avoca.lua", "post" )
 

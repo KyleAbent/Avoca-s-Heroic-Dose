@@ -59,22 +59,22 @@ local orig_PowerPoint_StopDamagedSound = PowerPoint.StopDamagedSound
       -- if nearestHarvester then nearestHarvester:Kill() end
    end
    
-   /*
+/*
    
 local orig_PowerPoint_OnKill = PowerPoint.OnKill
     function PowerPoint:OnKill(attacker, doer, point, direction)
-    orig_PowerPoint_OnKill(self)
-                --  AddPayLoadTime(kTimeRemovePowerKilled)
-    --if not GetIsPointInMarineBase(self:GetOrigin()) then KillAllStructuresInLocation(self:GetOrigin(), 1) end
+    orig_PowerPoint_OnKill(self, attacker, doer, point, direction)
     
-       --local nearestExtractor = GetNearest(self:GetOrigin(), "Extractor", 1, function(ent) return LocationsMatch(self,ent)  end)
-      -- if nearestExtractor then
-       --  nearestExtractor:Kill()
-       --end
+      local  PanicAttackCount = GetEntitiesForTeam( "PanicAttack", 2 )
+      if #PanicAttackCount < 18 then 
+             for i = 1 ,math.random(1, ( 18 - #PanicAttackCount ) * mult ) do
+             local panicattack = CreateEntity(PanicAttack.kMapName, FindFreeSpace(self:GetOrigin(), 8, 24), 2)
+             end
+      end     
        
     end
-    
-    */
+   */ 
+
     
     
     function PowerPoint:GetCanBeUsedConstructed(byPlayer)
