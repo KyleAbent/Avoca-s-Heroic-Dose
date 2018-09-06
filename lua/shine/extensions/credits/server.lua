@@ -2,6 +2,8 @@
 KyleAbent@gmail.com 
 */
 
+
+Script.Load("lua/Additions/Conductor.lua")
 Script.Load("lua/Additions/CreditMixin.lua")
 local Shine = Shine
 local Plugin = Plugin
@@ -27,7 +29,7 @@ local URLPath = "config:--shine/CreditsLink.json"
 local BadgesPath = "config:--shine/UserConfig.json"
 
 
-Shine.Hook.SetupClassHook( "ScoringMixin", "AddScore", "OnScore", "PassivePost" )
+Shine.Hook.SetupClassHook( "Player", "AddResources", "OnAddResources", "PassivePost" )
 
 Shine.Hook.SetupClassHook( "OnoGrow", "OnoEggFilled", "OnOnEggFilled", "PassivePost" )
 
@@ -198,25 +200,17 @@ function Plugin:PrimalScreamPointBonus(who, Points)
 end
 */
 
-function Plugin:OnScore( Player, Points, Res, WasKill ) --or on spawn xD
-if Points ~= nil and Points ~= 0 and Player and not Shared.GetCheatsEnabled() then
-   --if not self.GameStarted then Points = 1  AddOneScore(Player,Points,Res, WasKill) end
-  --if WasKill and Player:isa("Alien") then self:PrimalScreamPointBonus(Player, Points) end
- local client = Player:GetClient()
- if not client then return end
+function Plugin:OnAddResources(who) --or on spawn xD
+
+ --local client = who.GetClient and who:GetClient()
+ --if not client then return end
          
-    local addamount = Points --* 0.10     
- local controlling = client:GetControllingPlayer()
- 
-         if Player:GetTeamNumber() == 1 then
-         self.marinecredits = self.marinecredits + Points 
-        elseif Player:GetTeamNumber() == 2 then
-         self.aliencredits = self.aliencredits + Points 
-         end
-         
-self.CreditUsers[ controlling:GetClient() ] = self:GetPlayerCreditInfo(controlling:GetClient()) + addamount
-Shine.ScreenText.SetText("Credit", string.format( "%s Credit", self:GetPlayerCreditInfo(controlling:GetClient()) ), controlling:GetClient()) 
-end
+    --local addamount = amount --* 0.10     
+    local controlling = who --client:GetControllingPlayer()
+
+local res = controlling:GetResources()
+--self.CreditUsers[ controlling:GetClient() ] =  res
+Shine.ScreenText.SetText("Credit", string.format( "%s Credit", res ), controlling:GetClient()) 
 end
 function Plugin:NotifySiege( Player, String, Format, ... )
 Shine:NotifyDualColour( Player, 255, 165, 0,  "[Siege]",  math.random(0,255), math.random(0,255), math.random(0,255), String, Format, ... )
@@ -382,7 +376,8 @@ function Plugin:DeductCreditIfNotPregame(self, who, amount, delayafter)
  if ( GetGamerules():GetGameStarted() and not GetGamerules():GetCountingDown() )  then
         -- amount = amount * kPrestoCreditMul
         -- Print("Cost is %s", amount)
-         self.CreditUsers[ who:GetClient() ] = self:GetPlayerCreditInfo(who:GetClient()) - amount
+       --  self.CreditUsers[ who:GetClient() ] = self:GetPlayerCreditInfo(who:GetClient()) - amount
+         who:SetResources( who:GetResources() - amount ) 
          self.PlayerSpentAmount[who:GetClient()] = self.PlayerSpentAmount[who:GetClient()]  + amount
          Shine.ScreenText.SetText("Credit", string.format( "%s Credit", self:GetPlayerCreditInfo(who:GetClient()) ), who) 
    self.BuyUsersTimer[who:GetClient()] = Shared.GetTime() + delayafter
@@ -600,7 +595,8 @@ end
 
 if ( GetGamerules():GetGameStarted() and not GetGamerules():GetCountingDown()  )  then  
 
-    if  self:GetPlayerCreditInfo(Player:GetClient()) < cost  then 
+  --  if  self:GetPlayerCreditInfo(Player:GetClient()) < cost  then 
+    if Player:GetResources() < cost then
    self:NotifyCredit( Client, "%s costs %s Credit, you have %s Credit. Purchase invalid.", true, String, cost, self:GetPlayerCreditInfo(Player:GetClient()) )
     return true
     end
@@ -1098,7 +1094,7 @@ local function SetCredit(Client, Targets, Number, Display, Double) --TriggerHapp
 
 for i = 1, #Targets do
 local Player = Targets[ i ]:GetControllingPlayer()
-self.CreditUsers[ Player:GetClient() ] = Number
+--self.CreditUsers[ Player:GetClient() ] = Number
 Shine.ScreenText.SetText("Credit", string.format("%s Credit", self:GetPlayerCreditInfo(Player:GetClient()) ), Player:GetClient())
    if Display == true then
    self:NotifyGeneric( nil, "set %s's  Credit to %s", true, Player:GetName(), Number )
@@ -1131,7 +1127,7 @@ local function AddCredit(Client, Targets, Number, Display, Double)
 for i = 1, #Targets do
 local Player = Targets[ i ]:GetControllingPlayer()
 if Double == true then Number = Number * self.Config.kCreditMultiplier end
-self.CreditUsers[ Player:GetClient() ] = self:GetPlayerCreditInfo(Player:GetClient()) + Number
+--self.CreditUsers[ Player:GetClient() ] = self:GetPlayerCreditInfo(Player:GetClient()) + Number
 Shine.ScreenText.SetText("Credit", string.format( "%s Credit", self:GetPlayerCreditInfo(Player:GetClient()) ), Player:GetClient()) 
    if Display == true then
    self:NotifyGeneric( nil, "gave %s Credit to %s (who now has a total of %s)", true, Number, Player:GetName(), self:GetPlayerCreditInfo(Player:GetClient()))

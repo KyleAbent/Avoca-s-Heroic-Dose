@@ -69,7 +69,7 @@ function Conductor:MaintainHiveDefense()
           local hive = table.random(which)
 		 if not hive:GetIsAlive() then return end
          local origin = hive:GetOrigin()
-        local canafford = GetCanSpawnAlienEntity(0)
+        local canafford = true --GetCanSpawnAlienEntity(0)
         if canafford then SpawnUpgChamber(origin) end    
           
                   return true
@@ -106,9 +106,9 @@ local function SpawnUpgChamber(origin)
           spawnedupg = true
           end
           
-         if spawnedupg == true then
-           workaround:GetTeam():SetTeamResources(workaround:GetTeam():GetTeamResources() - 0) 
-            end
+        -- if spawnedupg == true then
+        --   workaround:GetTeam():SetTeamResources(workaround:GetTeam():GetTeamResources() - 0) 
+          --  end
             
 end
 

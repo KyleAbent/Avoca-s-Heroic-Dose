@@ -33,6 +33,7 @@ end
 end
 
 function Conductor:FirePhaseCannons(powerpoint)
+
               if not GetHasThreeHives() then return end -- although not requiring biomass. Maybe later.
               /*
               local mult = 0 --Clamp( GetConductor():GetIsPhaseTwoBoolean().phase, 1, 4)
@@ -51,6 +52,8 @@ function Conductor:FirePhaseCannons(powerpoint)
              local origin = FindFreeSpace(powerpoint:GetOrigin())
              CreateEntity(Contamination.kMapName, FindFreeSpace(origin, 1, 8), 2)
           
+       /*
+       
       local  WhipCount = GetEntitiesForTeam( "Whip", 2 )   
      -- local doCons = GetConductor():GetIsPhaseFourBoolean()
       if #WhipCount < 18 then
@@ -79,8 +82,76 @@ function Conductor:FirePhaseCannons(powerpoint)
                --shade:SetConstructionComplete()-- chance < 100% ?
              end
       end
+      */
+    
+      local  PanicAttackCount = GetEntitiesForTeam( "PanicAttack", 2 )   --withinradius?
+      if #PanicAttackCount < 18 then
+             for i = 1, math.random(1, 18 - #PanicAttackCount ) do
+               local pannicattack = CreateEntity(PanicAttack.kMapName, FindFreeSpace(origin, 1, 8), 2)
+               --shade:SetConstructionComplete()-- chance < 100% ?
+             end
+      end 
       
-       
+  
+      
+     --local tospawn = {}
+     
+     if GetConductor().phase >= 1 then  
+             local  NutrientMist_Count = GetEntitiesForTeam( "NutrientMist", 2 )   --withinradius?
+             if #NutrientMist_Count < 2 then
+           --  for i = 1, math.random(1, 18 - #PannicAttackCount ) do
+                 local mist = CreateEntity(NutrientMist.kMapName, FindFreeSpace(origin, 1, 8), 2)
+              --  table.insert(tospawn, NutrientMist.kMapName)
+               --shade:SetConstructionComplete()-- chance < 100% ?
+            -- end
+               end 
+      end
+      
+      
+      if GetConductor().phase >= 2 then  
+      
+         local  ShadeInk_Count = GetEntitiesForTeam( "ShadeInk", 2 )   --withinradius?
+          if #ShadeInk_Count < 2 then
+           --  for i = 1, math.random(1, 18 - #PannicAttackCount ) do
+               local ink = CreateEntity(ShadeInk.kMapName, FindFreeSpace(origin, 1, 8), 2)
+              -- table.insert(tospawn, ShadeInk.kMapName)
+               --shade:SetConstructionComplete()-- chance < 100% ?
+            -- end
+           end 
+       end
+    
+ if GetConductor().phase >= 3 then     
+      
+     local  Rupture_Count = GetEntitiesForTeam( "Rupture", 2 )   --withinradius?
+      if #Rupture_Count < 2 then
+           --  for i = 1, math.random(1, 18 - #PannicAttackCount ) do
+               local rupture = CreateEntity(Rupture.kMapName, FindFreeSpace(origin, 1, 8), 2)
+            -- table.insert(tospawn, Rupture.kMapName)
+               --shade:SetConstructionComplete()-- chance < 100% ?
+            -- end
+      end 
+      
+   end   
+   
+    if GetConductor().phase >= 4 then  
+    
+        local  Babbler_Count = GetEntitiesForTeam( "Babbler", 2 )   --withinradius?
+         if #Babbler_Count < 9 then
+               for i = 1, math.random(1, 9 - #Babbler_Count ) do
+                local babs = CreateEntity(Babbler.kMapName, FindFreeSpace(origin, 1, 8), 2)
+               --  table.insert(tospawn, Babbler.kMapName)
+               --shade:SetConstructionComplete()-- chance < 100% ?
+               end
+          end 
+      
+      end
+      
+      /*
+      for i = 1, #tospawn do
+       local mapname = tospawn[i]
+        CreateEntity(mapname, FindFreeSpace(origin, 1, 8), 2)
+      end
+      */
 
     
 end
@@ -119,7 +190,7 @@ local function PackRulesHere(who, origin, techId, self)
          position = desired
          end
         local droppack = CreateEntity(mapName, position, 1)
-        StartSoundEffectForPlayer(GetDroppackSoundName(techId), self)
+      --  StartSoundEffectForPlayer(GetDroppackSoundName(techId), self)
        // self:ProcessSuccessAction(techId)
        -- success = true
         

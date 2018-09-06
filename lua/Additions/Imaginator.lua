@@ -83,9 +83,9 @@ local technodes = {}
 
     for _, node in pairs(tree.nodeList) do
            local canRes = tree:GetHasTech(node:GetPrereq1()) and tree:GetHasTech(node:GetPrereq2())
-           local cost = math.random(1,4) --node.cost
-         if canRes and TresCheck(2, cost) and node:GetIsResearch() and node:GetCanResearch() then
-                who:GetTeam():SetTeamResources(who:GetTeam():GetTeamResources() - cost)
+          -- local cost = math.random(1,4) --node.cost
+         if canRes and node:GetIsResearch() and node:GetCanResearch() then
+                --who:GetTeam():SetTeamResources(who:GetTeam():GetTeamResources() - cost)
                 node:SetResearched(true)
                 tree:SetTechNodeChanged(node, string.format("hasTech = %s", ToString(true)))
          end
@@ -203,9 +203,9 @@ local CommandStations = #GetEntitiesForTeam( "CommandStation", 1 )
 return GetConductor():GetIsPhaseFourBoolean()
 end
 
-local function GetHasThreeHives()
+local function GetHasFourHives()
    local Hives = #GetEntitiesForTeam( "Hive", 2 )
-   if Hives >= 3 then return true end
+   if Hives >= 4 then return true end
    return GetConductor():GetIsPhaseFourBoolean()
 end
 
@@ -323,7 +323,7 @@ local gamestarted = false
 ----------------------------------------------------------------------------------------------------
       --timecheck to prevent 3 CC in one room w/o checking for such definition
          local  CommandStation = #GetEntitiesForTeam( "CommandStation", 1 )
-         local timecheck = ( Shared.GetTime() - GetGamerules():GetGameStartTime() ) >= 120
+         local timecheck = true--( Shared.GetTime() - GetGamerules():GetGameStartTime() ) >= 120
            if timecheck and CommandStation < 3 and not GetConductor():GetIsPhaseFourBoolean() then
            table.insert(tospawn, kTechId.CommandStation)
            end
@@ -435,10 +435,10 @@ local function OrganizedIPCheck(who, self)
             end
          end
       
-         if labs < 2 and TresCheck(1, armscost) then
+         if labs < 2 then --and TresCheck(1, armscost) then
                local origin = FindFreeSpace(who:GetOrigin(), 1, kInfantryPortalAttachRange)
                local armslab = CreateEntity(ArmsLab.kMapName, origin,  1)
-               armslab:GetTeam():SetTeamResources(armslab:GetTeam():GetTeamResources() - armscost)
+               --armslab:GetTeam():SetTeamResources(armslab:GetTeam():GetTeamResources() - armscost)
                return --one at a time
          end
       
@@ -453,14 +453,14 @@ local function OrganizedIPCheck(who, self)
            
          --  for i = 1, math.abs( 2 - count ) do --one at a time
            local cost = 20
-               if TresCheck(1, cost) then 
+              -- if TresCheck(1, cost) then 
                 local where = who:GetOrigin()
                 local origin = FindFreeSpace(where, 4, kInfantryPortalAttachRange)
                    if origin ~= where then
                    local ip = CreateEntity(InfantryPortal.kMapName, origin,  1)
-                   ip:GetTeam():SetTeamResources(ip:GetTeam():GetTeamResources() - cost)
+                   --ip:GetTeam():SetTeamResources(ip:GetTeam():GetTeamResources() - cost)
                    end
-              end
+            --  end
 end
 
 
@@ -470,28 +470,7 @@ local function HaveCCsCheckIps(self)
         OrganizedIPCheck(table.random(CommandStations), self)
 end
 
-function Imaginator:ManageMarineBeacons()
-            local chair = nil
 
-                for _, entity in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do
-                    if entity:GetIsBuilt() and entity:GetHealthScalar() <= 0.3 then
-				    chair = entity
-				    break
-				    end
-               end
-
-               if not chair then
-			   return 
-			   end
-
-               local obs = GetNearest(chair:GetOrigin(), "Observatory", 1,  function(ent) return GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(chair:GetOrigin()) and ent:GetIsBuilt() and ent:GetIsPowered()  end )
-             
-                if obs then 
-                obs:TriggerDistressBeacon() 
-                self.lastMarineBeacon = Shared.GetTime()
-                end
-   
-end
 
 function Imaginator:ActualFormulaMarine()
      GetConductor():ManageMacs()  
@@ -499,7 +478,7 @@ function Imaginator:ActualFormulaMarine()
      local randomspawn = nil
      local tospawn, cost, gamestarted = GetMarineSpawnList(self)
      if  GetIsTimeUp(self.lastMarineBeacon, 30) then 
-	 self:ManageMarineBeacons()
+	 GetConductor():ManageMarineBeacons()
 	 end
 
      if GetGamerules():GetGameState() == kGameState.Started then 
@@ -534,13 +513,13 @@ function Imaginator:ActualFormulaMarine()
                           
                       if range >=  minrange  then
                             entity = CreateEntityForTeam(tospawn, randomspawn, 1)
-                            if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
+                           -- if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                                --BuildNotificationMessage(randomspawn, self, tospawn)
                                success = true
                             end --
                       else -- it tonly takes 1!
                        entity = CreateEntityForTeam(tospawn, randomspawn, 1)
-                          if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
+                        --  if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                           success = true
                         end  
                     end
@@ -589,7 +568,7 @@ local canafford = {}
       end 
       
       local timecheck = true --( Shared.GetTime() - GetGamerules():GetGameStartTime() ) >= 120
-       if timecheck and not GetHasThreeHives() then
+       if timecheck and not GetHasFourHives() then
       table.insert(tospawn, kTechId.Hive)
       end
   
@@ -673,7 +652,7 @@ if not gamestarted then return end
                  randomspawn = FindFreeSpace( hive:GetOrigin(), 4, 24, true)
             if randomspawn then
                    local entity = CreateEntityForTeam(tospawn, randomspawn, 2)
-                    if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
+                  --  if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
             end
   end
     
@@ -748,9 +727,9 @@ function Imaginator:ActualAlienFormula(cystonly)
   local success = false
   local entity = nil
 
-  if spawnNearEnt then
-  Print("ActualAlienFormula cystonly %s, spawnNearEnt %s, tospawn %s", cystonly,  powerpoint:GetMapName() or nil, LookupTechData(tospawn, kTechDataMapName)  )
-  end
+  --if spawnNearEnt then
+  --Print("ActualAlienFormula cystonly %s, spawnNearEnt %s, tospawn %s", cystonly,  powerpoint:GetMapName() or nil, LookupTechData(tospawn, kTechDataMapName)  )
+  --end
 
      if powerpoint and tospawn then     
                  local potential = FindPosition(GetAllLocationsWithSameName(powerpoint:GetOrigin()), powerpoint, 2)
@@ -775,16 +754,16 @@ function Imaginator:ActualAlienFormula(cystonly)
                              --Print("ActualAlienFormula range range >=  minrange")
                              entity = CreateEntityForTeam(tospawn, randomspawn, 2)
                              -- cost = GetAlienCostScalar(self, cost)
-                             if gamestarted then
-						   	entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
-							 end
+                           --  if gamestarted then
+						  --- 	entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
+							-- end
                           end
                           success = true
-                     else -- it tonly takes 1!
+                       else -- it tonly takes 1!
                           entity = CreateEntityForTeam(tospawn, randomspawn, 2)
                         -- if entity:isa("Cyst") then CystChain(entity:GetOrigin()) end
                       --      if not entity:isa("Cyst") then FakeCyst(entity:GetOrigin()) end
-                          if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
+                         -- if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                           success = true
                      end 
             end

@@ -54,6 +54,7 @@ local kAvoca_TechIds =
     'WeldFlamerExosuit',
     'DualWelderExosuit',
     'PrimalScream',
+    'LerkBileBomb',
 }
 
 for i = 1, #kAvoca_TechIds do

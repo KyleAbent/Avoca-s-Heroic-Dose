@@ -1,3 +1,42 @@
+
+Onos.XExtents = .7 * .8
+Onos.YExtents = 1.2 * .8 
+Onos.ZExtents = .4 * .8
+
+function Onos:OnAdjustModelCoords(modelCoords)
+    local coords = modelCoords
+        coords.xAxis = coords.xAxis * 0.8
+        coords.yAxis = coords.yAxis * 0.8
+        coords.zAxis = coords.zAxis * 0.8
+    return coords
+end
+
+/*
+function Onos:GetExtentsOverride()
+     return Vector(7 * 0.8 , 1.2 * 0.8, .4 * 0.8)
+end
+*/
+
+
+function Onos:OnUpdateAnimationInput(modelMixin)
+
+    Player.OnUpdateAnimationInput(self, modelMixin)
+    Alien.OnUpdateAnimationInput(self, modelMixin)
+    local attackSpeed = self.raged and 1.15 or 1
+      --What's better? GetHasTech or skulk networkvar? I choose networkvar b.c enzyme does that, and primal
+    if self.ModifyAttackSpeed then
+    
+        local attackSpeedTable = { attackSpeed = attackSpeed }
+        self:ModifyAttackSpeed(attackSpeedTable)
+        attackSpeed = attackSpeedTable.attackSpeed
+        
+    end
+    
+    modelMixin:SetAnimationInput("attack_speed", attackSpeed)
+    
+end
+
+
 function Onos:GetHasMovementSpecial()
     return GetHasTech(self, kTechId.Charge)
 end

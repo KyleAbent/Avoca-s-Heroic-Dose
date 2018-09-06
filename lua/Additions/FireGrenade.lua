@@ -46,7 +46,7 @@ function FireGrenade:OnCreate()
     
     InitMixin(self, BaseModelMixin)
     InitMixin(self, ModelMixin)
-    InitMixin(self, TeamMixin)
+--    InitMixin(self, TeamMixin)
     InitMixin(self, DamageMixin)
 
     if Server then    

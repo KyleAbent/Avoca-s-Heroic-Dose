@@ -1,6 +1,6 @@
 Script.Load("lua/InfestationMixin.lua")
 
-
+Crag.kMaxTargets = 9
 local networkVars = 
 
 {   
@@ -57,7 +57,8 @@ local function ManageHealWave(self)
                  if not self:GetIsOnFire() and GetIsUnitActive(self) and entity:GetIsInCombat() and entity:GetHealthScalar() <= .9  then
                          self:TriggerHealWave()
                          if self.moving then 
-                            self:ClearOrders()
+                           -- self:ClearOrders()
+                           self:GiveOrder(kTechId.Stop, nil, self:GetOrigin(), nil, true, true) 
                         end
                 end
       end

@@ -9,3 +9,21 @@ local kRandDebuff = Vector(math.random(0,.7), math.random(0,.7), math.random(0,.
 function Skulk:GetEngagementPointOverride()
     return self:GetOrigin() + kRandDebuff
 end
+
+function Skulk:OnUpdateAnimationInput(modelMixin)
+
+    Player.OnUpdateAnimationInput(self, modelMixin)
+    Alien.OnUpdateAnimationInput(self, modelMixin)
+    local attackSpeed = 1.20
+      --What's better? GetHasTech or skulk networkvar? I choose networkvar b.c enzyme does that, and primal
+    if self.ModifyAttackSpeed then
+    
+        local attackSpeedTable = { attackSpeed = attackSpeed }
+        self:ModifyAttackSpeed(attackSpeedTable)
+        attackSpeed = attackSpeedTable.attackSpeed
+        
+    end
+    
+    modelMixin:SetAnimationInput("attack_speed", attackSpeed)
+    
+end

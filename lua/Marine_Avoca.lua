@@ -1,4 +1,6 @@
  --Thanks for the trick, modular exo
+  
+  /*
 local orig_Marine_GetMaxSpeed = Marine.GetMaxSpeed
 function Marine:GetMaxSpeed(possible)
  local original = orig_Marine_GetMaxSpeed(self)
@@ -9,6 +11,8 @@ function Marine:GetMaxSpeed(possible)
 
 
 end 
+
+*/
 
 local orig_Marine_OnCreate = Marine.OnCreate
 function Marine:OnCreate()

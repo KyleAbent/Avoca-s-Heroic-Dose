@@ -13,7 +13,21 @@ local networkVars =
 
 --AddMixinNetworkVars(LevelsMixin, networkVars)
 
+function ARC:SetIsACreditStructure(boolean)
+    
+self.isacreditstructure = boolean
+self.avoca = false
+self:GiveOrder(kTechId.ARCDeploy, self:GetId(), self:GetOrigin(), nil, true, true)
+      --Print("AvocaMixin SetIsACreditStructure %s isacreditstructure is %s", self:GetClassName(), self.isacreditstructure)
+end
 
+function ARC:GetIsACreditStructure()
+    
+       -- Print("AvocaMixin GetIsACreditStructure %s isacreditstructure is %s", self:GetClassName(), self.isacreditstructure)
+return self.isacreditstructure 
+ 
+
+end
 
 
     
@@ -48,9 +62,9 @@ function ARC:OnInitialized()
           ARC.kAttackDamage = kARCDamage*1.05
     end
      self.lastCheck = 0
-     if  GetPayLoadArc() == nil then
+     if  GetPayLoadArc() == nil and not self.isacreditstructure then
            self.avoca = true 
-        end
+     end
      self.vortexCheck = false
 end
 
@@ -268,20 +282,20 @@ function ARC:GiveScan()
 
 end
 
-/*
+
 local origu = ARC.OnUpdate
 function ARC:OnUpdate(deltaTime)
     origu(self, deltaTime)
    
    
-    if self:GetInAttackMode() and  GetIsTimeUp(self.lastCheck, 4)  then
+    if self.isacreditstructure and  GetIsTimeUp(self.lastCheck, 4)  then
       self.lastCheck = Shared.GetTime()
       self:GiveScan()
     end
     
 
 end
-*/
+
 
 
 
@@ -289,7 +303,7 @@ end
 local function GiveDeploy(who)
     --Print("GiveDeploy")
 who:GiveOrder(kTechId.ARCDeploy, who:GetId(), who:GetOrigin(), nil, true, true)
-CreateEntity(Scan.kMapName, who:GetOrigin(), 1) 
+--CreateEntity(Scan.kMapName, who:GetOrigin(), 1) 
 
 
 end
@@ -454,14 +468,10 @@ end
 function ARC:Instruct()
    --Print("Arc instructing")
    -- CheckHivesForScan(self)
+   if not self:GetIsACreditStructure() then
    self:SpecificRules()
+   end
    return true
-end
-
-local function DestroPanicAttackInRadius(where)
-    for _, panicattack in ipairs(GetEntitiesWithinRange("PanicAttack", where, kARCRange)) do
-         if panicattack then panicattack:Kill() end
-    end
 end
 
 
@@ -470,53 +480,19 @@ end
 
 end--server
 
-/*
-function ARC:GetUnitNameOverride(viewer)
-    local unitName = GetDisplayName(self)   
-    if self.mainroom then
-      if  not self:GetInAttackMode() then
-    unitName = string.format(Locale.ResolveString("StructureFinder ") )
-    end
-   elseif self.avoca then 
-       unitName = string.format(Locale.ResolveString("Hive-Payload") )
-   end
-return unitName
-end  
-*/
 
 
-if Client then
+function ARC:OnAdjustModelCoords(modelCoords)
+    local coords = modelCoords
+    local scale = ConditionalValue(self.avoca, 0.8, 1)
+        coords.xAxis = coords.xAxis * scale
+        coords.yAxis = coords.yAxis * scale
+        coords.zAxis = coords.zAxis * scale
+    return coords
+end
 
-    function ARC:OnUpdateRender()
-          local showMaterial = self.avoca
-    
-        local model = self:GetRenderModel()
-        if model then
 
-            model:SetMaterialParameter("glowIntensity", 4)
 
-            if showMaterial then
-                
-                if not self.hallucinationMaterial then
-                    self.hallucinationMaterial = AddMaterial(model, kAvocaWeedMaterial)
-                end
-                
-                self:SetOpacity(0, "hallucination")
-            
-            else
-            
-                if self.hallucinationMaterial then
-                    RemoveMaterial(model, self.hallucinationMaterial)
-                    self.hallucinationMaterial = nil
-                end--
-                
-                self:SetOpacity(1, "hallucination")
-            
-            end --showma
-            
-        end--omodel
-end --up render
-end -- client
 
 
 Shared.LinkClassToMap("ARC", ARC.kMapName, networkVars)

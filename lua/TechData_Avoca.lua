@@ -1,3 +1,4 @@
+Script.Load("lua/Additions/LerkBileBomb.lua")
 --Script.Load("lua/Weapons/Alien/PrimalScream.lua")
 --Script.Load("lua/Additions/OnoGrow.lua")
 --Script.Load("lua/Additions/Onocide.lua")
@@ -17,6 +18,15 @@ Script.Load("lua/Weapons/Alien/PrimalScream.lua")
 local kAvoca_TechData =
 {   
 
+
+   { [kTechDataId] = kTechId.LerkBileBomb,        
+  [kTechDataCategory] = kTechId.Lerk,   
+     [kTechDataMapName] = LerkBileBomb.kMapName,  
+[kTechDataCostKey] = kStabResearchCost,
+ [kTechDataResearchTimeKey] = kStabResearchTime, 
+    [kTechDataDamageType] = kDamageType.Corrode,  
+     [kTechDataDisplayName] = "LerkBileBomb",
+ [kTechDataTooltipInfo] = "Derp"},
 
                   { [kTechDataId] = kTechId.Rebirth, 
        [kTechDataCategory] = kTechId.CragHiveTwo,  

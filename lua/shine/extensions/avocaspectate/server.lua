@@ -228,7 +228,7 @@ local function SwitchToOverHead(client, self, where)
         local height = math.random(4,12)
         self:NotifyGeneric( client, "Overhead mode nearby otherwise inside entity origin. Height is %s", true, height)
         if client.specMode ~= kSpectatorMode.Overhead  then client:SetSpectatorMode(kSpectatorMode.Overhead)  end
-        client:SetOrigin(where)
+        --client:SetOrigin(where)
         client.overheadModeHeight =  height
 
 end
@@ -240,7 +240,7 @@ local function lockTarget(self, client, vip)
         //  local findfreespace = FindFreeSpace(viporigin, 1, 8)
         //  if findfreespace == viporigin then findfreespace.x = findfreespace.x - 2 return end
             //  client:SetOrigin(findfreespace)
-             client:SetOrigin(viporigin)
+           --  client:SetOrigin(viporigin)
              client:SetOffsetAngles(vip:GetAngles()) //if iscam
             
              local dir = GetNormalizedVector(viporigin - client:GetOrigin())

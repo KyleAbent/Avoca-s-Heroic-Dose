@@ -14,6 +14,8 @@ ModLoader.SetupFileHook( "lua/Whip.lua", "lua/Whip_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/AmmoPack.lua", "lua/AmmoPack_Skynet.lua", "post" )
 
+ModLoader.SetupFileHook( "lua/MedPack.lua", "lua/MedPack_Skynet.lua", "post" )
+
 ModLoader.SetupFileHook( "lua/Bots/BotUtils.lua", "lua/BotUtils_Skynet.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/LiveMixin.lua", "lua/LiveMixin_Skynet.lua", "post" ) 

@@ -51,7 +51,7 @@ function LiveMixin:Kill(attacker, doer, point, direction)
               --if GetHasHungerUpgrade(attacker) and attacker:isa("Gorge") and doer:isa("DotMarker") then 
                 if attacker:isa("Gorge") and doer:isa("DotMarker") then 
                         attacker:TriggerEnzyme(6)
-                        attacker:AddEnergy(40)
+                        attacker:AddEnergy(45)
                end
           end
      end 

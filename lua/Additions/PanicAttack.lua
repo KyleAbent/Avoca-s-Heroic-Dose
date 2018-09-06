@@ -6,6 +6,11 @@ function PanicAttack:GetSendDeathMessageOverride()
 return false
 end
 
+function PanicAttack:GetCanAutoBuild()
+return true
+end
+
+
 function PanicAttack:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

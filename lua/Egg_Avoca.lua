@@ -1,3 +1,10 @@
+
+local kRandDebuff = Vector(math.random(0,.3), math.random(0,.3), math.random(0,.3)  ) --if 1 isnt too much
+function Egg:GetEngagementPointOverride()
+    return self:GetOrigin() + kRandDebuff
+end
+
+
 if Server then
 
 

@@ -45,6 +45,30 @@ function Conductor:OnReset()
    self:TimerValues()
 end
 
+
+function Conductor:ManageMarineBeacons()
+            local chair = nil
+
+                for _, entity in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do
+                    if entity:GetIsBuilt() and entity:GetHealthScalar() <= 0.6 then
+				    chair = entity
+				    break
+				    end
+               end
+
+               if not chair then
+			   return 
+			   end
+
+               local obs = GetNearest(chair:GetOrigin(), "Observatory", 1,  function(ent) return GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(chair:GetOrigin()) and ent:GetIsBuilt() and ent:GetIsPowered()  end )
+             
+                if obs then 
+                obs:TriggerDistressBeacon() 
+                GetImaginatior().lastMarineBeacon = Shared.GetTime()
+                end
+   
+end
+
 function Conductor:ResetLight()
 if not self.powerlighth then return false end 
 self.powerlighth:RestoreColorDerp()
@@ -653,27 +677,32 @@ end
 if Server then 
 
 
+function Conductor:AddRes(who, amount)
 
-function Conductor:CollectResources()  --Not great for CO_ With 4 total PP. 0 res.
-   local builtpower = 9
-   local disabledpower = 9
+
+            who:AddResources(amount )  --clamp it
+ 
+end
+
+function Conductor:CollectResources()  --Not great for CO_ With 4 total PP. 0 res. Do % of PP owned on map.
+   local builtpower = 4
+   local disabledpower = 6
    local marineteam = nil
    local alienteam = nil
 
        for _, player in ipairs(GetEntitiesForTeam("Player", 1)) do
         if not player:isa("Commander") then
-            player:AddResources(builtpower / 10 )  --clamp it
-            if not marineteam then marineteam = player:GetTeam() end
+            self:AddRes(player, builtpower )
         end
     end
     
         for _, player in ipairs(GetEntitiesForTeam("Player", 2)) do
         if not player:isa("Commander") then
-            player:AddResources(disabledpower / 10) 
-             if not alienteam then alienteam = player:GetTeam() end
+              self:AddRes(player, disabledpower )
         end
     end
     
+    /*
         if alienteam then
         alienteam:AddTeamResources(kTeamResourcePerTick, true)
        end
@@ -681,6 +710,7 @@ function Conductor:CollectResources()  --Not great for CO_ With 4 total PP. 0 re
         if marineteam then
         marineteam:AddTeamResources(kTeamResourcePerTick, true)
        end
+       */
     
    --AddPlayerResources(harvesters, extractors)
 

@@ -76,7 +76,9 @@ function Contamination:OnInitialized()
        --  self:DoYourBusiness()
      --  self:AddTimedCallback(Contamination.DoYourBusiness, GetLifeSpan(self) / 4 )
      --   if not GetWhereIsInSiege(self:GetOrigin()) then 
-       -- self:AddTimedCallback( SpewBile, 1 ) 
+        -- if GetConductor():GetIsPhaseFourBoolean() then
+         self:AddTimedCallback( SpewBile, 1 ) 
+        -- end
         --end
         
     elseif Client then

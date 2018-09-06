@@ -8,7 +8,7 @@ local function DoMoreArmorOnStructThanNormal(target, attacker, doer, damage, arm
 end
     local kMachineGunPlayerDamageScalar = 1.7
      local function MultiplyForMachineGun(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
-     return ConditionalValue(target:isa("Player") or target:isa("Exosuit"), damage * kMachineGunPlayerDamageScalar, damage), armorFractionUsed, healthPerArmor
+     return damage * kMachineGunPlayerDamageScalar, armorFractionUsed, healthPerArmor
     end  
 function DoAvoca()
 

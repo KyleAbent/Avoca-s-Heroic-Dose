@@ -323,6 +323,30 @@ function Gorge:PostUpdatedsdMove(input, runningPrediction)
 end
 
 
+function Gorge:OnAdjustModelCoords(modelCoords)
+    local coords = modelCoords
+        coords.xAxis = coords.xAxis * 0.8
+        coords.yAxis = coords.yAxis * 0.8
+        coords.zAxis = coords.zAxis * 0.8
+    return coords
+end
+
+function Gorge:GetExtentsOverride()
+local kXZExtents = 0.5 * 0.8
+local kYExtents = 0.475 * 0.8
+local crouchshrink = 0
+     return Vector(kXZExtents, kYExtents, kXZExtents)
+end
+
+local origspeed = Gorge.GetMaxSpeed
+
+function Gorge:GetMaxSpeed(possible)
+     local speed = origspeed(self)
+  --return speed * 1.10
+  return not self:GetIsOnFire() and speed * 1.30 or speed
+end
+
+
 if Server then
 
 

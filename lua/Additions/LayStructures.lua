@@ -386,13 +386,13 @@ function LayStructures:GetPositionForStructure(player)
         
         foundPositionInRange = true
     
-        if trace.entity == nil then
+     --   if trace.entity == nil then
             isPositionValid = true
        -- elseif HasMixin(trace.entity, "Avoca") and trace.entity:GetTeamNumber() == 1  then
        --     isonstructure = false --( trace.entity.GetCanStick and trace.entity:GetCanStick() )
        --     isPositionValid = isonstructure
-        end
-  
+      --  end
+  --
              if not IsPathable(displayOrigin) then
                     isPositionValid = false
                 end

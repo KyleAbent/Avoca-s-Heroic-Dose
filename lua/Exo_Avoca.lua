@@ -297,7 +297,7 @@ end
             marine.onGround = false
             local initialVelocity = self:GetViewCoords().zAxis
             initialVelocity:Scale(4)
-            initialVelocity.y = math.max(0,initialVelocity.y) + 9
+            initialVelocity.y = math.max(0,initialVelocity.y) + 19
             marine:SetVelocity(initialVelocity)
             
             if reuseWeapons then
@@ -316,7 +316,7 @@ end
             marine:SetHUDSlotActive(1)
             
             if marine:isa("JetpackMarine") then
-                marine:SetFuel(0.25)
+                marine:SetFuel(1)
             end
         
 

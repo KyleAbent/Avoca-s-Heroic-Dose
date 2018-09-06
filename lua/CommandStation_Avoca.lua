@@ -9,6 +9,7 @@
     return coords
 end
 
+/*
 function CommandStation:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
     if hitPoint ~= nil and doer ~= nil then
@@ -18,3 +19,4 @@ function CommandStation:ModifyDamageTaken(damageTable, attacker, doer, damageTyp
     end
 
 end
+*/

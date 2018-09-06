@@ -12,7 +12,16 @@ grenadeType = "integer (1 to 4)",
 local og = Grenade.OnCreate
 function Grenade:OnCreate()
 og(self)
-self.grenadeType = 1
+Grenade.grenadeType = 1
+self.kClearOnImpact = true
+end
+
+
+function Grenade:ProcessNearMiss( targetHit, endPoint )
+        if Server then
+            self:Detonate( targetHit )
+        end
+        return true
 end
 
 function Grenade:SetType(num)
@@ -22,6 +31,20 @@ end
 
 if Server then
 
+    function Grenade:ProcessHit(targetHit, surface, normal, endPoint )
+
+        --if targetHit and GetAreEnemies(self, targetHit) then
+            
+            self:Detonate(targetHit, hitPoint )
+                
+      --  elseif self:GetVelocity():GetLength() > 2 then
+            
+          --  self:TriggerEffects("grenade_bounce")
+            
+       -- end
+        
+    end
+    
 local og = Grenade.Detonate
 
 function Grenade:Detonate()
