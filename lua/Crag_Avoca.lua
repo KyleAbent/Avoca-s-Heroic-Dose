@@ -53,13 +53,15 @@ return 14/5
 end
 
 local function ManageHealWave(self)
+  if self:GetIsOnFire() or not GetIsUnitActive(self) then return end 
       for _, entity in ipairs(GetEntitiesWithinRange("Live", self:GetOrigin(), Crag.kHealRadius)) do
-                 if not self:GetIsOnFire() and GetIsUnitActive(self) and entity:GetIsInCombat() and entity:GetHealthScalar() <= .9  then
+                  if entity:GetIsInCombat() and entity:GetHealthScalar() <= .9  then
                          self:TriggerHealWave()
-                         if self.moving then 
+                         break
+                        -- if self.moving then 
                            -- self:ClearOrders()
-                           self:GiveOrder(kTechId.Stop, nil, self:GetOrigin(), nil, true, true) 
-                        end
+                          -- self:GiveOrder(kTechId.Stop, nil, self:GetOrigin(), nil, true, true) 
+                       -- end
                 end
       end
 end

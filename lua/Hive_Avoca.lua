@@ -303,7 +303,7 @@ function Hive:UpdateSpawnEgg()
     local egg
 
     local eggCount = self:GetNumEggs()
-    if eggCount < kAlienEggsPerHive then
+    if eggCount < kAlienEggsPerHive and not GetConductor():GetIsPhaseFourBoolean() then
 
         egg = self:SpawnEgg()
         success = egg ~= nil

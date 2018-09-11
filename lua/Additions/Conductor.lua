@@ -59,13 +59,9 @@ function Conductor:ManageMarineBeacons()
                if not chair then
 			   return 
 			   end
-
-               local obs = GetNearest(chair:GetOrigin(), "Observatory", 1,  function(ent) return GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(chair:GetOrigin()) and ent:GetIsBuilt() and ent:GetIsPowered()  end )
              
-                if obs then 
-                obs:TriggerDistressBeacon() 
-                GetImaginatior().lastMarineBeacon = Shared.GetTime()
-                end
+                chair:TriggerDistressBeacon() --unfair during phase four for aliens without eggs and marine with ip for marine to respawn lol
+                GetImaginator().lastMarineBeacon = Shared.GetTime()
    
 end
 

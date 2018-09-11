@@ -10,10 +10,25 @@ end
      local function MultiplyForMachineGun(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
      return damage * kMachineGunPlayerDamageScalar, armorFractionUsed, healthPerArmor
     end  
+    
+    
+local function IncreaseForPlayers(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
+    if target:isa("Player") then
+        damage = damage * 1.2
+    end
+    
+    return damage, armorFractionUsed, healthPerArmor
+end
+    
 function DoAvoca()
 
     kDamageTypeRules[kDamageType.MachineGun] = {}
     table.insert(kDamageTypeRules[kDamageType.MachineGun], MultiplyForMachineGun)
+    
+    
+    kDamageTypeRules[kDamageType.GrenadeLauncher] = {}
+    table.insert(kDamageTypeRules[kDamageType.GrenadeLauncher], IncreaseForPlayers)
+    
     
     
  --  kDamageTypeRules[kDamageType.Corrode] = {}

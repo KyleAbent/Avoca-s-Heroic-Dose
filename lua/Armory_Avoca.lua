@@ -72,7 +72,7 @@ function Armory:ResupplyPlayer(player)
                    //Heal Health First, Then Armor, 3 armor per level of armor
                    //then add level bonus
            if ( player:GetHealth() == player:GetMaxHealth() ) then
-           local addarmoramount = kArmoryAvoArcAddArmrAmt * player:GetArmorLevel()
+           local addarmoramount = 8
            
            player:AddHealth(addarmoramount, false, not true, nil, nil, true)
            else

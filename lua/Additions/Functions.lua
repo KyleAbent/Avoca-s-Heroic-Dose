@@ -1,3 +1,16 @@
+function GetActiveConstructsForTeam(className, teamNumber)
+
+    assert(type(className) == "string")
+    assert(type(teamNumber) == "number")
+    
+    local function teamFilterFunction(entity)
+        return HasMixin(entity, "Team") and entity:GetTeamNumber() == teamNumber
+        and    HasMixin(entity, "Construct") and  GetIsUnitActive(entity)
+    end
+    return GetEntitiesWithFilter(Shared.GetEntitiesWithClassname(className), teamFilterFunction)
+    
+end
+
 local function UnlockAbility(forAlien, techId)
 
     local mapName = LookupTechData(techId, kTechDataMapName)
@@ -84,7 +97,14 @@ function GetConductor() --it washed away
     end    
     return nil
 end
-
+function GetImaginator() --it washed away
+    local entityList = Shared.GetEntitiesWithClassname("Imaginator")
+    if entityList:GetSize() > 0 then
+                 local imaginator = entityList:GetEntityAtIndex(0) 
+                 return imaginator
+    end    
+    return nil
+end
 function GetGStartTime()
     
         for _, ginfo in ipairs(GetEntitiesWithinRange("GameInfo", where, 8)) do

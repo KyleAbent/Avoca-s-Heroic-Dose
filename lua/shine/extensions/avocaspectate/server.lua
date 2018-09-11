@@ -8,22 +8,11 @@ Shine.Hook.SetupClassHook( "AvocaSpectator", "ChangeView", "OnChangeView", "Post
 Plugin.Version = "1.0"
 
 local function AutoSpectate(self)
- //local count = 0
- //Yes yes i know 
-    //Print("ummmm")
-              
-   // Print("AutoSpectate 1")
+
     Shine.Timer.Create( "AutoSpectate", 8, -1, function() 
                    for index, player in ientitylist(Shared.GetEntitiesWithClassname("AvocaSpectator")) do
                               self:OnChangeView(player)
-                           
-                //     count = count + 1
               end 
-     // Print("AutoSpectate 2")
-   //   if count == 0 then 
-   ////  Shine.Timer.Destroy("AutoSpectate") 
-       // Print("AutoSpectate 3")
-    //  end 
     end )
     
 end
@@ -59,156 +48,10 @@ local busy = false
    if order then
    busy = true
    end
-  -- if who:isa("MAC") then
- --  elseif who:isa("Drifter") then
-   -- end
 return busy
 end
-local function GetViewOne()
 
 
-if not GetGamerules():GetGameStarted() then return GetPregameView() end
-
-local choices = {}
---arc if moving or in siege
---contam
---commandstructure if in combat
---alive power node in combat
---egg or structure beacon
-
-//if interesting ~= nil then table.insert(choices,interesting) end
-           
-                     for index, camera in ientitylist(Shared.GetEntitiesWithClassname("DirectorCamera")) do
-                   table.insert(choices, camera) //should be random not first. always will go to same first. argh. NM no break lol
-              end    
-           
-              for index, shadeink in ientitylist(Shared.GetEntitiesWithClassname("ShadeInk")) do
-                   table.insert(choices, shadeink)
-              end     
-    
-              
-               for index, arc in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
-                      if arc.mode == ARC.kMode.Moving then table.insert(choices, arc) end
-              end 
-              
-                            
-               for index, whip in ientitylist(Shared.GetEntitiesWithClassname("Whip")) do
-                      if whip.moving  then table.insert(choices, whip) end
-              end 
-              
-             for index, contam in ientitylist(Shared.GetEntitiesWithClassname("Contamination")) do
-                  table.insert(choices, contam) 
-                   break  -- just 1xx
-              end 
-             for index, cs in ientitylist(Shared.GetEntitiesWithClassname("CommandStructure")) do
-                  if cs:GetIsInCombat() then table.insert(choices, cs) break end
-              end 
-                 for _, construct in ipairs(GetEntitiesWithMixin("Construct")) do
-                 if not construct:isa("Hydra") and not construct:isa("PowerPoint") and construct:GetIsAlive() and construct:GetHealthScalar() <= .5 and construct:GetIsInCombat() then table.insert(choices, construct) break end --built and not disabled should be summed up by if in combat?
-             end  
-
-              
-               for index, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
-                  if player ~= self and not player:isa("Spectator")  and not player:isa("ReadyRoomPlayer") 
-                    and not player:isa("Commander") and player:GetIsInCombat() then 
-                   table.insert(choices, player) 
-                     break 
-                  end
-              end 
-            
-              local random = table.random(choices)
-              return random
-end
- local function GetViewTwo()
-
-local choices = {}
-
-            
-                                 for index, camera in ientitylist(Shared.GetEntitiesWithClassname("DirectorCamera")) do
-                   table.insert(choices, camera) //should be random not first. always will go to same first. argh. NM no break lol
-              end    
-              
-
-             for index, obs in ientitylist(Shared.GetEntitiesWithClassname("Observatory")) do
-                  if obs:GetIsBeaconing()  then table.insert(choices, obs) break end --built and not disabled should be summed up by if in combat?
-              end  
-              
-                      for index, whip in ientitylist(Shared.GetEntitiesWithClassname("Whip")) do
-                      if whip.moving  then table.insert(choices, whip) end
-                     end        
-      
-             for index, contam in ientitylist(Shared.GetEntitiesWithClassname("Contamination")) do
-                  table.insert(choices, contam) 
-                   break  -- just 1
-              end
-        
-                  for _, construct in ipairs(GetEntitiesWithMixin("Construct")) do
-                 if construct:GetIsBuilt() and  not construct:isa("PowerPoint") and construct:GetHealthScalar() <= .3 and construct:GetIsInCombat() then table.insert(choices, construct) break end --built and not disabled should be summed up by if in combat?
-              end     
-
-               for index, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
-                  if player ~= self and not player:isa("Spectator")  and not player:isa("ReadyRoomPlayer") 
-                    and not player:isa("Commander") and player:GetIsInCombat() then 
-                   table.insert(choices, player) 
-                    -- break 
-                  end
-              end       
-              
-             
-              local random = table.random(choices)
-              return random
-
-end
-local function GetViewThree()
-local choices = {}    
-      
-                            for index, camera in ientitylist(Shared.GetEntitiesWithClassname("DirectorCamera")) do
-                   table.insert(choices, camera) //should be random not first. always will go to same first. argh. NM no break lol
-              end    
-              
-                      for index, arc in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
-                    local order = arc:GetCurrentOrder()
-                      if order then 
-                 if order:GetType() == kTechId.Move then table.insert(choices, arc) break end -- just 1
-                     end
-              end 
-              
-                             for index, whip in ientitylist(Shared.GetEntitiesWithClassname("Whip")) do
-                      if whip.moving  then table.insert(choices, whip) end
-              end 
-              
-              
-             for index, mac in ientitylist(Shared.GetEntitiesWithClassname("MAC")) do
-                  if GetIsBusy(mac) then table.insert(choices, mac) break end 
-              end   
-         /*
-             for index, cyst in ientitylist(Shared.GetEntitiesWithClassname("Cyst")) do
-                  if not cyst:GetIsBuilt() then table.insert(choices, cyst) break end 
-              end
-      */
-    
-                     for index, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
-                  if player ~= self and not player:isa("Spectator")  and not player:isa("ReadyRoomPlayer") 
-                    and not player:isa("Commander") and player:GetIsInCombat() then 
-                   table.insert(choices, player) 
-                     break 
-                  end
-              end 
-  
-             for index, drifter in ientitylist(Shared.GetEntitiesWithClassname("Drifter")) do
-                  if GetIsBusy(drifter) then table.insert(choices, drifter) break end 
-              end    
-                   for _, construct in ipairs(GetEntitiesWithMixin("Construct")) do //should be randomized and not index 0
-                  if not construct:isa("PowerPoint") and not construct:GetIsBuilt() and construct:GetIsInCombat()
-                 then table.insert(choices, construct) 
-                 -- break
-                  end --built and not disabled should be summed up by if in combat?
-              end    
-              
-              local random = table.random(choices)
-              return random
-
-end
 local function GetLocationName(who)
         local location = GetLocationForPoint(who:GetOrigin())
         local locationName = location and location:GetName() or ""
@@ -223,15 +66,6 @@ local function FindEntNear(where)
 end
 
 
-local function SwitchToOverHead(client, self, where)
-        client:BreakChains()
-        local height = math.random(4,12)
-        self:NotifyGeneric( client, "Overhead mode nearby otherwise inside entity origin. Height is %s", true, height)
-        if client.specMode ~= kSpectatorMode.Overhead  then client:SetSpectatorMode(kSpectatorMode.Overhead)  end
-        --client:SetOrigin(where)
-        client.overheadModeHeight =  height
-
-end
 local function lockTarget(self, client, vip)
           client:SetDesiredCameraDistance(0)
         -- Print("vip is %s", vip:GetClassName())
@@ -273,35 +107,23 @@ local function firstPersonScoreBased(self, client)
     self:NotifyGeneric( client, "(First person) VIP is %s, # rank in score is %s", true, topscorer:GetName(), entrant )
 end
  function Plugin:OnChangeView(client, untilNext, betweenLast)
- -- Print("ChangeView")
-      -- client.SendNetworkMessage("SwitchFromFirstPersonSpectate", { mode = kSpectatorMode.Following })
         
         if not client then return end
+       local random = {} --table.random(choices)
        local vip = nil
-       
-
-        local random = math.random(1,3)
-        if random == 1 then
-           vip = GetViewOne()
-        elseif random == 2 then
-           vip = GetViewTwo()
-        elseif random == 3 then
-           vip = GetViewThree()
-     -- --  else 
-         --   firstPersonScoreBased(self, client)
+        
+        for i = 1, 2 do
+             vip = GetNearestMixin(client:GetOrigin(), "Combat", i, function(ent) return ent:GetIsInCombat() end)
+             if vip ~= nil then 
+             table.insert(random, vip)
+              end
         end
-   
-        if vip ~= nil then 
-            --  local roll = math.random(1,2)
-            -- if roll == 1 then
-              lockTarget(self, client, vip)
-           --  elseif roll == 2 then
-            --  firstPersonScoreBased(self, client)
-             -- end
-      else
-        firstPersonScoreBased(self, client)
-       end
-  
+        
+        local choice = table.random(random)
+         if choice ~= nil then 
+        lockTarget(self, client, vip)
+        end
+        
          Shine.ScreenText.Add( 50, {X = 0.20, Y = 0.75,Text = "[Director] untilNext: %s",Duration = betweenLast or 0,R = 255, G = 0, B = 0,Alignment = 0,Size = 1,FadeIn = 0,}, client )  
 
 end
@@ -317,8 +139,6 @@ local function Direct( Client, Targets )
           AutoSpectate(self)
     for i = 1, #Targets do
     local Player = Targets[ i ]:GetControllingPlayer()
-          //Shared.ConsoleCommand(string.format("sh_setteam %s %s", Player:GetUserId(), 3 )) 
-          //Player:ReplaceRespawnPlayer(Player, nil, nil, AvocaSpectator.kMapName)
           Player:Replace(AvocaSpectator.kMapName, 3)
      end
 end

@@ -4,15 +4,13 @@ local networkVars =
 
 {
 lastswitch = "private time", 
-
 nextangle = "private integer (0 to 8)", 
-
 lockedId = "entityid"
 } 
 class 'AvocaSpectator' (Spectator)
 AvocaSpectator.kMapName = "Spectator"
 
---AvocaSpectator.kModelName = PrecacheAsset("models/alien/fade/fade.model")
+
 
 function AvocaSpectator:OnInitialized()
 
@@ -101,7 +99,7 @@ function AvocaSpectator:OverrideInput(input)
                       input.move.z = input.move.z + 1
                       local ymove = 0
                       local myY = self:GetOrigin().y
-                      local urY = target:GetOrigin().y 
+                      local urY = target:GetOrigin().y  - 1
                       local difference =  urY - myY
                             if difference == 0 then
                                 ymove = difference
@@ -126,7 +124,7 @@ function AvocaSpectator:UpdateCamera()
          self:LockAngles()
         --  Print(self.lastswitch,  " ", self.nextangle )
          if GetIsTimeUp(self.lastswitch, self.nextangle ) then
-             Print("AvocaSpectator ChangeView")
+             --Print("AvocaSpectator ChangeView")
               self.nextangle = math.random(4,8)
               self.lastswitch = Shared.GetTime()
               self:ChangeView(self, self.nextangle, self.lastswitch )

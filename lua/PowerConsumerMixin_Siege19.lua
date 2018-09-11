@@ -1,4 +1,4 @@
-
+/*
 
 --local orig consOn = ConstructMixin.OnConstructionComplete
 function PowerConsumerMixin:OnPowerOff()
@@ -14,3 +14,5 @@ function PowerConsumerMixin:OnPowerOff()
       end   
       
 end
+
+*/
