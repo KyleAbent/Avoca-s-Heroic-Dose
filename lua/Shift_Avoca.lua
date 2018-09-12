@@ -28,6 +28,20 @@ function Shift:GetMinRangeAC()
 return 14/3    
 end
 
+
+function Shift:OnConstructionComplete()
+	 GetImaginator().activeShifts = GetImaginator().activeShifts + 1;  
+end
+
+
+ function Shift:PreOnKill(attacker, doer, point, direction)
+      
+	  if self:GetIsBuilt() then
+	    GetImaginator().activeShifts  = GetImaginator().activeShifts- 1;  
+	  end
+end
+
+
 Shared.LinkClassToMap("Shift", Shift.kMapName, networkVars)
 /*
 Script.Load("lua/Additions/SaltMixin.lua")

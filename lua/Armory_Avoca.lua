@@ -2,6 +2,7 @@ local originit = Armory.OnInitialized
 function Armory:OnInitialized()
 
        originit(self)
+       if not Server then return end
        if GetHasTech(self, kTechId.ShotgunTech) then return end --What about AA? I'll get there I guess.. Hm.
        local techIds =  self:GetTechButtons()
          
@@ -22,6 +23,21 @@ function Armory:OnInitialized()
 
     
 end
+   
+function Armory:OnPowerOn()
+	 GetImaginator().activeArmorys = GetImaginator().activeArmorys + 1 
+end
+
+function Armory:OnPowerOff()
+	 GetImaginator().activeArmorys  = GetImaginator().activeArmorys - 1
+end
+
+ function Armory:PreOnKill(attacker, doer, point, direction)
+      
+	  if self:GetIsPowered() then
+	    GetImaginator().activeArmorys  = GetImaginator().activeArmorys - 1;  
+	  end
+ end
 
 function Armory:GetMinRangeAC()
 return 16 /2

@@ -14,10 +14,9 @@ end
 
 function Hive:ModifyDamageTaken(damageTable, attacker, doer, damageType, hitPoint)
 
-    -- webs can't be destroyed with bullet weapons
+
     if doer ~= nil then 
-      --  local scale = ConditionalValue(GetTechPoint(self:GetOrigin()) ~= nil, 1, 0.5) 
-      --  damageTable.damage = damageTable.damage * scale
+
         
         if doer:isa("ARC") and doer.avoca == true then
          damageTable.damage = damageTable.damage * 2
@@ -33,14 +32,10 @@ if Server then
 
 local orig_Hive_OnResearchComplete = Hive.OnResearchComplete
 function Hive:OnResearchComplete(researchId)
---Print("HiveOnResearchComplete")
   UpdateAliensWeaponsManually() 
     if researchId == kTechId.UpgradeToCragHive or researchId == kTechId.UpgradeToShadeHive or researchId ==  kTechId.UpgradeToShiftHive then
         self:AddTimedCallback(Hive.CheckForDoubleUpG, 4) 
-      --  Print("Started Callback Hive CheckForDoubleUpG")
      end   
-   --for now just updtate alien hp on all research completes b/c i dont feel like filtering the biomass -.-
-      -- IfBioMassThenAdjustHp(self)
   return orig_Hive_OnResearchComplete(self, researchId) 
 end
 
@@ -53,86 +48,6 @@ local function LocationsMatch(who,whom)
   return true --whoname == whomname
 end
 
-/*
-
-local function ToSpawnFormula(self,panicstospawn, where)
-         for i = 1, panicstospawn do
-                           local bitch = GetPayLoadArc()
-                           if bitch and GetIsPointWithinHiveRadius(bitch:GetOrigin()) then
-                           local spawnpoint = FindFreeSpace(bitch:GetOrigin(), 4, 8)
-                              if spawnpoint then
-                              local panicattack = CreateEntity(PanicAttack.kMapName, spawnpoint, 2)
-                               panicattack:SetConstructionComplete()
-                               panicattack:SetMature()
-                               end
-                           end
-               end
-            
-end
-local function GetRange(who, where)
-    local ArcFormula = (where - who:GetOrigin()):GetLengthXZ()
-    return ArcFormula
-end
-local function SendAnxietyAttack(self, where, who)
-         for i = 1, #who do
-                           local panicattack = who[i]
-                         --  local bitch = GetDeployedPayLoadArc()
-                        --   if bitch and GetIsPointWithinHiveRadius(bitch:GetOrigin()) and GetRange(panicattack,bitch:GetOrigin()) >= 16 then                  
-                           local spawnpoint = FindFreeSpace(where, 4, 8)
-                              if spawnpoint then
-                                    panicattack:SetOrigin(spawnpoint)
-                               end
-                         --  end
-               end
-end
-local function PanicInitiate(self,where)
-local panicattacks = {}
-
-        for _, panicattack in ipairs(GetEntitiesWithinRange("PanicAttack", where, 9999)) do
-                if panicattack:GetIsAlive() then
-                       table.insert(panicattacks,panicattack) 
-               end
-       end
-       
-  local countofpanic = Clamp(table.count(panicattacks), 0, 8)
-  local maxpanic = 4
-  local panicstospawn = math.abs(maxpanic - countofpanic)
-        panicstospawn = Clamp(panicstospawn, 1, 2)
-
-            if panicstospawn >= 1 then ToSpawnFormula(self,panicstospawn, where) end
-            
-            if countofpanic >= 1 then
-                SendAnxietyAttack(self, where, panicattacks) -- not sure
-            end
-            
-end
-
-local orig_Hive_OnTakeDamage = Hive.OnTakeDamage
-function Hive:OnTakeDamage(damage, attacker, doer, point)
-
-   if attacker then --and doer.avoca == true then 
-         Print("PanicAttack Initiated")
-         PanicInitiate(self,attacker:GetOrigin())
-        --if self:GetIsBuilt() then  AddPayLoadTime(10)  end
-    end
-    
-return orig_Hive_OnTakeDamage(self,damage, attacker, doer, point)
-end
-
-
-
-*/
-
-
-
-/*
-
-local function DestroyAvocaArcInRadius(where)
-    for _, avocaarc in ipairs(GetEntitiesWithinRange("AvocaArc", where, kARCRange)) do
-         if avocaarc then avocaarc:Kill() end
-    end
-end
-*/
 
 
 
@@ -198,10 +113,15 @@ UpdateAliensWeaponsManually()
 end
 
 function Hive:OnConstructionComplete()
+
+  if Server then
+    self.bioMassLevel = 3
+  end
+  
+  
 --biomass 0
     -- Play special tech point animation at same time so it appears that we bash through it.
     UpdateTypeOfHive(self)
-    self:AddTimedCallback(Hive.UpdateManually, 15)
     local attachedTechPoint = self:GetAttached()
     if attachedTechPoint then
         attachedTechPoint:SetIsSmashed(true)
@@ -228,71 +148,7 @@ function Hive:OnConstructionComplete()
         cyst:ChangeParent(self)
     end
 end
-function Hive:UpdateManually()
-   if Server then  
-     self:UpdatePassive()
-   end
-   return self:GetIsAlive()
-end
 
-local function GetBioMassLevel()
-           local teamInfo = GetTeamInfoEntity(2)
-           local bioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
-           return math.round(bioMass / 4, 1, 3)
-end
-function Hive:UpdatePassive()
-       if GetHasTech(self, kTechId.Xenocide) or not GetGamerules():GetGameStarted() or not self:GetIsBuilt() or self:GetIsResearching() then return true end
-           
-           local teamInfo = GetTeamInfoEntity(2)
-           local teambioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
-           
-    local techid = nil
-    
-
-      if teambioMass >= 2 and not GetHasTech(self, kTechId.Charge) then
-    techid = kTechId.Charge
-      elseif teambioMass >= 3 and not GetHasTech(self, kTechId.BileBomb) then
-    techid = kTechId.BileBomb
-      elseif teambioMass >= 3 and not GetHasTech(self, kTechId.MetabolizeEnergy) then
-    techid = kTechId.MetabolizeEnergy
-      elseif teambioMass >= 4 and not GetHasTech(self, kTechId.Leap) then
-    techid = kTechId.Leap
-      elseif teambioMass >= 4 and not GetHasTech(self, kTechId.Spores) then
-    techid = kTechId.Spores
-      elseif teambioMass >= 5 and not GetHasTech(self, kTechId.Umbra) then
-    techid = kTechId.Umbra
-      elseif teambioMass >= 5 and not GetHasTech(self, kTechId.MetabolizeHealth) then
-    techid = kTechId.MetabolizeHealth
-      elseif teambioMass >= 6 and not GetHasTech(self, kTechId.BoneShield) then 
-    techid = kTechId.BoneShield
-      elseif teambioMass >= 7 and not GetHasTech(self, kTechId.Stab) then 
-    techid = kTechId.Stab
-      elseif teambioMass >= 8 and not GetHasTech(self, kTechId.Stomp) then 
-    techid = kTechId.Stomp
-      elseif teambioMass >= 9 and not GetHasTech(self, kTechId.Xenocide) then 
-    techid = kTechId.Xenocide
-    end
-    
-        if techid == nil and self.bioMassLevel <= 1 then
-    techid = kTechId.ResearchBioMassOne
-    elseif techid == nil and self.bioMassLevel == 2 then
-    techid = kTechId.ResearchBioMassTwo
-    elseif techid == nil and self.bioMassLevel == 3 then
-    techid = kTechId.ResearchBioMassThree
-    elseif techid == nil and self.bioMassLevel == 4 then
-    techid = kTechId.ResearchBioMassFour   
-    end
-    
-    if techid == nil then return true end
-    local cost = LookupTechData(techid, kTechDataCostKey, 0)
-    if TresCheck(cost) then
-    DeductTres(cost, 2)
-   local techNode = self:GetTeam():GetTechTree():GetTechNode( techid ) 
-   self:SetResearching(techNode, self)
-   end
-   
-   
-end
 
 
 -- overwrite get rid of scale with player count

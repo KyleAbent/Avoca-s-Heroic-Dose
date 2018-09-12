@@ -8,7 +8,20 @@ local networkVars =
 
 {
   lastMarineBeacon =  "private time",
-  lasthealwave = "private time",
+
+  activeArmorys = "float", --int
+  activeRobos = "float",
+  activeSentrys = "float",
+  activeObs = "float",
+  activeIPs = "float",
+  activePGs = "float",
+  activeProtos = "float",
+  activeArms = "float",
+  activeWhips = "float",
+  activeCrags = "float",
+  activeShades = "float",
+  activeShifts = "float",
+
 }
 
 function Imaginator:GetIsMapEntity()
@@ -16,10 +29,18 @@ return true
 end
 
 function Imaginator:OnCreate() 
-   for i = 1, 8 do
-     Print("Imaginator created")
-   end
-   self.lasthealwave = 0
+   self.activeArmorys = 0
+   self.activeRobos = 0
+   self.activeSentrys = 0
+   self.activeObs = 0
+   self.activeIPs = 0
+   self.activePGs = 0
+   self.activeProtos = 0
+   self.activeArms = 0
+   self.activeWhips = 0
+   self.activeCrags = 0
+   self.activeShades = 0
+   self.activeShifts = 0
    self:SetUpdates(true)
 end
 local function NotBeingResearched(techId, who)   
@@ -52,32 +73,8 @@ local techIds = who:GetTechButtons() or {}
                       end
                   end
 end
-local function HiveResearch(who)
-if not who or GetGameInfoEntity():GetWarmUpActive() then return true end
-if who:GetIsResearching() then return true end
-local tree = who:GetTeam():GetTechTree()
-local technodes = {}
-
-    for _, node in pairs(tree.nodeList) do
-           local canRes = tree:GetHasTech(node:GetPrereq1()) and tree:GetHasTech(node:GetPrereq2())
-         if canRes and node:GetIsResearch() and node:GetCanResearch() then
-                node:SetResearched(true)
-                tree:SetTechNodeChanged(node, string.format("hasTech = %s", ToString(true)))
-         end
-    
-    end              
-                  return true
 
 
-end
-function Imaginator:UpdateHivesManually()
-                 for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
-                     if hive:GetIsBuilt() then 
-                         HiveResearch(hive) 
-                     end
-               end
-     return true
-end
 function Imaginator:OnUpdate(deltatime)
    
    if Server then
@@ -196,51 +193,61 @@ local function GetHasAdvancedArmory()
     return false
 end
 
-local function GetMarineSpawnList()
+local function GetMarineSpawnList(self)
 
 local tospawn = {}
 local canafford = {}
 local gamestarted = false
 --Horrible for performance, right? Not precaching ++ local variables ++ table && for loops !!! 
 
+         local  CCs = #GetEntitiesForTeam( "CommandStation", 1 )  
+
+  
+           if CCs < 3 then 
+             return kTechId.CommandStation
+             end
+           
+
 -----------------------------------------------------------------------------------------------  
-         local  PhaseGates = #GetActiveConstructsForTeam( "PhaseGate", 1 )
+        -- local  PhaseGates = #GetActiveConstructsForTeam( "PhaseGate", 1 )
          
-        if PhaseGates <= 3 then
+       -- if PhaseGates <= 3 then
+     --  	Print("Imaginator activePGs count == %s", self.activePGs)
+         if self.activePGs <= 3 then
         table.insert(tospawn, kTechId.PhaseGate)
         end --phaseavoca init 
    ------------------------------------------------------------------------------------------- 
-     
-        local  Armory = #GetActiveConstructsForTeam( "Armory", 1 )
-      
-         if Armory <= 7 then
-         table.insert(tospawn, kTechId.Armory)
-         end
+      --	Print("Imaginator activeArmory count == %s", self.activeArmorys)
+	     if self.activeArmorys <= 7 then
+		   table.insert(tospawn, kTechId.Armory)   --Is not incremented here because it may not be active until powered on and built!
+		 end
+
+	   -- Try using the variable rather than loop. Better on perf? 
+
    ---------------------------------------------------------------------------------------------
-      
-         local  RoboticsFactory = #GetActiveConstructsForTeam( "RoboticsFactory", 1 )
-      
-         if RoboticsFactory <= 3 then
+      -- 	Print("Imaginator activeRobos count == %s", self.activeRobos)
+         if self.activeRobos <= 3 then
          table.insert(tospawn, kTechId.RoboticsFactory)
          end
  ------------------------------------------------------------------------------------------------
-         local  Observatory = #GetActiveConstructsForTeam( "Observatory", 1 )
-      
-         if Observatory <= 08 then
+      --	Print("Imaginator activeObs count == %s", self.activeObs)
+         if self.activeObs <= 08 then
          table.insert(tospawn, kTechId.Observatory)
          end
  -----------------------------------------------------------------------------------------------
        
       if GetHasAdvancedArmory()  then
-          local  PrototypeLab = #GetActiveConstructsForTeam( "PrototypeLab", 1 ) 
-            if PrototypeLab < 6 then
+        --  local  PrototypeLab = #GetActiveConstructsForTeam( "PrototypeLab", 1 ) 
+          --  if PrototypeLab < 6 then
+        --  Print("Imaginator activeProtos count == %s", self.activeProtos)
+		     if self.activeProtos < 6 then
              table.insert(tospawn, kTechId.PrototypeLab)
            end
      end
 -------------------------------------------------------------------------------------------------   
          local  Sentry = #GetActiveConstructsForTeam( "Sentry", 1 )
       
-         if Sentry <= 11 then
+         if Sentry <= 11 then --self.activeSentrys <= 11 then
          table.insert(tospawn, kTechId.Sentry)
          end
 ----------------------------------------------------------------------------------------------------
@@ -253,29 +260,27 @@ local gamestarted = false
            
 ------------------------------------------------------------------------------------------------------
 --Lets make IPS purposefully spawn anywhere, possibly seperated from commandstation. Refer to previous version for ns2_ base hoarding.
-         local  IPs = #GetActiveConstructsForTeam( "InfantryPortal", 1 )
-           if IPs < 12 then --stop spawning? Noice. Natural. Old school 2015 (Better) ONLY IF I DO THE SAME WITH EGGS LOL
+       --  local  IPs = #GetActiveConstructsForTeam( "InfantryPortal", 1 )
+          -- if IPs < 12 then --stop spawning? Noice. Natural. Old school 2015 (Better) ONLY IF I DO THE SAME WITH EGGS LOL
+        --    Print("Imaginator activeIPs count == %s", self.activeIPs)
+		  if self.activeIPs < 12 then
            table.insert(tospawn, kTechId.InfantryPortal) --make everyone director lulz
            end
  ----------------------------------------------------------------------------------------------------
   --Lets make arms lab do the same and spawn anywhere with power independent from cc
-         local  Labs = #GetActiveConstructsForTeam( "ArmsLab", 1 )  
+        -- local  Labs = #GetActiveConstructsForTeam( "ArmsLab", 1 )  
                --the 3 on the map could be inactive. 
-           if Labs < 3 then --more? compare to alien 3 of each 
+          -- if Labs < 3 then --more? compare to alien 3 of each 
+          --   Print("Imaginator activeArms count == %s", self.activeArms)
+		   if self.activeArms < 3 then
            table.insert(tospawn, kTechId.ArmsLab) 
            end
  ----------------------------------------------------------------------------------------------------
 
-local  CCs = #GetEntitiesForTeam( "CommandStation", 1 )  
 
-  local finalchoice = nil--table.random(tospawn) 
+
+  local finalchoice  = table.random(tospawn) 
   
-           if CCs < 3 then --more? compare to alien 3 of each 
-          -- table.insert(tospawn, kTechId.CommandStation) 
-             finalchoice = kTechId.CommandStation
-           else
-           finalchoice = table.random(tospawn) 
-           end
 ---------------------------------------------------------------------------------------------------------
       return finalchoice
 ----------------------------------------------------------------------------------------------------------
@@ -401,35 +406,40 @@ end
 local function GetAlienSpawnList(self)
 local tospawn = {}
 
-      local  Shift = #GetActiveConstructsForTeam( "Shift", 2 )
-      
-      if Shift < 14 then
+     -- local  Shift = #GetActiveConstructsForTeam( "Shift", 2 )
+   
+        if not GetHasFourHives() then return  kTechId.Hive  end
+
+
+      --if Shift < 14 then
+         --Print("Imaginator activeShifts count == %s", self.activeShifts)
+      if self.activeShifts < 14 then
       table.insert(tospawn, kTechId.Shift)
       end 
       
-      local  Whip = #GetActiveConstructsForTeam( "Whip", 2 )
-      if Whip < 18 then
+      --local  Whip = #GetActiveConstructsForTeam( "Whip", 2 )
+      --if Whip < 18 then
+       --  Print("Imaginator activeWhips count == %s", self.activeWhips)
+      if self.activeWhips < 13 then
       table.insert(tospawn, kTechId.Whip)
       end 
       
-      local  Crag = #GetActiveConstructsForTeam( "Crag", 2 )
-      if Crag < 18 then
+     -- local  Crag = #GetActiveConstructsForTeam( "Crag", 2 )
+      --if Crag < 18 then
+      --   Print("Imaginator activeCrags count == %s", self.activeCrags)
+      if  self.activeCrags  < 13 then
       table.insert(tospawn, kTechId.Crag)
       end 
       
-      local  Shade = #GetActiveConstructsForTeam( "Shade", 2 )
-      if Shade < 12 then
+     -- local  Shade = #GetActiveConstructsForTeam( "Shade", 2 )
+     -- if Shade < 12 then
+       -- Print("Imaginator activeShades count == %s", self.activeShades)
+     if  self.activeShades  < 12 then
       table.insert(tospawn, kTechId.Shade)
       end 
       
      
-    local finalchoice = nil
-            
-       if not GetHasFourHives() then
-     finalchoice = kTechId.Hive 
-      else
-          finalchoice  = table.random(tospawn)
-      end
+    local finalchoice = table.random(tospawn)
   
 
 

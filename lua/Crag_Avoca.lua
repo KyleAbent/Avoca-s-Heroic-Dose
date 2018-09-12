@@ -122,7 +122,17 @@ function Crag:TryHeal(target)
    
 end
 
+function Crag:OnConstructionComplete()
+	 GetImaginator().activeCrags = GetImaginator().activeCrags + 1;  
+end
 
+
+ function Crag:PreOnKill(attacker, doer, point, direction)
+      
+	  if self:GetIsBuilt() then
+	    GetImaginator().activeCrags  = GetImaginator().activeCrags- 1;  
+	  end
+end
 
 /*
 

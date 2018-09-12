@@ -33,6 +33,17 @@ end
      end
    end
    
+function Whip:OnConstructionComplete()
+	 GetImaginator().activeWhips = GetImaginator().activeWhips + 1;  
+end
+
+
+ function Whip:PreOnKill(attacker, doer, point, direction)
+      
+	  if self:GetIsBuilt() then
+	    GetImaginator().activeWhips  = GetImaginator().activeWhips- 1;  
+	  end
+end
 if Server then
 
 

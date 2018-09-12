@@ -18,3 +18,22 @@ local origUpdate = Sentry.OnUpdate
 end
 
 end
+
+/*
+   not powered by powerconsumer
+	function Sentry:OnPowerOn(){
+	 GetImaginator().activeSentrys += 1;  
+}
+
+function Sentry:OnPowerOff(){
+	 GetImaginator().activeSentrys -= 1;  
+}
+
+ function Sentry:PreOnKill(attacker, doer, point, direction){
+      
+	  if self:GetIsPowered() then
+	    GetImaginator().activeSentrys += 1;  
+	  end
+ }
+
+ */

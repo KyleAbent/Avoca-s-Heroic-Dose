@@ -19,4 +19,19 @@ function InfantryPortal:OnUpdate(deltaTime)
 
 end
 
+function InfantryPortal:OnPowerOn()
+	 GetImaginator().activeIPs = GetImaginator().activeIPs + 1  
+
+end
+function InfantryPortal:OnPowerOff()
+	 GetImaginator().activeIPs = GetImaginator().activeIPs - 1  
+
+end
+ function InfantryPortal:PreOnKill(attacker, doer, point, direction)
+      
+	  if self:GetIsPowered() then
+	    GetImaginator().activeIPs  = GetImaginator().activeIPs - 1 
+	  end
+ end
+
 Shared.LinkClassToMap("InfantryPortal", InfantryPortal.kMapName, networkVars)

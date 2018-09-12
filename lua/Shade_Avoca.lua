@@ -19,6 +19,17 @@ function Shade:OnInitialized()
 InitMixin(self, InfestationMixin)
 end
 
+function Shade:OnConstructionComplete()
+	 GetImaginator().activeShades = GetImaginator().activeShades + 1;  
+end
+
+
+ function Shade:PreOnKill(attacker, doer, point, direction)
+      
+	  if self:GetIsBuilt() then
+	    GetImaginator().activeShades  = GetImaginator().activeShades- 1;  
+	  end
+end
 
   function Shade:GetInfestationRadius()
      if  GetConductor():GetIsPhaseTwoBoolean() then
