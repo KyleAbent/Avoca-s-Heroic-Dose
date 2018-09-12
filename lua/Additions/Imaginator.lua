@@ -33,29 +33,8 @@ local function NotBeingResearched(techId, who)
 end
 local function ResearchEachTechButton(who)
 local techIds = who:GetTechButtons() or {}
-      if who:isa("EvolutionChamber") then
-      
-               techIds = {}
-               table.insert(techIds, kTechId.Charge )
-               table.insert(techIds, kTechId.BileBomb )
-               table.insert(techIds, kTechId.MetabolizeEnergy )
-               table.insert(techIds, kTechId.Leap )
-               table.insert(techIds, kTechId.Spores )
-               table.insert(techIds, kTechId.Umbra )
-               table.insert(techIds, kTechId.MetabolizeHealth )
-               table.insert(techIds, kTechId.BoneShield )
-               table.insert(techIds, kTechId.Stab )
-               table.insert(techIds, kTechId.Stomp )
-               table.insert(techIds, kTechId.Xenocide )
-          
-      end
-      
-            if who:isa("Observatory") then
-             techIds = {}
-             table.insert(techIds, kTechId.PhaseTech )
-            end
 
-      
+      --AdvancedArmory
                        for _, techId in ipairs(techIds) do
                      if techId ~= kTechId.None then
                         if not GetHasTech(who, techId) and who:GetCanResearch(techId) then
@@ -133,20 +112,20 @@ function Imaginator:OnUpdate(deltatime)
                if gamestarted then 
 
                local researchables = {}
-                   for _, ent in ientitylist(Shared.GetEntitiesWithClassname("EvolutionChamber")) do
-                   table.insert(researchables, ent)
+
+                   for _, ent in ientitylist(Shared.GetEntitiesWithClassname("Armory")) do
+                    if not  ent:isa("AdvancedArmory") then table.insert(researchables, ent) end
+                    ResearchEachTechButton(ent)
                    end
 
-                   for _, researchable in ipairs(GetEntitiesWithMixinForTeam("Research", 1)) do
-                   table.insert(researchables, researchable)  
-                        if researchable:isa("Observatory") then
-					    table.insert(researchables, researchable)
-					    end 
+                   for _, ent in ientitylist(Shared.GetEntitiesWithClassname("RoboticsFactory")) do
+                    if not  ent:isa("ARCRoboticsFactory") then table.insert(researchables, ent) end
+                    ResearchEachTechButton(ent)
                    end
-               
+                   
                    for i = 1, #researchables do
                        local researchable = researchables[i]
-                       ResearchEachTechButton(researchable)  
+                
                    end
                 
              self.timeLastResearch = Shared.GetTime()  
@@ -502,7 +481,7 @@ end
 
 
 function Imaginator:DoBetterUpgs()
-local tospawn
+local tospawn = UpgChambers()
 local success = false
 local randomspawn = nil
 local hive = GetHive()

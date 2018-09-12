@@ -263,15 +263,19 @@ function ARC:GiveScan()
  --   self:CheckVortex()
  --  end
   
-   if not self:GetInAttackMode() or  self.targetPosition == nil then return end
+   if not self:GetInAttackMode() then return end --or  self.targetPosition == nil then return end
    
- --   local where = GetNearestEligable(self):GetOrigin()
-
-    if not hasScan(self, self.targetPosition ) then  
-      CreateEntity(Scan.kMapName, self.targetPosition , 1) 
+   local where = GetNearestMixin(self:GetOrigin(), "Construct", 2)
+   
+   if not where then return end
+   
+   where = where:GetOrigin()
+ 
+    if not hasScan(self, where ) then  
+      CreateEntity(Scan.kMapName, where, 1) 
       end
       
-    for _, shade in ipairs(GetEntitiesWithinRange("Shade", self.targetPosition, 20)) do
+    for _, shade in ipairs(GetEntitiesWithinRange("Shade", self:GetOrigin(), 20)) do
        if shade:GetIsBuilt() then
            shade.shouldInk = true  --better than shade onup scan check
            break -- one at a time?

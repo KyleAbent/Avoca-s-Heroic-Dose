@@ -1,12 +1,17 @@
-local originit = Observatory.OnInitialized
-function Observatory:OnInitialized()
+
+local originit = ArmsLab.OnInitialized
+function ArmsLab:OnInitialized()
 
        originit(self)
        if not Server then return end
-       if GetHasTech(self, kTechId.PhaseTech) then return end
+       if GetHasTech(self, kTechId.Armor3) then return end
        local techIds = {}
-         table.insert(techIds, kTechId.PhaseTech )
-         
+         table.insert(techIds, kTechId.Weapons1 )
+         table.insert(techIds, kTechId.Weapons2 )
+         table.insert(techIds, kTechId.Weapons3 )
+         table.insert(techIds, kTechId.Armor1 )
+         table.insert(techIds, kTechId.Armor2 )
+         table.insert(techIds, kTechId.Armor3 )
         local techTree = self:GetTeam():GetTechTree()
       --  local researchNode = techTree:GetTechNode(kTechId.AdvancedWeaponry)
         
@@ -23,8 +28,4 @@ function Observatory:OnInitialized()
         
 
     
-end
-
-function Observatory:GetMinRangeAC()
-return kScanRadius   
 end

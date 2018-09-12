@@ -1,3 +1,28 @@
+local originit = Armory.OnInitialized
+function Armory:OnInitialized()
+
+       originit(self)
+       if GetHasTech(self, kTechId.ShotgunTech) then return end --What about AA? I'll get there I guess.. Hm.
+       local techIds =  self:GetTechButtons()
+         
+        local techTree = self:GetTeam():GetTechTree()
+      --  local researchNode = techTree:GetTechNode(kTechId.AdvancedWeaponry)
+        
+         for i = 1, #techIds do
+            local single = techIds[i]
+            local researchNode = techTree:GetTechNode(single)
+            if researchNode then
+            researchNode:SetResearchProgress(1)
+            techTree:SetTechNodeChanged(researchNode, string.format("researchProgress = %.2f", 1))
+            researchNode:SetResearched(true)
+            techTree:QueueOnResearchComplete(single, self)
+            end
+        end
+        
+
+    
+end
+
 function Armory:GetMinRangeAC()
 return 16 /2
 end

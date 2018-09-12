@@ -12,6 +12,11 @@ ModLoader.SetupFileHook( "lua/Exo.lua", "lua/Exo_Avoca.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/Whip.lua", "lua/Whip_Avoca.lua", "post" )
 
+ModLoader.SetupFileHook( "lua/ArmsLab.lua", "lua/ArmsLab_Avoca.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/EvolutionChamber.lua", "lua/EvolutionChamber_Avoca.lua", "post" )
+
+
 ModLoader.SetupFileHook( "lua/AmmoPack.lua", "lua/AmmoPack_Skynet.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/MedPack.lua", "lua/MedPack_Skynet.lua", "post" )
