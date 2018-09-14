@@ -74,7 +74,7 @@ local function lockTarget(self, client, vip)
         //  local findfreespace = FindFreeSpace(viporigin, 1, 8)
         //  if findfreespace == viporigin then findfreespace.x = findfreespace.x - 2 return end
             //  client:SetOrigin(findfreespace)
-           --  client:SetOrigin(viporigin)
+              client:SetOrigin(viporigin)
              client:SetOffsetAngles(vip:GetAngles()) //if iscam
             
              local dir = GetNormalizedVector(viporigin - client:GetOrigin())
@@ -85,28 +85,8 @@ local function lockTarget(self, client, vip)
              
              self:NotifyGeneric( client, "VIP is %s, location is %s", true, vip:GetClassName(), GetLocationName(client) )
 end
-local function firstPersonScoreBased(self, client)
 
-    client:BreakChains()
-    function sortByScore(ent1, ent2)
-        return ent1:GetScore() > ent2:GetScore()
-    end
-    
-    local tableof = {}
-                for _, scorer in ipairs(GetEntitiesWithMixin("Scoring")) do
-                 if not scorer:isa("ReadyRoomPlayer") and not scorer:isa("Commander") and scorer:GetIsAlive() then table.insert(tableof, scorer) end
-              end  
-    if table.count(tableof) == 0 then return end
-    local max = Clamp(table.count(tableof), 1, 4)
-    table.sort(tableof, sortByScore)
-    local entrant = math.random(1,max)
-    local topscorer = tableof[entrant]
-    if not topscorer then return end
-    if client:GetSpectatorMode() ~= kSpectatorMode.FirstPerson then client:SetSpectatorMode(kSpectatorMode.FirstPerson)  end
-    Server.GetOwner(client):SetSpectatingPlayer(topscorer)
-    self:NotifyGeneric( client, "(First person) VIP is %s, # rank in score is %s", true, topscorer:GetName(), entrant )
-end
- function Plugin:OnChangeView(client, untilNext, betweenLast)
+ function Plugin:OnChangeView(client)
         
         if not client then return end
        local random = {} --table.random(choices)
@@ -124,7 +104,7 @@ end
         lockTarget(self, client, vip)
         end
         
-         Shine.ScreenText.Add( 50, {X = 0.20, Y = 0.75,Text = "[Director] untilNext: %s",Duration = betweenLast or 0,R = 255, G = 0, B = 0,Alignment = 0,Size = 1,FadeIn = 0,}, client )  
+       --  Shine.ScreenText.Add( 50, {X = 0.20, Y = 0.75,Text = "[Director] untilNext: %s",Duration = betweenLast or 0,R = 255, G = 0, B = 0,Alignment = 0,Size = 1,FadeIn = 0,}, client )  
 
 end
 

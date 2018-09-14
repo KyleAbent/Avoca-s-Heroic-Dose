@@ -35,22 +35,18 @@ end
 function Conductor:FirePhaseCannons(powerpoint)
 
               if not GetHasThreeHives() then return end -- although not requiring biomass. Maybe later.
-              /*
-              local mult = 0 --Clamp( GetConductor():GetIsPhaseTwoBoolean().phase, 1, 4)
               
-              if GetConductor().phase == 4 then
-                   max = 1
-              elseif GetConductor().phase == 3 then
-                   max = 2
-              elseif GetConductor().phase == 2 then
-                   max = 3
-              elseif GetConductor().phase == 1 then
-                   max = 4
-              else
+
+              
+              for i = 1, GetConductor():getPhase()  do
+              local origin = FindFreeSpace(powerpoint:GetOrigin())
+              CreateEntity(Contamination.kMapName, FindFreeSpace(origin, 1, 8), 2)
+              CreateEntity(Egg.kMapName, FindFreeSpace(origin, 1, 8), 2)
+              --phase four egg spawn?
               end
-              */
-             local origin = FindFreeSpace(powerpoint:GetOrigin())
-             CreateEntity(Contamination.kMapName, FindFreeSpace(origin, 1, 8), 2)
+              
+            
+
           
        /*
        
@@ -83,7 +79,8 @@ function Conductor:FirePhaseCannons(powerpoint)
              end
       end
       */
-    
+     
+     /*
       local  PanicAttackCount = GetEntitiesForTeam( "PanicAttack", 2 )   --withinradius?
       if #PanicAttackCount < 18 then
              for i = 1, math.random(1, 18 - #PanicAttackCount ) do
@@ -91,6 +88,7 @@ function Conductor:FirePhaseCannons(powerpoint)
                --shade:SetConstructionComplete()-- chance < 100% ?
              end
       end 
+      */
      
 
 

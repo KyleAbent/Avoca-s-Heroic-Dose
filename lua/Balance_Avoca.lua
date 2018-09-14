@@ -1,3 +1,4 @@
+kHeavyMachineGunClipSize = 250
 kLerkBiteDamage = 65--60
 kMucousShieldPercent = 0.9
 kMucousShieldDuration = 10

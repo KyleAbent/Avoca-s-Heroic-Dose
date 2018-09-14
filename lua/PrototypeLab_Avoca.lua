@@ -3,7 +3,7 @@ function PrototypeLab:OnInitialized()
 
        originit(self)
        if not Server then return end
-       if GetHasTech(self, kTechId.PhaseTech) then return end
+       if GetHasTech(self, kTechId.JetpackTech) then return end
        local techIds = self:GetTechButtons()
          
         local techTree = self:GetTeam():GetTechTree()

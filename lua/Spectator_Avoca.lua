@@ -24,7 +24,8 @@ function AvocaSpectator:OnCreate()
  Spectator.OnCreate(self)
   self.lastswitch = Shared.GetTime()
        if Server then
-         self:AddTimedCallback( AvocaSpectator.UpdateCamera, 1 )
+         self:AddTimedCallback( AvocaSpectator.LockAngles, 1 )
+         self:AddTimedCallback( AvocaSpectator.UpdateCamera, 9 )
         end
         self.nextangle = math.random(4,8)
          self.lockedId = Entity.invalidI 
@@ -62,9 +63,9 @@ function AvocaSpectator:OnEntityChange(oldId)
 
     if self.lockedId == oldId then
         self.lockedId = Entity.invalidId
-       self.lastswitch = Shared.GetTime()
-       self.nextangle = math.random(4,8)
-     self:ChangeView(self, self.nextangle, self.lastswitch )
+   --    self.lastswitch = Shared.GetTime()
+   --    self.nextangle = math.random(4,8)
+     self:ChangeView(self )
     end    
     
 
@@ -121,14 +122,14 @@ function AvocaSpectator:OverrideInput(input)
     
 end
 function AvocaSpectator:UpdateCamera()
-         self:LockAngles()
+        -- self:LockAngles()
         --  Print(self.lastswitch,  " ", self.nextangle )
-         if GetIsTimeUp(self.lastswitch, self.nextangle ) then
+       --  if GetIsTimeUp(self.lastswitch, self.nextangle ) then
              --Print("AvocaSpectator ChangeView")
-              self.nextangle = math.random(4,8)
-              self.lastswitch = Shared.GetTime()
-              self:ChangeView(self, self.nextangle, self.lastswitch )
-          end
+            --  self.nextangle = math.random(4,8)
+            --  self.lastswitch = Shared.GetTime()
+              self:ChangeView(self )
+        --  end
           return true
 end
 Shared.LinkClassToMap("AvocaSpectator", AvocaSpectator.kMapName, networkVars)

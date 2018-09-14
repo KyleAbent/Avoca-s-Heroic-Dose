@@ -45,7 +45,9 @@ function Conductor:OnReset()
    self:TimerValues()
 end
 
-
+function Conductor:getPhase() 
+   return self.phase
+end
 function Conductor:ManageMarineBeacons()
             local chair = nil
 
@@ -611,6 +613,13 @@ function Conductor:ManageCrags()
             --if moving then like arc instruct specificrules
                nearestof:InstructSpecificRules()
                if nearestof.moving then return end
+              if self.phase == 4 then --GetConductor().phase == 4 then
+                 local cc = GetRandomCC()
+                 if cc then
+                 nearestof:GiveOrder(kTechId.Move, cc:GetId(), FindFreeSpace(cc:GetOrigin(), 4), nil, false, false)
+                 return
+                 end
+               end
                local power = GetNearest(nearestof:GetOrigin(), "PowerPoint", 1,  function(ent) return ent:GetIsBuilt() and ent:GetIsDisabled() and GetLocationForPoint(nearestof:GetOrigin()) ~= GetLocationForPoint(ent:GetOrigin()) end ) 
                if power then
                  nearestof:GiveOrder(kTechId.Move, power:GetId(), FindFreeSpace(power:GetOrigin(), 4), nil, false, false) 
@@ -619,7 +628,7 @@ function Conductor:ManageCrags()
        end  
 end
 
-function Conductor:ManageWhips()
+function Conductor:ManageWhips() --add to whip as instruct
 
        --mindfuck would be getnearest built node that is beyond the arc radius of the closest arc to that node. HAH.
        --local powerpoint = GetRandomActivePower() 
@@ -633,6 +642,13 @@ function Conductor:ManageWhips()
            local hive = GetRandomHive()
            local nearestof = GetNearest(hive:GetOrigin(), "Whip", 2, function(ent) return ent:GetIsBuilt() and ( ent.GetIsInCombat and not ent:GetIsInCombat() and not ent:GetIsACreditStructure() and not ent.moving )  end)
             if nearestof then
+              if self.phase == 4 then --GetConductor().phase == 4 then
+                 local cc = GetRandomCC()
+                 if cc then
+                 nearestof:GiveOrder(kTechId.Move, cc:GetId(), FindFreeSpace(cc:GetOrigin(), 4), nil, false, false)
+                 return
+                 end
+               end
                local power = GetNearest(nearestof:GetOrigin(), "PowerPoint", 1,  function(ent) return ent:GetIsBuilt() and not ent:GetIsDisabled()  end ) 
                if power then
                  nearestof:GiveOrder(kTechId.Move, power:GetId(), FindFreeSpace(power:GetOrigin(), 4), nil, false, false) 

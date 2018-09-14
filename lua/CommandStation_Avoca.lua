@@ -142,6 +142,8 @@ function CommandStation:PerformDistressBeacon()
                           end
                         end
                         
+                        if GetConductor().phase == 4 then return end
+                        
                         
         for index, player in ipairs(GetPlayersToBeacon(self, distressOrigin)) do
         

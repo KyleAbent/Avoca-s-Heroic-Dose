@@ -1,3 +1,7 @@
+function Sentry:GetMinRangeAC()
+return 16 /4
+end
+
 function Sentry:GetFov()
     return 360
 end

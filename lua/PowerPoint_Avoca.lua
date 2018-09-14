@@ -1,3 +1,26 @@
+
+local networkVars = 
+{
+  addBonus = "integer",
+}
+
+
+
+local origC = PowerPoint.OnCreate
+function PowerPoint:OnCreate()
+   origC(self)
+   self.addBonus = 100
+end
+
+
+
+function PowerPoint:OnAddHealth()
+   self:AddArmor(1)
+end
+
+
+
+
 /*
 
 function PowerPoint:OnAdjustModelCoords(modelCoords)
@@ -14,7 +37,7 @@ function PowerPoint:OnAddHealth()
 end
 
 
-local kDestructionBuildDelay = 4
+local kDestructionBuildDelay = 1
 
 function GetPowerPointRecentlyDestroyed(self)
     return (self.timeOfDestruction + kDestructionBuildDelay) > Shared.GetTime()
@@ -53,6 +76,10 @@ local orig_PowerPoint_StopDamagedSound = PowerPoint.StopDamagedSound
     orig_PowerPoint_StopDamagedSound(self)
         if self:GetHealthScalar() ~= 1 then return end
          self:SpawnSurgeForEach(self:GetOrigin(), self)
+         --  if Server then
+         --       self:AdjustMaxHealth(self:GetMaxHealth() + 250)
+          --      self:AdjustMaxArmor(self:GetMaxArmor() + 25)
+          -- end
           --self:SetArmor(kPowerPointArmor) -- macs dont weld armor. Hm.
         -- AddPayLoadTime(kTimeAddPowerBuilt)
        -- local nearestHarvester = GetNearest(self:GetOrigin(), "Harvester", 2, function(ent) return LocationsMatch(self,ent)  end)
@@ -86,5 +113,37 @@ function PowerPoint:GetCanBeUsed(player, useSuccessTable)
 
         useSuccessTable.useSuccess = false
 
+    
+end
+
+
+if Server then
+
+
+local origK = PowerPoint.OnKill
+ function PowerPoint:OnKill(attacker, doer, point, direction)
+    
+       origK(self, attacker, doer, point, direction)
+     --  self:AdjustMaxHealth(self:GetMaxHealth() + 100)
+       --self:AdjustMaxArmor(self:GetMaxArmor() + 10)
+        kPowerPointHealth = kPowerPointHealth + 10
+        kPowerPointArmor = kPowerPointArmor + 5
+        
+     end
+
+/*
+local origW = PowerPoint.OnWeldOverride
+function PowerPoint:OnWeldOverride(entity, elapsedTime)
+        if self:GetHealthScalar() == 1 and self:GetPowerState() == PowerPoint.kPowerState.destroyed then
+            self.health = kPowerPointHealth + self.addBonus
+            self.armor = kPowerPointArmor + (self.addBonus/10)
+            self:SetMaxHealth(kPowerPointHealth + self.addBonus)
+            self:SetMaxArmor(kPowerPointArmor + (self.addBonus/10) )
+            self.addBonus = self.addBonus + 100
+        end
+                  origW(self, entity, elapsedTime)
+        
+    end
+*/
     
 end

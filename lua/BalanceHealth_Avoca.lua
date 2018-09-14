@@ -21,6 +21,6 @@ kLerkHealth = 175
 
 kSkulkHealth = 85
 
---kPowerPointHealth = 1000    kPowerPointArmor =  0   kPowerPointPointValue = 5
+kPowerPointHealth = 1000    kPowerPointArmor =  0   kPowerPointPointValue = 5
 kARCHealth = 2200
 kARCArmor = 510

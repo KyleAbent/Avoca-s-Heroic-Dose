@@ -10,7 +10,7 @@ function InfantryPortal:OnUpdate(deltaTime)
   origupdate(self, deltaTime)
   
   if Server then
-    if  self:GetIsBuilt() and not self:GetIsPowered() and GetIsTimeUp(self.lastCheck, 8)  then
+    if  self:GetIsBuilt() and not self:GetIsPowered() and GetIsTimeUp(self.lastCheck, 8)  and not GetConductor().phase == 4 then
         self:SetPowerSurgeDuration(16)
         self.lastCheck = Shared.GetTime()
     end

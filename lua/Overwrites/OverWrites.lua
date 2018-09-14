@@ -80,19 +80,6 @@ if Server then
 
 --Whips do less damage with less health (slap atleast)
 
-function Whip:SlapTarget(target)
-    self:FaceTarget(target)
-    -- where we hit
-    local targetPoint = target:GetEngagementPoint()
-    local attackOrigin = self:GetEyePos()
-    local hitDirection = targetPoint - attackOrigin
-    hitDirection:Normalize()
-    -- fudge a bit - put the point of attack 0.5m short of the target
-    local hitPosition = targetPoint - hitDirection * 0.5
-    self:DoDamage(Whip.kDamage, target, hitPosition, hitDirection, nil, true)
-    self:TriggerEffects("whip_attack")
-
-end
 
 
 local function GetIsPowered(where)
@@ -119,11 +106,11 @@ function ConstructMixin:OnConstructUpdate(deltaTime)
       else --Because pressing e and building everything slows down the tempo wayy too much
          --and is not in sync with the fast gameplay that I have going on here.
          --maybe this will be better than ns2siege where i had dynamic build speed based on playercount & roundlength?
-        local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
-        local macs = GetEntitiesWithinRange("MAC", self:GetOrigin(), 4)
-        if #marines >= 1 or #macs >= 1 then
+      --  local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
+       -- local macs = GetEntitiesWithinRange("MAC", self:GetOrigin(), 4)
+       -- if #marines >= 1 or #macs >= 1 then
         canauto = GetIsPowered(self:GetOrigin())
-        end
+        --end
       end
       
          if canauto then
@@ -132,12 +119,12 @@ function ConstructMixin:OnConstructUpdate(deltaTime)
             multiplier = self.hasDrifterEnzyme and kDrifterBuildRate or kAutoBuildRate
             multiplier = multiplier * ( (HasMixin(self, "Catalyst") and self:GetIsCatalysted()) and kNutrientMistAutobuildMultiplier or 1 )
             else
-           local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
-           local macs = GetEntitiesWithinRange("MAC", self:GetOrigin(), 4)
-           marines = Clamp(#marines, 1, 4)
-           macs = Clamp(#macs, 1, 4)
-           multiplier = 1 + (marines/4) * 1
-           multiplier = 1 + (macs/4) * 1
+         --  local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
+        --   local macs = GetEntitiesWithinRange("MAC", self:GetOrigin(), 4)
+         --  marines = Clamp(#marines, 1, 4)
+          -- macs = Clamp(#macs, 1, 4)
+           --multiplier = 1 + (marines/4) * 1
+           --multiplier = 1 + (macs/4) * 1
             end
             self:Construct(deltaTime * multiplier)
         end --canauto

@@ -84,6 +84,7 @@ function Imaginator:OnUpdate(deltatime)
             self.timeLastImaginations = Shared.GetTime()
                self:MarineConstructs()
               self:AlienConstructs(false)
+               self:DoBetterUpgs()
          end
 
        if not  self.timeLastStructOne or self.timeLastStructOne + 9 <= Shared.GetTime() then 
@@ -147,30 +148,7 @@ local function GetRange(who, where)
     return ArcFormula
 end
 
-local function GetSentryMinRangeReq(where)
-local count = 0
-            local ents = GetEntitiesForTeamWithinRange("SentryAvoca", 1, where, 16)
-            for index, ent in ipairs(ents) do
-                  count = count + 1
-           end
-           
-           count = Clamp(count, 1, 4)
-           
-           return count*8
-                
-end
-local function GetWhipMinRangeReq(where)
-local count = 0
-            local ents = GetEntitiesForTeamWithinRange("WhipAvoca", 1, where, 16)
-            for index, ent in ipairs(ents) do
-                  count = count + 1
-           end
-           
-           count = Clamp(count, 1, 4)
-           
-           return count*16
-                
-end
+
 
 local function GetHasThreeChairs()
 local CommandStations = #GetEntitiesForTeam( "CommandStation", 1 )
@@ -180,9 +158,9 @@ local CommandStations = #GetEntitiesForTeam( "CommandStation", 1 )
 return GetConductor():GetIsPhaseFourBoolean()
 end
 
-local function GetHasFourHives()
+local function GetHasThreeHives()
    local Hives = #GetEntitiesForTeam( "Hive", 2 )
-   if Hives >= 4 then return true end
+   if Hives >= 3 then return true end
    return GetConductor():GetIsPhaseFourBoolean()
 end
 
@@ -203,7 +181,7 @@ local gamestarted = false
          local  CCs = #GetEntitiesForTeam( "CommandStation", 1 )  
 
   
-           if CCs < 3 then 
+           if CCs < 3  and not GetConductor():GetIsPhaseFourBoolean() then 
              return kTechId.CommandStation
              end
            
@@ -317,40 +295,6 @@ end
 local function BuildNotificationMessage(where, self, mapname)
 end
 
-local function FindPosition(location, searchEnt, teamnum)
-
-     if not location or #location == 0  then
-	 return
-	 end
-
-      local origin = nil
-      local where = {}
-       for i = 1, #location do
-         local location = location[i]   
-         local ents = location:GetEntitiesInTrigger()
-         local potential = InsideLocation(ents, teamnum)
-          if potential ~= nil then
-		  table.insert(where, potential )
-		  end 
-     end
-
-     for _, entity in ipairs( GetEntitiesWithMixinForTeamWithinRange("Construct", teamnum, searchEnt:GetOrigin(), 24) ) do
-       if  GetLocationForPoint(entity:GetOrigin()) ==  GetLocationForPoint(searchEnt:GetOrigin()) then
-          table.insert(where, entity:GetOrigin() )
-       end
-     end
-
-     if #where == 0 then return nil end
-      local random = table.random(where)
-      local actualWhere = FindFreeSpace(random)
-        if random == actualWhere then
-	    return nil
-	    end -- ugh
-     return actualWhere
- end
-
-
-
 function Imaginator:ActualFormulaMarine()
      local randomspawn = nil
      local tospawn = GetMarineSpawnList(self)
@@ -361,17 +305,13 @@ function Imaginator:ActualFormulaMarine()
      local powerpoint = GetRandomActivePower()
      local success = false
      local entity = nil
+                 local potential = GetNearestMixin(powerpoint:GetOrigin(), "Construct", 1, function(ent) return GetLocationForPoint(powerpoint:GetOrigin()) == GetLocationForPoint(ent:GetOrigin()) end)--FindPosition(GetAllLocationsWithSameName(powerpoint:GetOrigin()), powerpoint, 1)
             if powerpoint and tospawn then
-                 local potential = FindPosition(GetAllLocationsWithSameName(powerpoint:GetOrigin()), powerpoint, 1)
-                  if potential == nil then local roll = math.random(1,3)
-				    if roll == 3 then
-				    self:ActualFormulaMarine() return
-				    else
-				    return
-				    end
+                  if potential == nil then 
+                     potential = self
 		        end
 
-            randomspawn = FindFreeSpace(potential, 2.5)
+            randomspawn = FindFreeSpace(potential:GetOrigin(), 2.5)
                 if randomspawn then
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetTechId() == tospawn or ( ent:GetTechId() == kTechId.AdvancedArmory and tospawn == kTechId.Armory)  or ( ent:GetTechId() == kTechId.ARCRoboticsFactory and tospawn == kTechId.RoboticsFactory) end)
                       if nearestof then
@@ -408,7 +348,7 @@ local tospawn = {}
 
      -- local  Shift = #GetActiveConstructsForTeam( "Shift", 2 )
    
-        if not GetHasFourHives() then return  kTechId.Hive  end
+        if not GetHasThreeHives() then return  kTechId.Hive  end
 
 
       --if Shift < 14 then
@@ -555,16 +495,11 @@ function Imaginator:ActualAlienFormula(cystonly)
 
 
      if powerpoint and tospawn then     
-                 local potential = FindPosition(GetAllLocationsWithSameName(powerpoint:GetOrigin()), powerpoint, 2)
-                   if potential == nil then
-				     local roll = math.random(1,3)
-				       if roll == 3 then
-				       self:ActualAlienFormula() return
-				       else
-				       return
-				      end
-				   end              
-                  randomspawn = FindFreeSpace(potential, math.random(2.5, 4) , math.random(8, 16), not tospawn == kTechId.Cyst )
+                 local potential = GetNearestMixin(powerpoint:GetOrigin(), "Construct", 2, function(ent) return GetLocationForPoint(powerpoint:GetOrigin()) == GetLocationForPoint(ent:GetOrigin()) end )--FindPosition(GetAllLocationsWithSameName(powerpoint:GetOrigin()), powerpoint, 1)
+                  if potential == nil then 
+                     potential = powerpoint
+		           end           
+                  randomspawn = FindFreeSpace(potential:GetOrigin(), math.random(2.5, 4) , math.random(8, 16), not tospawn == kTechId.Cyst )
              if randomspawn then
                     local nearestof = GetNearestMixin(randomspawn, "Construct", 2, function(ent) return ent:GetTechId() == tospawn end)
                       if nearestof then
