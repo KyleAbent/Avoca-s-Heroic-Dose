@@ -288,19 +288,19 @@ end
            vip = GetViewTwo()
         elseif random == 3 then
            vip = GetViewThree()
-       -- else 
-       --     firstPersonScoreBased(self, client)
+        else 
+            firstPersonScoreBased(self, client)
         end
    
         if vip ~= nil then 
-           --   local roll = math.random(1,2)
-            -- if roll == 1 then
+              local roll = math.random(1,2)
+             if roll == 1 then
               overHeadandNear(self, client, vip)
-            -- elseif roll == 2 then
-            --  firstPersonScoreBased(self, client)
-            --  end
+             elseif roll == 2 then
+              firstPersonScoreBased(self, client)
+              end
       else
-      --  firstPersonScoreBased(self, client)
+        firstPersonScoreBased(self, client)
        end
   
          Shine.ScreenText.Add( 50, {X = 0.20, Y = 0.75,Text = "[Director] untilNext: %s",Duration = betweenLast or 0,R = 255, G = 0, B = 0,Alignment = 0,Size = 1,FadeIn = 0,}, client )  

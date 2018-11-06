@@ -1,3 +1,0 @@
-My intention is to rewrite its entities from scratch and not rely on external authors writing. I apologize for taking
-EEM and using it in Siege, however, it was the only tool I had during 2015 2016 2017, and it worked for full servers
-to play and mimic NS1. Please give me time to adjust and not rely on EEM thank you.

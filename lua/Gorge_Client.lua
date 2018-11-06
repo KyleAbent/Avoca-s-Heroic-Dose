@@ -12,7 +12,7 @@ function Gorge:GetHeadAttachpointName()
     return "Bone_Tongue"
 end
 
-// Tilt the camera based on the wall the Gorge is attached to.
+-- Tilt the camera based on the wall the Gorge is attached to.
 function Gorge:PlayerCameraCoordsAdjustment(cameraCoords)
 
     if self.currentCameraRoll ~= 0 then
@@ -47,7 +47,7 @@ local function UpdateCameraTilt(self, deltaTime)
         self.currentViewModelRoll = 0
     end
     
-    // Don't rotate if too close to upside down (on ceiling).
+    -- Don't rotate if too close to upside down (on ceiling).
     if not Client.GetOptionBoolean("CameraAnimation", false) or math.abs(self.wallWalkingNormalGoal:DotProduct(Vector.yAxis)) > 0.9 then
         self.goalCameraRoll = 0
     else

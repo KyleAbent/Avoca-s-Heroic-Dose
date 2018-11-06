@@ -1,39 +1,51 @@
-local origInit = ConstructMixin.__initmixin
-function ConstructMixin:__initmixin()
-
-origInit(self)
-self.level = 0
-self.MaxLevel = 19
-self.GainXP = 1
+function ConstructMixin:SetIsACreditStructure(boolean)
+    
+self.isacreditstructure = boolean
+      --Print("AvocaMixin SetIsACreditStructure %s isacreditstructure is %s", self:GetClassName(), self.isacreditstructure)
+end
+function ConstructMixin:GetCanStick()
+     local canstick = not GetSetupConcluded()
+     --Print("Canstick = %s", canstick)
+     return canstick and self:GetIsACreditStructure() 
 end
 
 function ConstructMixin:GetIsACreditStructure()
-return false
-end
-
-function ConstructMixin:GetAddXPAmount()
-return 0.025
-end
-function ConstructMixin:GetMaxLevel()
-return self.MaxLevel
-end
-function ConstructMixin:AddXP(amount)
-
-    local xpReward = 0
-        xpReward = math.min(amount, self.MaxLevel - self.level)
-        self.level = self.level + xpReward
-        
-        self:AdjustMaxArmor( self:GetMaxArmor() * (self.level/100) + self:GetMaxArmor() ) 
-   
-    return xpReward
     
-end
-function ConstructMixin:GetLevel()
-        return Round(self.level, 2)
-end
-  function ConstructMixin:GetUnitNameOverride(viewer)
-    local unitName = GetDisplayName(self)   
-    unitName = string.format(Locale.ResolveString("%s (Lvl %s more armor)"), self:GetClassName(), self:GetLevel())
-    return unitName
-end 
+       -- Print("AvocaMixin GetIsACreditStructure %s isacreditstructure is %s", self:GetClassName(), self.isacreditstructure)
+return self.isacreditstructure 
+ 
 
+end
+
+
+if Server then
+
+
+function ConstructMixin:AdjustHPArmor()
+  if GetIsRoomPowerUp(self) then --if phase 1? or not phase 4?
+   local amthp =  self:isa("PowerPoint") and 25 or 100
+   local amtarmor =  self:isa("PowerPoint") and 5 or 25
+  if not self:GetIsInCombat() then self:AddHealth(amthp) self:AddArmor(amtarmor) end
+else
+  self:DeductHealth(100)  
+ end
+  return true//self:GetIsBuilt()
+end
+
+local orig consOn = ConstructMixin.OnConstructionComplete
+function ConstructMixin:OnConstructionComplete(builder)
+      consOn(self, builder)
+      if self:GetTeamNumber() == 1 then
+      self:AddTimedCallback(ConstructMixin.AdjustHPArmor, 4)
+      end
+end
+
+function ConstructMixin:OnUpdate(deltaTime)
+  if ( self.GetIsInCombat  ) and not self:GetIsInCombat() and not self:isa("PowerPoint") and self:GetTeamNumber() == 1 and not self:GetIsBuilt() and GetIsRoomPowerUp(self) then
+ -- Print("derp")
+  self:Construct(0.0125)
+  end
+end
+
+
+end//server
