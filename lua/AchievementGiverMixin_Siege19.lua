@@ -4,7 +4,7 @@
 --
 --    Created by:   Sebastian Schuck (sebastian@naturalselection2.com)
 --
--- ========= For more information, visit us at http:--www.unknownworlds.com =====================
+-- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 -- This mixin assigns event based achievements to the players
 AchievementGiverMixin = CreateMixin(AchievementGiverMixin)

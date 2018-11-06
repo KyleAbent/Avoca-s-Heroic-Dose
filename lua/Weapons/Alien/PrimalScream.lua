@@ -1,6 +1,6 @@
--- NS2 - Classic -- Modified for siege ofc -- thanks dragon
--- lua\Weapons\Alien\Umbra.lua
---
+// NS2 - Classic -- Modified for siege ofc -- thanks dragon
+// lua\Weapons\Alien\Umbra.lua
+//
 
 Script.Load("lua/Weapons/Alien/Ability.lua")
 Script.Load("lua/Weapons/Alien/LerkBite.lua")

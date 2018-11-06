@@ -8,23 +8,23 @@ Shine.Hook.SetupClassHook( "AvocaSpectator", "ChangeView", "OnChangeView", "Post
 Plugin.Version = "1.0"
 
 local function AutoSpectate(self)
- --local count = 0
- --Yes yes i know 
+ //local count = 0
+ //Yes yes i know 
     Print("ummmm")
               
-   -- Print("AutoSpectate 1")
-    --Shine.Timer.Create( "AutoSpectate", 8, -1, function() 
+   // Print("AutoSpectate 1")
+    //Shine.Timer.Create( "AutoSpectate", 8, -1, function() 
                    for index, player in ientitylist(Shared.GetEntitiesWithClassname("AvocaSpectator")) do
                                player:doTimer()
                                rint("really")
-                --     count = count + 1
+                //     count = count + 1
               end 
-     -- Print("AutoSpectate 2")
-   --   if count == 0 then 
-   ----  Shine.Timer.Destroy("AutoSpectate") 
-       -- Print("AutoSpectate 3")
-    --  end 
-  --  end )
+     // Print("AutoSpectate 2")
+   //   if count == 0 then 
+   ////  Shine.Timer.Destroy("AutoSpectate") 
+       // Print("AutoSpectate 3")
+    //  end 
+  //  end )
     
 end
 
@@ -71,10 +71,10 @@ local neutralavgorigin = Vector(0, 0, 0)
              --v1.23 added check to make sure room isnt empty
          neutralavgorigin =  team1avgorigin + team2avgorigin
          neutralavgorigin =  neutralavgorigin / (marines+aliens) --better as a table i know
-     --    Print("neutralavgorigin is %s", neutralavgorigin)
+     //    Print("neutralavgorigin is %s", neutralavgorigin)
      local nearest = GetNearestMixin(neutralavgorigin, "Combat", nil, function(ent)  return ent:isa("Player") and ent:GetIsInCombat() end)
     if nearest then
-   -- Print("nearest is %s", nearest.name)
+   // Print("nearest is %s", nearest.name)
         return nearest
     end
 
@@ -246,7 +246,7 @@ local function overHeadandNear(self, client, vip)
              local angles = Angles(GetPitchFromVector(dir), GetYawFromVector(dir), 0)
              client:SetOffsetAngles(angles)
              client:SetLockOnTarget(vip:GetId())
-             --Sixteenth notes within eigth notes which is the other untilNext
+             //Sixteenth notes within eigth notes which is the other untilNext
              
              self:NotifyGeneric( client, "VIP is %s, location is %s", true, vip:GetClassName(), GetLocationName(client) )
 end
@@ -290,14 +290,14 @@ end
         end
        
         if vip ~= nil then 
-            --  local roll = math.random(1,2)
-            -- if roll == 1 then
+            //  local roll = math.random(1,2)
+            // if roll == 1 then
               overHeadandNear(self, client, vip)
-            -- elseif roll == 2 then
-            --  firstPersonScoreBased(self, client)
-            --  end
-      ----  else
-      --  firstPersonScoreBased(self, client)
+            // elseif roll == 2 then
+            //  firstPersonScoreBased(self, client)
+            //  end
+      ////  else
+      //  firstPersonScoreBased(self, client)
        end
   
          Shine.ScreenText.Add( 50, {X = 0.20, Y = 0.75,Text = "[Director] untilNext: %s",Duration = betweenLast or 0,R = 255, G = 0, B = 0,Alignment = 0,Size = 1,FadeIn = 0,}, client )  

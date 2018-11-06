@@ -1,4 +1,4 @@
---SiegeMod Kyle abent 2015
+//SiegeMod Kyle abent 2015
 GlowMixin = CreateMixin( GlowMixin )
 GlowMixin.type = "Glow"
 
@@ -118,7 +118,7 @@ local function UpdateClientGlowEffects(self)
 
     assert(Client)
     
-    if self:GetIsGlowing() and self:GetIsAlive() then --and not (not self:GetHasRespawnProtection() and self:GetIsNanoShielded() ) then
+    if self:GetIsGlowing() and self:GetIsAlive() then //and not (not self:GetHasRespawnProtection() and self:GetIsNanoShielded() ) then
         self:_CreateGlow()
     else
         self:_RemoveGlow() 
